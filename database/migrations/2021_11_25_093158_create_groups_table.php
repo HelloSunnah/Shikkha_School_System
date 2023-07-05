@@ -21,6 +21,8 @@ class CreateGroupsTable extends Migration
             $table->foreignId('class_id')->constrained('institute_classes')->cascadeOnDelete();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -32,5 +34,7 @@ class CreateGroupsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('groups');
+        $table->dropSoftDeletes();
+
     }
 }

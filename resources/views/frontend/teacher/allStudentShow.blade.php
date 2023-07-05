@@ -17,7 +17,7 @@
                             <a href="{{route('allAttendance.show.all.teacher',['class_id'=>$s->class_id,'section_id'=>$s->section_id,'group_id'=>is_null($s->group_id) ? 0 :$s->group_id])}}"><div class="card radius-10 mb-0 shadow-none bg-light-purple">
                                     <div class="card-body p-4">
                                         <div class="text-center">
-                                            <h5 class="mb-0 text-purple">{{getSubjectNameAll($s->subject_id)->subject_name}}</h5>
+                                            <h5 class="mb-0 text-purple">{{getSubjectNameAll($s->subject_id)?->subject_name}}</h5>
                                             <p class="mb-0 text-purple">{{ getClassnameUser($s->class_id)->class_name }} , {{getSectionnameUser($s->section_id)->section_name }}  , {{ !isset($s->group_id) ? '' : getGroupnameUser($s->group_id)->group_name ?? '' }}
                                             </p>
                                         </div>
@@ -32,7 +32,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="">
                                         <p class="mb-1 text-white">{{ getClassnameUser($s->class_id)->class_name }}</p>
-                                        <h4 class="mb-0 text-white">{{getSubjectNameAll($s->subject_id)->subject_name}}</h4>
+                                        <h4 class="mb-0 text-white">{{getSubjectNameAll($s->subject_id)?->subject_name}}</h4>
                                     </div>
                                     <div class="ms-auto fs-2 text-white">
                                         <i class="fadeIn animated bx bx-group"></i>
@@ -93,12 +93,12 @@
                         @endif
                     @elseif(Request::segment(2) == 'assignment')
                         <div class="col">
-                            <div class="card radius-10 {{cardColorChange($key)}}">
+                            <div class="card radius-10 {{cardColorChange($s)}}">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
                                         <div class="">
-                                            <p class="mb-1 text-white">{{ getClassnameUser($s2[0]->class_id)->class_name }}</p>
-                                            <h4 class="mb-0 text-white">{{getSubjectNameAll($s2[0]->subject_id)->subject_name}}</h4>
+                                            <p class="mb-1 text-white">{{ getClassnameUser($s2[0]->class_id)?->class_name }}</p>
+                                            <h4 class="mb-0 text-white">{{getSubjectNameAll($s2[0]->subject_id)}}</h4>
                                         </div>
                                         <div class="ms-auto fs-2 text-white">
                                             <i class="fadeIn animated bx bx-group"></i>
@@ -115,19 +115,19 @@
                         </div>
                     @else
                     <div class="col">
-                                <div class="card radius-10 {{cardColorChange($key)}}">
+                                <div class="card radius-10 {{cardColorChange($s)}}">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center">
                                             <div class="">
-                                                <p class="mb-1 text-white">{{ getClassnameUser($s2[0]->class_id)->class_name }}</p>
-                                                <h4 class="mb-0 text-white">{{getSubjectNameAll($s2[0]->subject_id)->subject_name}}</h4>
+                                                <p class="mb-1 text-white">{{ getClassnameUser($s2[0]->class_id)?->class_name }}</p>
+                                                <h4 class="mb-0 text-white">{{getSubjectNameAll($s2[0]->subject_id)}}</h4>
                                             </div>
                                             <div class="ms-auto fs-2 text-white">
                                                 <i class="fadeIn animated bx bx-group"></i>
                                             </div>
                                         </div>
                                         <hr class="my-2 border-top border-light">
-                                        <small class="mb-0 text-white"><i class="fadeIn animated bx bx-intersect"></i> <span>{{getSectionnameUser($s2[0]->section_id)->section_name }}</span></small>
+                                        <small class="mb-0 text-white"><i class="fadeIn animated bx bx-intersect"></i> <span>{{getSectionnameUser($s2[0]->section_id)?->section_name }}</span></small>
                                         <hr class="my-2 border-top border-light">
                                         <small class="mb-0 text-white"><i class="fadeIn animated bx bx-detail"></i> <span>{{ (!isset($s->group_id)) ? 'No Group' : getGroupnameUser($s2[0]->group_id)->group_name ?? '' }}</span></small>
                                         <hr class="my-2 border-top border-light">

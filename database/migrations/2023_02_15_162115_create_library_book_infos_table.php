@@ -22,6 +22,7 @@ class CreateLibraryBookInfosTable extends Migration
             $table->string('image');
             $table->integer('quantity');
             $table->integer('available');
+            $table->softDeletes();
 
             $table->timestamps();
         });
@@ -35,5 +36,7 @@ class CreateLibraryBookInfosTable extends Migration
     public function down()
     {
         Schema::dropIfExists('library_book_infos');
+        $table->dropSoftDeletes();
+
     }
 }

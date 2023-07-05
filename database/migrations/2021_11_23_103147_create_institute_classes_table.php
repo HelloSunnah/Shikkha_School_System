@@ -20,6 +20,7 @@ class CreateInstituteClassesTable extends Migration
             $table->string('class_fees')->nullable();
             $table->string('active')->nullable();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -32,5 +33,7 @@ class CreateInstituteClassesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('institute_classes');
+        $table->dropSoftDeletes();
+
     }
 }

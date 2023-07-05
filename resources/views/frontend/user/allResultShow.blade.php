@@ -28,7 +28,7 @@
                     @foreach($dataResult as $key => $data)
                         <tr>
                             <td>{{$key++ +1}}</td>
-                            <td>{{getSubjectNameAll($data->subject_id)->subject_name ?? ''}}</td>
+                            <td>{{getSubjectNameAll($data->subject_id)?->subject_name ?? ''}}</td>
                             <td>{{$data->written}}</td>
                             <td>{{$data->mcq}}</td>
                             <td>{{$data->practical}}</td>

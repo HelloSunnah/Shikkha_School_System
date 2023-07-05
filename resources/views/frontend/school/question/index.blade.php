@@ -24,7 +24,7 @@
                             <form  id="form_data">
                                 {{-- @csrf --}}
                                 <!-- Modal -->
-                                <div class="modal fade mymodal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                <div class="modal fade mymodal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" >
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             
@@ -42,13 +42,13 @@
                                                     <div class="col">
                                                         <div class="btn  card h-100 ">
                                                             <i class="fa fa-question-circle fa-xl mt-3 mb-1" aria-hidden="true"></i>
-                                                            <input style="padding: 26px" class="btn btn-outline-info mt-3 question_type1"  type="button" name="question_type1" value="Written">
+                                                            <input style="padding: 26px" class="btn btn-primary mt-3 question_type1"  type="button" name="question_type1" value="Written">
                                                         </div>
                                                     </div>
                                                     <div class="col">
                                                         <div class="btn card h-100">
                                                             <i class="fa fa-question-circle fa-xl mt-3 mb-1" aria-hidden="true"></i>
-                                                            <input style="padding: 26px" class="btn  btn-outline-secondary mt-3 question_type2" type="button" name="question_type2" value="Creative">
+                                                            <input style="padding: 26px" class="btn  btn-outline-info mt-3 question_type2" type="button" name="question_type2" value="Creative">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -62,9 +62,9 @@
                                 <div class="col-md-12 d-none" id="selectOption">
                                     <div class="row">
                                         <div>
-                                            <div class="row">
+                                            <div class="row mt-2">
                                                 <div class="col-md-3">
-                                                    <label>Exam Term</label>
+                                                    <label class="select-form">Exam Term</label>
                                                     <select class="form-control mb-3 js-select"aria-label="Default select example" name="exam_term" id="term_id" required>
                                                         <option selected="" value="">--Select Term--</option>
                                                         @foreach($terms as $term)
@@ -74,7 +74,7 @@
                                                 </div>
                                                 
                                                 <div class="col-md-2">
-                                                    <label>{{__('app.class')}}</label>
+                                                    <label class="select-form">{{__('app.class')}}</label>
                                                     <select class="form-control mb-3 js-select" aria-label="Default select example" name="class_name"  id="class_id"  required>
                                                         <option selected value="">--Select Class Name--</option>
                                                         @foreach($classes as $class)
@@ -83,14 +83,14 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label>Subject</label>
+                                                    <label class="select-form">Subject</label>
                                                     <select class="form-control mb-3 js-select" aria-label="Default select example" name="subject_name" id="subject_id" required>
                                                         <option selected value="">--Select Subject--</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-2">
-                                                    <label class="text-center">Hours/Min</label>
+                                                    <label class="text-center form-label">Hours/Min</label>
                                                     <div class="">
                                                         <div class="">
                                                             <input type="number" min="1" name="hours" value="{{ old('hours') }}" placeholder="Hours or Minutes" class="form-control" id="" required>
@@ -98,7 +98,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="text-center">Total Marks</label>
+                                                    <label class="text-center form-label">Total Marks</label>
                                                     <div class="">
                                                         <div class="">
                                                             <input type="number" min="1" name="total_mark" value="{{ old("total_mark") }}" placeholder="Total Mark" class="form-control" id="" required>
@@ -115,17 +115,17 @@
                                         {{-- written question --}}
                                         <div id="apeandField">
                                             <div class="row">
-                                                <div class="col-md-8">
-                                                    <label for="">Question Title</label>
+                                                <div class="col-md-8 mt-4">
+                                                    <label class="form-label">Question Title</label>
                                                     <input name="question_title[1]" value="{{ old('question_title[1]') }}" class="form-control" type="text" >
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <label for="">Mark</label>
+                                                <div class="col-md-3 mt-4">
+                                                    <label class="form-label">Mark</label>
                                                     <input name="question_mark[1]" value="{{ old('question_mark[1]') }}" class="form-control" type="number" >
                                                 </div>
 
                                                 <div class="col-md-1" >
-                                                    <button type="button" class="btn btn-danger remove" style="margin-top: 22px; margin-left: 27px;">-</button>
+                                                    <button type="button" class="btn btn-danger btn-sm remove" style="margin-top: 22px; margin-left: 27px;">-</button>
                                                 </div>
 
                                                 <div class="col-md-12 mt-3">
@@ -134,17 +134,17 @@
                                             </div>
 
                                             <div class="row mt-3">
-                                                <div class="col-md-8">
-                                                    <label for="">Question Title</label>
+                                                <div class="col-md-8 mt-4">
+                                                    <label class="form-label">Question Title</label>
                                                     <input name="question_title[2]" value=" {{  old('question_title[1]')  }}" class="form-control" type="text">
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <label for="">Mark</label>
+                                                <div class="col-md-3 mt-4">
+                                                    <label class="form-label">Mark</label>
                                                     <input name="question_mark[2]" value=" {{ old('question_mark[1]') }}" class="form-control" type="number">
                                                 </div>
 
                                                 <div class="col-md-1" >
-                                                    <button type="button" class="btn btn-danger remove" style="margin-top: 22px; margin-left: 27px;">-</button>
+                                                    <button type="button" class="btn btn-danger btn-sm remove" style="margin-top: 22px; margin-left: 27px;">-</button>
                                                 </div>
 
                                                 <div class="col-md-12 mt-3">
@@ -154,7 +154,7 @@
 
                                         </div>
                                         <div class=" d-flex justify-content-between mt-3">
-                                            <button class="btn btn-success d-block " data-count="2" id="plusbtn">+</button>
+                                            <button class="btn btn-info btn-sm d-block " data-count="2" id="plusbtn">+</button>
                                             <button type="button" onclick="questionStore();" class="btn btn-primary d-block">Save</button>
                                         </div>
                                     </div>
@@ -169,25 +169,25 @@
                                                     <textarea name="mcqQuestions[1]" id="ckeditor2" ></textarea>
                                                 </div>
                                                 <div class="col-md-1" >
-                                                    <button type="button" class="btn btn-danger mcqRemove" style="margin-top: 16px; margin-left: 27px;">-</button>
+                                                    <button type="button" class="btn btn-danger  btn-sm mcqRemove" style="margin-top: 16px; margin-left: 27px;">-</button>
                                                 </div>
                                                 <div class="col-md-6 mt-3">
-                                                    <label for="">A</label>
+                                                    <label class="form-label">A</label>
                                                     <input name="mcqQuestion_no[1][1]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-6 mt-3">
-                                                    <label for="">B</label>
+                                                    <label class="form-label">B</label>
                                                     <input name="mcqQuestion_no[1][2]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-6 mt-3">
-                                                    <label for="">C</label>
+                                                    <label class="form-label">C</label>
                                                     <input name="mcqQuestion_no[1][3]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-6 mt-3">
-                                                    <label for="">D</label>
+                                                    <label class="form-label">D</label>
                                                     <input name="mcqQuestion_no[1][4]" class="form-control" type="text">
                                                 </div>
                                             </div>
@@ -198,25 +198,25 @@
                                                     <textarea name="mcqQuestions[2]" id="ckeditor3" ></textarea>
                                                 </div>
                                                 <div class="col-md-1" >
-                                                    <button type="button" class="btn btn-danger mcqRemove" style="margin-top: 16px; margin-left: 27px;">-</button>
+                                                    <button type="button" class="btn btn-danger btn-sm mcqRemove" style="margin-top: 16px; margin-left: 27px;">-</button>
                                                 </div>
                                                 <div class="col-md-6 mt-3">
-                                                    <label for="">A</label>
+                                                    <label class="form-label">A</label>
                                                     <input name="mcqQuestion_no[2][1]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-6 mt-3">
-                                                    <label for="">B</label>
+                                                    <label class="form-label">B</label>
                                                     <input name="mcqQuestion_no[2][2]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-6 mt-3">
-                                                    <label for="">C</label>
+                                                    <label class="form-label">C</label>
                                                     <input name="mcqQuestion_no[2][3]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-6 mt-3">
-                                                    <label for="">D</label>
+                                                    <label class="form-label">D</label>
                                                     <input name="mcqQuestion_no[2][4]" class="form-control" type="text">
                                                 </div>
                                                 
@@ -225,7 +225,7 @@
                                         </div>
 
                                         <div class=" d-flex justify-content-between mt-3">
-                                            <button class="btn btn-success d-block " mcq-ckeditor="3" data-count="2" id="mcqplusbtn">+</button>
+                                            <button class="btn btn-info btn-sm d-block " mcq-ckeditor="3" data-count="2" id="mcqplusbtn">+</button>
                                             <button type="button" onclick="questionStore();" class="btn btn-primary d-block">Save</button>
                                         </div>
                                     </div>
@@ -242,51 +242,51 @@
                                                 </div>
 
                                                 <div class="col-md-8 mt-3">
-                                                    <label for="">A</label>
+                                                    <label class="form-label">A</label>
                                                     <input name="creQuestion_no[1][1]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-3 mt-3">
-                                                    <label for="">Mark</label>
+                                                    <label class="form-label">Mark</label>
                                                     <input name="creQuestion_mark[1][1]" class="form-control" type="number" min="1">
                                                 </div>
                                                 <div class="col-md-8 mt-3">
-                                                    <label for="">B</label>
+                                                    <label class="form-label">B</label>
                                                     <input name="creQuestion_no[1][2]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-3 mt-3">
-                                                    <label for="">Mark</label>
+                                                    <label class="form-label">Mark</label>
                                                     <input name="creQuestion_mark[1][2]" class="form-control" type="number" min="1">
                                                 </div>
                                                 <div class="col-md-8 mt-3">
-                                                    <label for="">C</label>
+                                                    <label class="form-label">C</label>
                                                     <input name="creQuestion_no[1][3]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-3 mt-3">
-                                                    <label for="">Mark</label>
+                                                    <label class="form-label">Mark</label>
                                                     <input name="creQuestion_mark[1][3]" class="form-control" type="number" min="1">
                                                 </div>
                                                 <div class="col-md-8 mt-3">
-                                                    <label for="">D</label>
+                                                    <label class="form-label">D</label>
                                                     <input name="creQuestion_no[1][4]" class="form-control" type="text">
                                                 </div>
 
                                                 <div class="col-md-3 mt-3">
-                                                    <label for="">Mark</label>
+                                                    <label class="form-label">Mark</label>
                                                     <input name="creQuestion_mark[1][4]" class="form-control" type="number" min="1">
                                                 </div>
 
                                                 <div class="col-md-1" >
-                                                    <button type="button" class="btn btn-danger creRemove" style="margin-top: 40px; margin-left: 27px;">-</button>
+                                                    <button type="button" class="btn btn-danger btn-sm creRemove" style="margin-top: 40px; margin-left: 27px;">-</button>
                                                 </div>
                                             </div>
 
                                         </div>
 
                                         <div class=" d-flex justify-content-between mt-3">
-                                            <button class="btn btn-success d-block " cre-ckeditor="4" data-count="1" id="creplusbtn">+</button>
+                                            <button class="btn btn-info btn-sm d-block " cre-ckeditor="4" data-count="1" id="creplusbtn">+</button>
                                             <button type="button" onclick="questionStore();" class="btn btn-primary d-block">Save</button>
                                         </div>
                                     </div>
@@ -375,7 +375,7 @@
                     type: "GET",
                     url: "{{ url('/school/student/get/subjet/') }}/" + class_id,
                     datatype: "json",
-                    success: function(data) {
+                    info: function(data) {
                         $("#subject_id").empty();
                         $.each(data, function (key, value) { 
                              $("#subject_id").append('<option value="'+value.id+'"> '+value.subject_name+' </option>');                  
@@ -402,7 +402,7 @@
                         </div>
 
                         <div class="col-md-1" >
-                            <button type="button" class="btn btn-danger remove" style="margin-top: 37px; margin-left: 27px;">-</button>
+                            <button type="button" class="btn btn-danger btn-sm remove" style="margin-top: 37px; margin-left: 27px;">-</button>
                         </div>
 
                         <div class="col-md-12 mt-3">
@@ -432,7 +432,7 @@
                             <textarea name="mcqQuestions[${val}]" id="ckeditor${mcqVal}" ></textarea>
                         </div>
                         <div class="col-md-1" >
-                            <button type="button" class="btn btn-danger mcqRemove" style="margin-top: 16px; margin-left: 27px;">-</button>
+                            <button type="button" class="btn btn-danger btn-sm mcqRemove" style="margin-top: 16px; margin-left: 27px;">-</button>
                         </div>
                         <div class="col-md-6 mt-3">
                             <label for="">A</label>
@@ -518,7 +518,7 @@
                             </div>
 
                             <div class="col-md-1" >
-                                <button type="button" class="btn btn-danger creRemove" style="margin-top: 40px; margin-left: 27px;">-</button>
+                                <button type="button" class="btn btn-danger btn-sm creRemove" style="margin-top: 40px; margin-left: 27px;">-</button>
                             </div>
                         </div>
 
@@ -572,7 +572,7 @@
                 beforeSend: function () {
                     $("#error").empty();
                 },
-                success: function (data) {
+                info: function (data) {
                     if (data.status == "fail") {
                         $.each(data.error, function(key, value) {
                             $("#error").append(` <ul> <li class="text-danger">${value}</li></ul> `);
@@ -607,7 +607,7 @@
                 beforeSend: function () {
                     $("#error").empty();
                 },
-                success: function (data) {
+                info: function (data) {
 
                     if (data.status == "fail") {
                         $.each(data.error, function(key, value) {
@@ -620,7 +620,7 @@
                             timer: 5000
                             });
                         })
-                    } else if(data.status == 'success') {
+                    } else if(data.status == 'info') {
 
                         window.location.replace("{{ route('show.question') }}");
                         

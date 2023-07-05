@@ -1,59 +1,68 @@
 @extends('layouts.school.master')
 
 @section('content')
-    <!--start content-->
-    <main class="page-content">
-        
+<!--start content-->
+<style>
+    .Row {
+        display: table;
+        width: 100%;
+        /*Optional*/
+        table-layout: fixed;
+        /*Optional*/
+        border-spacing: 10px;
+        /*Optional*/
+    }
 
-        <div class="col-xl-12 mx-auto">
-            <!-- nav-tab -->
-            <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#5c84f6">
-            <div class="card">
-                <div class="card-header">
-                    <center><h3 class="mt-2 mb-2">Student Fees  </h3></center>
-                    <ul class="nav nav-tabs card-header-tabs" data-bs-tabs="tabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="true" data-bs-toggle="tab"
-                                href="#Profile">Fees</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#Fees">Fees List</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card-body tab-content">
-                    <div class="tab-pane active" id="Profile">
+    .Column {
+        display: table-cell;
+        background-color: white;
+        /*Optional*/
+    }
+</style>
+<main class="page-content">
 
-                        <table class="table table-bordered table-hover w-100">
-                            <tbody>
-                               <tr>
-                                <td width="25%">Student Name</td>
-                                <td>{{$data['student']->name}}</td>
-                                <td rowspan="5" class="text-center" width="25%">
+
+    <div class="col-xl-12 mx-auto">
+        <!-- nav-tab -->
+        <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#5c84f6">
+        <div class="card">
+            <div class="card-header">
+                <center>
+                    <h3 class="mt-2 mb-2">Student Fees </h3>
+                </center>
+                <ul class="nav nav-tabs card-header-tabs" data-bs-tabs="tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="true" data-bs-toggle="tab" href="#Profile">Fees</a>
+                    </li>
+
+                </ul>
+            </div>
+            <div class="card-body tab-content">
+                <div class="tab-pane active" id="Profile">
+
+                    <table class="table table-bordered w-100">
+                        <tbody>
+                            <tr>
+                                <td rowspan="7" class="text-center" width="20%">
                                     @if(File::exists(public_path($data['student']->image)))
-                                    <img src="{{asset($data['student']->image)}}" alt="{{$data['student']->name}}" width="200" height="200">
+                                    <img src="{{asset($data['student']->image)}}" alt="{{$data['student']->name}}" width="150" height="150">
                                     @else
-                                    <img src="{{asset('d/no-img.jpg')}}" alt="{{$data['student']->name}}" width="200" height="200">
+                                    <img src="{{asset('d/no-img.jpg')}}" alt="{{$data['student']->name}}" width="150" height="150">
                                     @endif
                                 </td>
-                               </tr>
-                               <tr>
-                                <td>Father Name</td>
-                                <td>{{$data['student']->father_name}}</td>
-                               </tr>
+                                <th width="25%">Student Name</th>
+                                <td>{{$data['student']->name}}</td>
+                                <th>Roll</th>
+                                <td>{{$data['student']->roll_number}}</td>
 
-                               <tr>
-                                <td>Mother Name</td>
-                                <td>{{$data['student']->mother_name}}</td>
-                               </tr>
-
-                               <tr>
-                                <td>Phone</td>
-                                <td>{{$data['student']->phone}}</td>
-                               </tr>
-
-                               <tr>
-                                <td>Shift</td>
+                            <tr>
+                                <th>{{__('app.class')}}</th>
+                                <td>{{$data['student']->class?->class_name}}</td>
+                                <th>{{__('app.section')}}</th>
+                                <td>{{$data['student']->section?->section_name}}</td>
+                            </tr>
+                            <tr>
+                                <th>Shift</th>
                                 <td>
                                     @if ($data['student']->shift == 1)
                                     <span class="badge bg-success px-2">{{strtoupper("Morning")}}</span>
@@ -63,306 +72,199 @@
                                     <span class="badge bg-success px-2">{{strtoupper("Evening")}}</span>
                                     @endif
                                 </td>
-                               </tr>
-
-                               <tr>
-                                <td>{{__('app.class')}}</td>
-                                <td>{{$data['student']->class?->class_name}}</td>
-                               </tr>
-
-                               <tr>
-                                <td>{{__('app.section')}}</td>
-                                <td>{{$data['student']->section?->section_name}}</td>
-                               </tr>
-
-                               <tr>
-                                <td>Roll</td>
-                                <td>{{$data['student']->roll_number}}</td>
-                               </tr>
-
-                               <tr>
-                                <td>SID</td>
+                                <th>SID</th>
                                 <td>{{$data['student']->unique_id}}</td>
-                               </tr>
-
-                                <form action="{{route('student.school.scholarship',$data['student']->id)}}" method="post">
-                                    @method('put')
-                                    @csrf
-                                    <tr>
-                                        <td>scholarship</td>
-
-                                        <td class="row">
-                                            <div class="col-2">
-                                                @if ($data['student']->scholarship == 1)
-                                                <span class="badge bg-secondary">Normal</span>
-                                                @elseif($data['student']->scholarship == 2)
-                                                <span class="badge bg-primary text-light">Half Free</span>
-                                                @elseif($data['student']->scholarship == 0)
-                                                <span class="badge bg-success text-light">Full Free</span>
-                                                @endif
-                                            </div>
-                                            <div class="col-6">
-                                                <select  class="form-control mb-3 js-select" name="scholarship" class="form-select">
-                                                    <option value="">Select One</option>
-                                                    <option value="1" {{($data['student']->scholarship == 1) ? 'selected' : ''}}>Normal</option>
-                                                    <option value="2" {{($data['student']->scholarship == 2) ? 'selected' : ''}}>Half Free</option>
-                                                    <option value="0" {{($data['student']->scholarship == 0) ? 'selected' : ''}}>Full Free</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-2">
-                                                <button class="btn btn-primary" type="submit" style="border-radius:7px;">Update</button>
-                                            </div>
-                                            
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </form>
-
-                                {{-- <tr>
-                                    <td>Scholarship</td>
-                                    <td class="col-2">
-                                        @if ($data['student']->scholarship == 1)
-                                        <span class="badge bg-warning">Normal</span>
-                                        @elseif($data['student']->scholarship == 2)
-                                        <span class="badge bg-success text-light">Half Free</span>
-                                        @elseif($data['student']->scholarship == 0)
-                                        <span class="badge bg-success text-light">Full Free</span>
-                                        @endif
-                                    </td>
-                                    <td class="col-2">
-
-                                        <div class="d-inline-block dropdown">
-                                            <button type="button" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="false" class="dropdown-toggle btn btn-sm btn-info text-nowrap" id="dropdownId">
-                                                Change Scholarship
-                                            </button>
-                                            <div tabindex="-1" role="menu" aria-hidden="true"
-                                                class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownId">
-                                                <ul class="nav flex-column">
-                                                    @if ($data['student']->scholarship != 1)
-                                                        <li class="nav-item">
-                                                            <a class="nav-link" href="javascript::"
-                                                                onclick="if(confirm('Are you sure? you are changing the status of this record')){ location.replace('{{route('scholarship.status', [$data['student']->id, 1])}}'); }">
-                                                                <i class="nav-link-icon fa fa-handshake"></i>
-                                                                <span>Normal</span>
-                                                            </a>
-                                                        </li>
-                                                    @endif
-
-                                                    @if ($data['student']->scholarship != 2)
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="javascript::"
-                                                            onclick="if(confirm('Are you sure? you are changing the status of this record')){ location.replace('{{route('scholarship.status', [$data['student']->id, 2])}}'); }">
-                                                            <i class="nav-link-icon fa fa-handshake"></i>
-                                                            <span>Half Free</span>
-                                                        </a>
-                                                    </li>
-                                                    @endif
-
-                                                    @if ($data['student']->scholarship != 0)
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="javascript::"
-                                                            onclick="if(confirm('Are you sure? you are changing the status of this record')){ location.replace('{{route('scholarship.status', [$data['student']->id, 0])}}'); }">
-                                                            <i class="nav-link-icon fa fa-ban"></i>
-                                                            <span>Full Free</span>
-                                                        </a>
-                                                    </li>
-                                                    @endif
-
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr> --}}
-
-
-                                <tr>
-                                    <td>Select Month</td>
-                                    <td class="row">
-                                        <form action="{{route('school.finance.history')}}" method="post" id="getPaymentFeeForm">
-                                            @csrf
-                                            <input type="hidden" name="studentId" value="{{$data['student']->id}}">
-                                            <select  class="form-control js-select" name="month[]" class="form-select" multiple>
-                                                <option value="">Select One</option>
-                                                @foreach ($data['months'] as $key => $month)
-                                                    <option value="{{$key}}" @isset(request()->month) {{(request()->month == $key) ? 'selected' : ''}}  @endisset>{{$month}}</option>
-                                                @endforeach
-                                            </select>
-                                            <button type="submit" class="btn-sm btn-primary">Get</button>
-                                        </form>
-                                    </td>
-                                </tr>
-
-                               @if ($data['month'] !== "n")
-                                <tr>
-                                <td colspan="3" class="text-center">
-                                    <h4 class="m-0">Fees Of {{date("F", mktime(0, 0, 0, $data['month']+1, 10))}}</h4>
-                                </td>
-                               </tr>
-
-                               <tr>
-                                
-                                <table class="table table-bordered w-50 mx-auto">
-                                    @if(isset($data['assignFees']['fees_details']))
-                                    <tbody>
-                                        <tr>
-                                            <td width="70%">Monthly Fee</td>
-                                            @if($data['student']->scholarship == 2) {{-- Half Payment --}}
-                                                <td class="text-end">৳ {{$monthlyFee /2}}</td>
-                                            @elseif ($data['student']->scholarship == 1) {{-- Full Payment --}}
-                                                <td class="text-end">৳ {{$monthlyFee }}</td>
-                                            @else 
-                                                <td class="text-end">৳ 0</td> {{-- Full Schoolarship --}}
-                                            @endif
-                                        </tr>
-                                        @php
-                                            $sum = 0;                 
-                                        @endphp
-                                        
-                                        @if(is_array($data['assignFees']['fees_details']))
-                                            @foreach ($data['assignFees']['fees_details'] as $key => $item)
-                                                <tr>
-                                                    <td width="70%">{{Str::title($key)}}</td>
-                                                    <td class="text-end">৳ {{$item}}</td>
-                                                </tr>
-
-                                                @php
-                                                    $sum += $item;
-                                                    
-                                                @endphp
-                                                
-                                            @endforeach
-                                        @else
-                                            @foreach (json_decode($data['assignFees']['fees_details']) as $key => $item)
-                                                <tr>
-                                                    <td width="70%">{{Str::title($key)}}</td>
-                                                    <td class="text-end">৳ {{$item}}</td>
-                                                </tr>
-                                                @php
-                                                    $sum += $item;                                                    
-                                                @endphp
-                                            @endforeach
-                                        @endif
-                                        <tr class="text-end">
-                                            <td>In Total: </td>
-                                            @if($data['student']->scholarship == 2)
-                                                <td>৳ {{$sum + ($monthlyFee /2)}}</td>
-                                            @elseif ($data['student']->scholarship == 1)
-                                                <td>৳ {{$sum + $monthlyFee }}</td>
-                                            @else 
-                                            <td>৳ {{$sum}}</td>
-                                            @endif
-                                        </tr>
-                                        <tr class="text-end">
-                                            <td>Status</td>
-                                            <td>
-                                                @if($data['studentFees']->status == 2)
-                                                <span class="badge bg-success">PAID</span>
-                                                @elseif($data['studentFees']->status == 0)
-                                                <span class="badge bg-danger">DUE</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td></td>
-                                            <td class="text-end">
-                                                {{-- @if($data['studentFees']->status == 0) --}}
-                                                <form action="{{url('/school/finance/payment/receive')}}" method="post" id="paymentRecivedForm">
-                                                    @csrf
-                                                    <input type="hidden" name="studentId" value="{{$data['student']->id}}">
-                                                    <input type="hidden" name="monthId" value="{{$data['month']}}">
-                                                    <input type="hidden" name="amount" value="{{$data['studentFees']->amount}}">
-                                                    <input type="hidden" name="assignFeesId" value="{{$data['assignFees']->id}}">
-
-                                                    <button class="btn-sm btn-primary" id="receivebtn">Received</button>
-                                                </form>
-                                                {{-- @endif --}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    @else
-                                    <tbody>
-                                        <tr class="text-center">
-                                            <td>No Fees Assigned</td>
-                                        </tr>
-                                    </tbody>
-                                    @endif
-                                </table>
-                               </tr>
-                               @endif
-                            </tbody>
-                        </table>
-
-
-                    </div>
-                    <!-- Fees -->
-                    <div class="tab-pane " id="Fees">
-
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                @foreach ($studentMonthlyFees as $studentMonthlyFee)
-                                    <tr >
-                                        <td>{{ $studentMonthlyFee->month_name }}</td>
-                                        <td>{{ $studentMonthlyFee->amount }} <svg style="width: 10px;"
-                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-                                                <path
-                                                    d="M36 32.2C18.4 30.1 2.4 42.5 .2 60S10.5 93.6 28 95.8l7.9 1c16 2 28 15.6 28 31.8V160H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H64V384c0 53 43 96 96 96h32c106 0 192-86 192-192V256c0-53-43-96-96-96H272c-17.7 0-32 14.3-32 32s14.3 32 32 32h16c17.7 0 32 14.3 32 32v32c0 70.7-57.3 128-128 128H160c-17.7 0-32-14.3-32-32V224h32c17.7 0 32-14.3 32-32s-14.3-32-32-32H128V128.5c0-48.4-36.1-89.3-84.1-95.3l-7.9-1z" />
-                                            </svg></td>
-                                        @if ($studentMonthlyFee->status == 2)
-                                            <td><button class="btn btn-success"> Paid </button></td>
-                                        @else
-                                            <td><button class="btn btn-danger">Due</button></td>
-                                        @endif
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-
-
-                    </div>
-                   
+                            </tr>
+                            <tr>
+                                <th>Father Name</th>
+                                <td>{{$data['student']->father_name}}</td>
+                                <th>Mother Name</th>
+                                <td>{{$data['student']->mother_name}}</td>
+                            </tr>
+                            <tr>
+                                <th>Phone</th>
+                                <td>{{$data['student']->phone}}</td>
+                                <th></th>
+                                <td></td>
+                            </tr>
                     
+                        </tbody>
+                    </table>
+
 
                 </div>
-            </div>
+                <!-- Fees -->
 
+
+
+
+            </div>
         </div>
-    </main>
-    <div class="hidden-reciet" style="display:none">
-        <div id="payment-reciept"></div>
+
     </div>
-    @endsection
-    
+
+    <div class="col-xl-12 mx-auto">
+        <!-- nav-tab -->
+        <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#5c84f6">
+        <div class="card">
+            <div class="card-header">
+
+                <table class="table">
+
+                    <tbody>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                                <th>Paid</th>
+                                <th>Due</th>
+                                <th>Action</th>
+
+                            </tr>
+                        </thead>
+                        @foreach($data['months'] as $key=>$da)
+                        <tr>
+                            <td>{{$da}}</td>
+                            <td>
+                                {!!getStatus(Auth::id(),$data['student']->id,$key)!!}
+                            </td>
+                            <td>
+                                {{getFees(Auth::id(),$data['student']->id,$key)+$data['monthlyFee']-$discountCount}}
+                            </td>
+                            <td> {{getPaid(Auth::id(),$data['student']->id,$key)}}
+                            </td>
+
+                            <td>
+                                {{(getFees(Auth::id(),$data['student']->id,$key)+$data['monthlyFee']-$discountCount)-(getPaid(Auth::id(),$data['student']->id,$key))}}
+
+                            </td>
+
+                            <td><a href="" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{$key}}"><i class="bi bi-border-outer"></i></a>
+                            </td>
+                            <div class="modal fade" id="exampleModal{{$key}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{{route('student.payment.post')}}" method="post">
+                                                @method('put')
+                                                @csrf
+                                                <input type="hidden" name="month_name" value="{{$da}}">
+                                                <input type="hidden" name="student_id" value="{{$data['student']->id}}">
+
+                                                @if($da== 'January')<input type="hidden" name="month_id" value="0">
+                                                @elseif($da== 'February') <input type="hidden" name="month_id" value="1">
+                                                @elseif($da== 'March') <input type="hidden" name="month_id" value="2">
+                                                @elseif($da== 'April') <input type="hidden" name="month_id" value="3">
+                                                @elseif($da== 'May') <input type="hidden" name="month_id" value="4">
+                                                @elseif($da== 'June') <input type="hidden" name="month_id" value="5">
+                                                @elseif($da== 'July') <input type="hidden" name="month_id" value="6">
+                                                @elseif($da== 'August') <input type="hidden" name="month_id" value="7">
+                                                @elseif($da== 'September') <input type="hidden" name="month_id" value="8">
+                                                @elseif($da== 'October') <input type="hidden" name="month_id" value="9">
+                                                @elseif($da== 'November') <input type="hidden" name="month_id" value="10">
+                                                @else <input type="hidden" name="month_id" value="11">
+                                                @endif
+                                                <div>
+                                                    <label for="">Month</label>
+                                                    <input readonly type="" placeholder="" value="{{$da}}" class="form-control">
+                                                </div>
+
+                                                <div>
+                                                    <label for="">Total Amount</label>
+                                                    <input type="number" readonly id="amount" name="amount" value="{{   getFees(Auth::id(),$data['student']->id,$key)+$data['monthlyFee']-$discountCount}}" class="form-control">
+                                                </div>
+                                                <div>
+
+                                                    <div>
+                                                        <label for="" style="color: red;">Due</label>
+                                                        <input type="number" readonly id="due" name="amount" style="color: red
+                                                        ;" value="{{$rdue =(getFees(Auth::id(),$data['student']->id,$key)+$data['monthlyFee']-$discountCount)-(getPaid(Auth::id(),$data['student']->id,$key))}}" class="form-control">
+                                                    </div>
+                                                    <div>
+
+                                                        <label for="">Discount</label>
+                                                        <input readonly type="" placeholder="" value="{{$data['student']->discount}}%" class="form-control">
+                                                    </div>
+
+                                                    <div>
+                                                        <label for="">Paid Amount</label>
+                                                        <input type="number" onkeyup="paidAmount(this.value, '{{$rdue}}', '{{$key}}')" placeholder="" id="paid_amount" class="form-control" name="paid_amount">
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" id="submit_btn_{{$key}}" class="btn btn-primary">Save</button>
+                                                    </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </form>
+                                </div>
+                        </tr>
+
+                        @endforeach
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+</main>
+
+
+
+
+
+
+<!-- Button trigger modal -->
+
+
+<!-- Modal -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@endsection
+
 @push('js')
 <script>
-    function feesShow(month)
-    {
-        location.replace(`/school/finance/student/{{$data['student']->id}}/${month}/fee`)
-    }
-
-    $("#paymentRecivedForm").submit(function(e){
+    $("#paymentRecivedForm").submit(function(e) {
         e.preventDefault();
         var j = $("#paymentRecivedForm").serialize();
         $.ajax({
             url: "{{url('/school/finance/payment/receive')}}",
             type: "POST",
             data: $("#paymentRecivedForm").serialize(),
-            success: function(resp){
+            success: function(resp) {
                 $("#payment-reciept").html(resp.html);
                 printDiv("payment-reciept");
                 location.reload();
             },
-            error: function(error){
+            error: function(error) {
                 Swal.fire({
                     title: "Try Later",
                     text: 'Have Some Problem. Please Try Again Later.',
@@ -382,6 +284,19 @@
         window.print();
 
         document.body.innerHTML = originalContents;
+    }
+</script>
+<script>
+    function paidAmount(paid, due, id) {
+        console.log(paid + "====>" + due + '====>' + id);
+        var paid = parseInt(paid);
+        var due = parseInt(due);
+
+        if (paid > due) {
+            document.getElementById("submit_btn_" + id).disabled = true;
+        } else {
+            document.getElementById("submit_btn_" + id).disabled = false;
+        }
     }
 </script>
 @endpush

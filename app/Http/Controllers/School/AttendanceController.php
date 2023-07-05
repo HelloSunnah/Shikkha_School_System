@@ -2,20 +2,36 @@
 
 namespace App\Http\Controllers\School;
 
-use App\Http\Controllers\Controller;
-use App\Imports\AttendanceImport;
-use App\Models\Attendance;
-use App\Models\User;
 use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Validators\ValidationException;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Message;
+use App\Models\Teacher;
+use App\Models\Employee;
+use App\Models\Attendance;
 use Rats\Zkteco\Lib\ZKTeco;
+use Illuminate\Http\Request;
+use App\Models\StaffAttendance;
+use App\Imports\AttendanceImport;
+use App\Models\TeacherAttendance;
+use App\Models\School;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\SchoolController;
+use App\Models\CustomAttendanceInput;
+use App\Models\InstituteClass;
+use App\Models\ResultSetting;
+use App\Models\Term;
+use App\Traits\HttpResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use RealRashid\SweetAlert\Facades\Alert;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class AttendanceController extends Controller
 {
+    use HttpResponse;
+
     /**
      * get attendance from device
      */
@@ -130,12 +146,6 @@ class AttendanceController extends Controller
                     ]; // Add parameters in key value
                     $url = "http://api.greenweb.com.bd/api.php?json";
 
-                    // $ch = curl_init(); // Initialize cURL
-                    // curl_setopt($ch, CURLOPT_URL, $url);
-                    // curl_setopt($ch, CURLOPT_ENCODING, '');
-                    // curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-                    // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    // $smsresult = curl_exec($ch);
                 }
             }
 
@@ -149,4 +159,525 @@ class AttendanceController extends Controller
             return back();
         }
     }
+
+
+    /**
+     * input attendance
+     */
+    public function inputAttendance(Request $request)
+    {
+        $query = User::where('school_id', Auth::id());
+
+        if($request->has('class_id') && !empty($request->class_id))
+        {
+            $query->where('class_id', $request->class_id);
+        }
+        
+        if($request->has('section_id') && !empty($request->section_id))
+        {
+            $query->where('section_id', $request->section_id);
+        }
+
+        if($request->has('shift_id') && !empty($request->shift_id))
+        {
+            $query->where('shift', $request->shift_id);
+        }
+        
+
+        $data['users'] = $query->orderBy('roll_number')->paginate(7);
+        $data['class'] = InstituteClass::where('school_id', Auth::id())->get();
+        $data['terms'] = ResultSetting::where('school_id', Auth::id())->get();
+
+        return view('panel.attendance.input')->with($data);
+    }
+
+
+
+    /**
+     * get custom attendance infor
+     */
+    public function inputAttendanceGet(Request $request)
+    {
+        try{
+            $data['working_days'] = getWorkingDays(Auth::id(), $request->studentId);
+            $data['present'] = getPresentDays(Auth::id(), $request->studentId);
+            $data['absent'] = getAbsentDays(Auth::id(), $request->studentId);
+
+            return $this->success("success", $data);
+        }
+        catch(Exception $e)
+        {
+            return $this->error($e->getMessage(), $request->all());
+        }
+    }
+
+
+    /**
+     * save input attendance
+     */
+    public function saveInputAttendance(Request $request)
+    {
+        try
+        {
+            $request->validate([
+                'term_id'   =>  ['required'],
+                'working_days'  =>  ['required'],
+                'present'   =>  ['required'],
+                'absent'    =>  ['required']
+            ]);
+            $class_id = User::findOrFail($request->studentId)->class_id;
+            CustomAttendanceInput::updateOrCreate(
+                [
+                    "school_id" =>  Auth::id(),
+                    "user_id"   =>  $request->studentId,
+                    "result_setting_id"   =>  $request->term_id
+                ],
+                [
+                    "class_id"      => $class_id,
+                    "working_days"  =>  $request->working_days,
+                    "present"  =>  $request->present,
+                    "absent"  =>  $request->absent,
+                ]
+            );
+
+            return $this->success("success", $request->all());
+        }
+        catch(Exception $e)
+        {
+            return $this->error($e->getMessage(), $request->all());
+        }
+    }
+
+
+    /**
+     * save selected class
+     */
+    public function classSelectForAbsentSMS(Request $request)
+    {
+        $raw = School::find(Auth::id());
+        
+        if(is_array($request->classIds) && count($request->classIds) > 0)
+        {
+            foreach($request->classIds as $id)
+            {
+                if(is_null($raw->class_for_absent_sms))
+                {
+                    $raw->update([
+                        'class_for_absent_sms'  => $id
+                    ]);
+                }
+                else
+                {
+                    if(!in_array($id, explode(",", $raw->class_for_absent_sms)))
+                    {
+                        $raw->update([
+                            'class_for_absent_sms'  => $raw->class_for_absent_sms . ',' . $id
+                        ]);
+                    }
+                    else
+                    {
+                        return back()->with('error', 'Record already exists');
+                    }
+                    
+                }
+            }
+        }
+
+        return back()->with('success', 'Record updated successfully');
+    }
+
+
+    // Staff Attendance
+
+    public function staffAttendancePage(){
+        $defaultDate = Carbon::today()->format('Y-m-d');
+        return view('frontend.school.staff.StaffAttendance.ViewPage',compact('defaultDate'));
+    }
+
+
+
+    public function StaffAttendance($date)
+    {
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('d M, Y');
+        $school = School::find(Auth::user()->id);
+        $dataAttendance = StaffAttendance::where('school_id', Auth::id())->whereDate('created_at', $date)->get()->unique('employee_id');
+        $dataShow=Employee::where("school_id", Auth::user()->id)->get();
+         
+        return view('frontend.school.staff.StaffAttendance.StaffAttendance',compact('dataShow','dataAttendance','date', 'formattedDate', 'school'));
+    }
+
+
+    public function StaffAttendance_DatePost(Request $request){
+        if (Auth::user()->status == 0) {
+            return redirect()->route('school.payment.info');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+            return back();
+        }
+        //dd($request->all());
+        if (Auth::user()->is_editor != 3) {
+            return back();
+        } else {
+            $request->validate([
+                'date' => 'required',
+            ]);
+
+            $date = $request->date;
+            return redirect()->route('StaffAttendance', [ 'date' => $date]);
+           }
+    }
+
+    
+    public function StaffAttendance_post(Request $request)
+    {
+        if (Auth::user()->status == 0) {
+            return redirect()->route('school.payment.info');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+            return back();
+        }
+        if (Auth::user()->is_editor != 3) {
+            return back();
+        } else {
+            foreach ($request->employee_id as $index => $code) {
+                $attend = StaffAttendance::where("school_id", Auth::user()->id)
+                             ->where('employee_id', $code)
+                             ->whereDate('created_at', $request->segment_date)->delete();
+                           
+                 $attendance = StaffAttendance::create(
+                     [                
+                         "employee_id"    => $code,
+                         "school_id"     => Auth::user()->id,
+                         "created_at"    => $request->segment_date." "."15:41:51",
+                         "attendance"    => $request->attendance[$code][0],
+                         "comment"       => $request->comment[$index],
+                     ]
+                 );
+             }
+             toast("Attendance Save Successfully", "success");
+             return back();
+         }
+    }
+
+
+    public function Staff_confirmabsentpresent(Request $request ,$id){
+        if (Auth::user()->status == 0) {
+            return redirect()->route('school.payment.info');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+            return back();
+        }
+        if (Auth::user()->is_editor != 3) {
+            return back();
+        } else {
+            $data = StaffAttendance::find($id);
+            $data->attendance = $request->attendance;
+            $data->save();
+            toast("Attendance Update Successfully", "success");
+            return back();
+        }
+    }
+
+
+   public function StaffAttendance_AllView()
+   {
+        return view('frontend.school.staff.StaffAttendance.AllStaffAttendance');
+   }
+
+
+   public function StaffAttendance_AllView_Post(Request $request)
+    {
+        if (Auth::user()->status == 0) {
+            return redirect()->route('school.payment.info');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+            return back();
+        }
+        //dd($request->all());
+        if (Auth::user()->is_editor != 3) {
+            return back();
+        } else {
+            $request->validate([
+                'month_id' => 'required',
+            ]);
+            $date = $request->month_id;
+
+            return redirect()->route('StaffAttendance.Month', [ 'date' => $date]);
+        }
+    }
+
+    public function StaffAttendance_Month($date){
+        $school = School::find(Auth::user()->id);
+        $dataAttendance = StaffAttendance::where("school_id", Auth::user()->id)->whereDate('created_at', $date)->get();
+        $dataShow = Employee::where("school_id", Auth::user()->id)->get();
+        return view('frontend.school.staff.StaffAttendance.AttendanceMonthView',compact('school','dataAttendance','dataShow','date'));
+    }
+    
+    //teacher Attendance
+    public function Teacher_datepage(){
+        $defaultDate = Carbon::today()->format('Y-m-d');
+        return view('frontend.school.teacher.TeacherAttendance.dateView',compact('defaultDate'));
+    }
+
+    public function datepage_post(Request $request){
+        if (Auth::user()->status == 0) {
+            return redirect()->route('school.payment.info');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+            return back();
+        }
+        //dd($request->all());
+        if (Auth::user()->is_editor != 3) {
+            return back();
+        } else {
+            $request->validate([
+                'date' => 'required',
+            ]);
+
+            $date = $request->date;
+            
+            return redirect()->route('TeacherAttendance.page', [ 'date' => $date]);
+           }
+    }
+
+
+    public function TeacherAttendance_page($date)
+    {
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('d M, Y');
+        $dataAttendance = TeacherAttendance::where('school_id', Auth::id())->whereDate('created_at',$date)->get()->unique('teacher_id');
+        $dataShow=Teacher::where("school_id", Auth::user()->id)->get();
+        $school = School::find(Auth::user()->id);
+        return view('frontend.school.teacher.TeacherAttendance.TeacherAttendancePage' ,compact('dataAttendance','dataShow','formattedDate','school','date'));
+    }
+    
+
+    public function TeacherAttendance_post(Request $request){
+        if (Auth::user()->status == 0) {
+            return redirect()->route('school.payment.info');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+            return back();
+        }
+        if (Auth::user()->is_editor != 3) {
+            return back();
+        } else {
+            foreach ($request->teacher_id as $index => $code) {
+                $attend = TeacherAttendance::where("school_id", Auth::user()->id)
+                             ->where('teacher_id', $code)
+                             ->whereDate('created_at', $request->segment_date)->delete();
+                           
+                 $attendance = TeacherAttendance::create(
+                     [                
+                         "teacher_id"    => $code,
+                         "school_id"     => Auth::user()->id,
+                         "created_at"    => $request->segment_date." ".date("H:i:s"),
+                         "attendance"    => $request->attendance[$code][0],
+                         "comment"       => $request->comment[$index],
+                     ]
+                 );
+             }
+             toast("Attendance Save Successfully", "success");
+             return back();
+         }
+   }
+
+    public function TeacherAttendance_AllView(){
+        return view('frontend.school.teacher.TeacherAttendance.AllTeacherView');
+    }
+
+    public function TeacherAttendance_Viewpost(Request $request){
+        if (Auth::user()->status == 0) {
+            return redirect()->route('school.payment.info');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+            return back();
+        }
+        if (Auth::user()->is_editor != 3) {
+            return back();
+        } else {
+            $request->validate([
+                'month_id' => 'required',
+            ]);
+            $date = $request->month_id;
+             
+            return redirect()->route('TeacherAttendance.Month', [ 'date' => $date]);
+        }
+    }
+
+    public function TeacherAttendance_Month($date){
+        $school = School::find(Auth::user()->id);
+        $dataAttendance = TeacherAttendance::where("school_id", Auth::user()->id)->whereDate('created_at', $date)->get();
+        $dataShow = Teacher::where("school_id", Auth::user()->id)->get();
+        return view('frontend.school.teacher.TeacherAttendance.TeacherMonthView',compact('school','dataAttendance','dataShow','date'));
+   }
+
+   public function Teacher_confirmabsentpresent(Request $request, $id){
+    if (Auth::user()->status == 0) {
+        return redirect()->route('school.payment.info');
+    } elseif (Auth::user()->status == 2) {
+        toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+        return back();
+    }
+    if (Auth::user()->is_editor != 3) {
+        return back();
+    } else {
+        $data = TeacherAttendance::find($id);
+        $data->attendance = $request->attendance;
+        $data->save();
+        toast("Attendance Update Successfully", "success");
+        return back();
+    }
+   }
+
+
+   public function Attendance_dashboard(){
+    return view ('frontend.school.student.Attendancedashboard.Sdashboard');
+   }
+   public function Attendance_profile(){
+    return view ('frontend.school.student.Attendancedashboard.SAttendanceProfile');
+   }
+
+
+   /**
+    * show student list in dashboard
+    */
+   public function Studentdetailsdashboard(Request $request)
+   {
+        try
+        {
+            $users = User::with('class:id,class_name', 'section:id,section_name')->where('school_id', Auth::id());
+
+            if($request->has('classId') && !empty($request->classId))
+            {
+                $users->where('class_id', $request->classId);
+            }
+
+            if($request->has('sectionId') && !empty($request->sectionId))
+            {
+                $users->where('section_id', $request->sectionId);
+            }
+
+            if($request->has('shift') && !empty($request->shift))
+            {
+                $users->where('shift', $request->shift);
+            }
+
+            if($request->has('groupId') && !empty($request->groupId))
+            {
+                $users->where('group_id', $request->groupId);
+            }
+
+            if($request->has('roll') && !empty($request->roll))
+            {
+                $users->where('roll_number', $request->roll);
+            }
+
+            if($request->has('limit') && !empty($request->limit))
+            {
+                $users->limit($request->limit);
+            }
+            else
+            {
+                $users->limit(100);
+            }
+
+            if($request->has('order') && !empty($request->order) && $request->order == "desc")
+            {
+                $users->latest();
+            }
+            else
+            {
+                $users->orderBy('roll_number');
+            }
+
+            $data['users'] = $users->get();
+            $data['classes'] = InstituteClass::where('school_id', Auth::id())->pluck('class_name', 'id');
+
+            if($request->ajax())
+            {
+                return $this->success(count($data['users']) . " record fetched", $data);
+            }
+            else
+            {
+                return view('frontend.school.student.Attendancedashboard.Studentdetailsdashboard')->with($data);
+            }
+        }
+        catch(Exception $e)
+        {
+            if($request->ajax())
+            {
+                return $this->error($e->getMessage());
+            }
+            else
+            {
+                return abort(403, $e->getMessage());
+            }
+        }
+   }
+
+   /**
+    * update user list from stellar api
+    */
+   protected function updateDeviceConnectedUserList()
+   {
+        try
+        {
+            if(Auth::check())
+            {
+                $schoolId = Auth::id();
+                $username = Auth::user()->device_username;
+                $updateCount = 0;
+
+                if(!is_null($username) && !empty($username)):
+                    
+                    $data = \App\Helper\Utility::fetchUserListInDevice($username);
+                    
+                    if(!is_null($data) && !empty($data))
+                    {
+                        $connectedUsers = array_column($data, 'registraton_id');
+
+                        $students = User::where('school_id', $schoolId)->pluck('unique_id', 'id');
+                    
+                        foreach($students as $userId => $uniqueId)
+                        {
+                            if(in_array($uniqueId, $connectedUsers))
+                            {
+                                User::find($userId)->update(['device_connected'=>1]);
+                                ++$updateCount;
+                            }
+                        } 
+                    
+                        $teachers = Teacher::where('school_id', $schoolId)->pluck('unique_id', 'id');
+
+                        foreach($teachers as $userId => $uniqueId)
+                        {
+                            if(in_array($uniqueId, $connectedUsers))
+                            {
+                                Teacher::find($userId)->update(['device_connected'=>1]);
+                                ++$updateCount;
+                            }
+                        }
+
+                        return $this->success($updateCount . " record updated successfully", $resp);
+                    }
+                    else
+                    {
+                        return $this->error("Stellar API data does not exists");
+                    }
+
+                else:
+                    return $this->error("Device is not connected");
+                endif;
+
+            }
+            else
+            {
+                return $this->error("Your session is over. Please login.");
+            }
+        }
+        catch(Exception $e)
+        {
+            return $this->error($e->getMessage());
+        }
+   }
 }

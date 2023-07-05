@@ -6,46 +6,39 @@
         <div class="row">
             <div class="col-xl-6 mx-auto">
 
-                <div class="card">
+                <div class="card" style="box-shadow:4px 3px 13px  .13px #cf74f9;">
                     <div class="card-body">
                         <div class="border p-3 rounded">
-                            <h6 class="mb-0 text-uppercase">{{ __('app.Class') }} {{ __('app.Create') }}</h6>
-                            <hr />
+                            
                             @if (!isset($classEdit))
+                            <h6 class="mb-0 text-uppercase text-primary">{{ __('app.Class') }} {{ __('app.Create') }}</h6>
+                            <hr />
                                 <form class="row g-3" method="post" action="{{ route('class.create.post') }}"
                                     enctype="multipart/form-data">
                                     @csrf
-                                    <div class="col-12">
+                                    <div class="col-12 mt-4">
                                         <label class="form-label">{{ __('app.Class') }} {{ __('app.Name') }} <span
                                                 style="color: red;">*</span></label>
-                                        <div class="input-group mb-3"> <span class="input-group-text"
-                                                id="basic-addon1">{{ __('app.Class') }}</span>
                                             <input type="text" required class="form-control"
-                                                placeholder="{{ __('app.Class') }} {{ __('app.Name') }}" name="class_name"
+                                                name="class_name"
                                                 required>
-                                        </div>
+                                        
                                         @error('class_name')<div class="alert alert-danger">{{$message}}</div>@enderror
 
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-12 mt-4">
                                         <label class="form-label">{{ __('app.Class') }} {{ __('app.Name') }}({{__('app.bangla')}}) <span
                                                 style="color: red;">*</span></label>
-                                        <div class="input-group mb-3"> <span class="input-group-text"
-                                                id="basic-addon1">{{ __('app.Class') }}</span>
-                                            <input type="text" required class="form-control"
-                                                placeholder="{{ __('app.Class') }} {{ __('app.Name') }}" name="class_name_bn"
+                                            <input type="text" required class="form-control" name="class_name_bn"
                                                 required>
-                                        </div>
+                                        
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-12 mt-4">
                                         <label class="form-label">{{ __('app.Class') }} {{ __('app.Fees') }} <span
                                                 style="color: red;">*</span></label>
-                                        <div class="input-group mb-3"> <span class="input-group-text"
-                                                id="basic-addon1">{{ __('app.Class') }} {{ __('app.Fees') }} </span>
-                                            <input type="number" required class="form-control"
-                                                placeholder="{{ __('app.Class') }} {{ __('app.Fees') }}" name="class_fees"
+                                            <input type="number" required class="form-control" name="class_fees"
                                                 required>
-                                        </div>
+                                        
                                     </div>
                                     {{-- <div class="col-6">
                                     <div class="form-check">
@@ -62,36 +55,27 @@
                                     </div>
                                 </form>
                             @else
+                            <h6 class="mb-0 text-uppercase text-primary">{{ __('app.Class') }} {{ __('app.Edit') }}</h6>
+                            <hr />
                                 <form class="row g-3" method="post"
                                     action="{{ route('class.update.post', $classEdit->id) }}" enctype="multipart/form-data">
                                     @csrf
                                     <div class="col-12">
-                                        <label class="form-label">{{ __('app.Class') }} {{ __('app.Name') }}</label>
-                                        <div class="input-group mb-3"> <span class="input-group-text"
-                                                id="basic-addon1">{{ __('app.Class') }}</span>
+                                        <label class="form-label-edit">{{ __('app.Class') }} {{ __('app.Name') }}</label>
                                             <input type="text" required class="form-control"
                                                 placeholder="{{ __('app.Class') }} {{ __('app.Name') }}" name="class_name"
                                                 value="{{ substr($classEdit->class_name, 5) }}">
-                                        </div>
+                                        
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">{{ __('app.Class') }} {{ __('app.Name') }} ({{__('app.bangla')}})</label>
-                                        <div class="input-group mb-3"> <span class="input-group-text"
-                                                id="basic-addon1">{{ __('app.Class') }}</span>
-                                            <input type="text"required class="form-control"
-                                                placeholder="{{ __('app.Class') }} {{ __('app.Name') }}" name="class_name_bn"
+                                        <label class="form-label-edit">{{ __('app.Class') }} {{ __('app.Name') }} ({{__('app.bangla')}})</label>
+                                            <input type="text" required class="form-control" name="class_name_bn"
                                                value="{{$classEdit->class_name_bn}}">
-                                        </div>
+                                               </div>
                                     <div class="col-12">
-                                        <label class="form-label">{{ __('app.Class') }} {{ __('app.Fees') }}</label>
-                                        <div class="input-group mb-3"> <span class="input-group-text"
-                                                id="basic-addon1">{{ __('app.Class') }} {{ __('app.Fees') }}</span>
-                                            <input type="number" required class="form-control"
-                                                placeholder="{{ __('app.Class') }} {{ __('app.Fees') }}" name="class_fees"
-                                                value="{{ $classEdit->class_fees }}">
-
-                                        </div>
-                                    </div> 
+                                        <label class="form-label-edit">{{ __('app.Class') }} {{ __('app.Fees') }}</label>
+                                            <input type="number" required class="form-control" name="class_fees"
+                                                value="{{ $classEdit->class_fees }}"> 
                                     </div>
                                     {{-- <div class="col-6">
                                     <div class="form-check">

@@ -21,6 +21,8 @@ class CreateStudentFeesTable extends Migration
             // $table->foreign('fees_type_id')->references('id')->on('fees_types')->onDelete('cascade');
             $table->double('fees');
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -34,5 +36,7 @@ class CreateStudentFeesTable extends Migration
         Schema::dropIfExists('student_fees',function(Blueprint $table){
             
         });
+        $table->dropSoftDeletes();
+
     }
 }

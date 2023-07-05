@@ -6,7 +6,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-1"></div>
                 <div class="col-lg-5">
-                    <h1 class="fs-1 fw-bold">{{__('app.op')}}</h1>
+                    <h1 style="padding-top:0px;font-size:35px !important" class="fs-1 fw-bold">{{__('app.op')}}</h1>
                     <p class="text-muted mt-4"> {{__('app.op1')}}</p>
                     <ul class="mt-4">
                         <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.op2')}}
@@ -19,7 +19,7 @@
                     <div class="hero__search wow fadeInUp" data-wow-delay=".7s">
                         <form method="post" action="{{route('getStarted.post')}}" enctype="multipart/form-data">
                             @csrf
-                            <input type="email" placeholder="Enter your email Address.." name="email" required>
+                            <input type="email" placeholder="{{__('app.email1')}}" name="email" required>
                             <br> <button type="submit" class="w-btn w-btn mt-4">{{__('app.op5')}}</button>
                         </form>
                     </div>
@@ -45,7 +45,7 @@
                     <div class="trackProgress__left">
                         <div class="text-center"> <img class="w-50" src="" alt=""></div>
 
-                        <h1>{{__('app.op8')}}</h1>
+                        <h4>{{__('app.op8')}}</h4>
                         <p>{{__('app.op9')}}</p>
                     </div>
                 </div>
@@ -54,7 +54,7 @@
                         <div class="text-center">
                             <img class="w-50" src="" alt="">
                         </div>
-                        <h1>{{__('app.op10')}}</h1>
+                        <h4>{{__('app.op10')}}</h4>
                         <p>{{__('app.op11')}}</p>
                     </div>
                 </div>
@@ -188,7 +188,7 @@
                 <div class="col-lg-4">
                     <div class="templates__div templates__div-pink">
                         <img src="{{ asset('frontend/assets/img/icon/services/home-2/services-7.png') }}" alt="">
-                        <h3 class="mt-4 fw-bold">{{__('app.op24')}} <br>{{__('app.op25')}}</h3>
+                        <h3 class="mt-4 fw-bold">{{__('app.op24')}}{{__('app.op25')}}</h3>
                     </div>
                 </div>
             </div>

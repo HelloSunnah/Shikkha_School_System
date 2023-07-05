@@ -4,13 +4,13 @@
 
 
 <main class="page-content">
-    <a class="btn btn-primary" href="{{route('books.create')}}">Back</a>
+    
 
     <div class="row justify-content-center">
          <div class="col-sm-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">Change Book Details</h5>
+                    <h5 class="card-title mb-3 text-center">Change Book Details</h5>
                     @if(\Session::has('insert'))
                     <div id="" class="alert alert-success">
                         {!!Session::get('insert')!!}
@@ -67,7 +67,11 @@
 
                         </div>
                         <br>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a class="btn btn-secondary" href="{{route('books.create')}}">Back</a>
+                        </div>
+                        
                     </form>
 
                 </div>

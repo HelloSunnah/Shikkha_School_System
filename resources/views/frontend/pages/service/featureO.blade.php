@@ -6,7 +6,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-1"></div>
                 <div class="col-lg-5">
-                    <h1 class="fs-1 fw-bold">{{__('app.os1')}}
+                    <h1 style="padding-top:0px;font-size:35px !important" class="fs-1 fw-bold">{{__('app.os1')}}
                         <br>{{__('app.os2')}}</h1>
                     <p class="text-muted mt-4">{{__('app.os3')}}</p>
                     <ul class="mt-4">
@@ -22,7 +22,7 @@
                     <div class="hero__search wow fadeInUp" data-wow-delay=".7s">
                         <form method="post" action="{{route('getStarted.post')}}" enctype="multipart/form-data">
                             @csrf
-                            <input type="email" placeholder="Enter your email Address.." name="email" required>
+                            <input type="email" placeholder="{{__('app.email1')}}" name="email" required>
                             <br> <button type="submit" class="w-btn w-btn mt-4">{{__('app.os7')}}</button>
                         </form>
                     </div>
@@ -48,7 +48,7 @@
                     <div class="trackProgress__left">
                         <div class="text-center"> <img class="w-50" src="" alt=""></div>
 
-                        <h1>{{__('app.os10')}}</h1>
+                        <h4>{{__('app.os10')}}</h4>
                         <p>{{__('app.os11')}}</p>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                         <div class="text-center">
                             <img class="w-50" src="" alt="">
                         </div>
-                        <h1>{{__('app.os12')}}</h1>
+                        <h4>{{__('app.os12')}}</h4>
                         <p>{{__('app.os13')}}</p>
                     </div>
                 </div>
@@ -81,8 +81,8 @@
                 <div class="col-xxl-6 offset-xxl-3 col-xl-8 offset-xl-2 col-lg-8 offset-lg-2">
                     <div class="section__title-wrapper section__title-wrapper-2 text-center mb-75 wow fadeInUp" data-wow-delay=".3s">
 
-                        <h2 class="section__title section__title-2">{{__('app.os14')}}
-                        </h2>
+                        <h3 class="section__title section__title-2">{{__('app.os14')}}
+                        </h3>
 
                     </div>
 

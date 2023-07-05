@@ -20,6 +20,8 @@ class CreateClassSyllabiTable extends Migration
             $table->foreignId('term_id')->constrained('terms')->cascadeOnDelete();
             $table->string('Syllabus');
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -31,5 +33,7 @@ class CreateClassSyllabiTable extends Migration
     public function down()
     {
         Schema::dropIfExists('class_syllabi');
+        $table->dropSoftDeletes();
+
     }
 }

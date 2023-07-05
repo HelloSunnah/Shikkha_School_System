@@ -7,7 +7,10 @@ use App\Models\Subject;
 use Illuminate\Http\Request;
 use App\Models\ClassSyllabus;
 use App\Models\InstituteClass;
+use App\Models\School;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\SchoolController;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SyllabusController extends Controller
@@ -65,6 +68,20 @@ class SyllabusController extends Controller
 
 
 
+    public function  pdeletesyllabus($id){
+        ClassSyllabus::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+
+    }
+    public function  restoresyllabus($id){
+        ClassSyllabus::withTrashed()->where('id', $id)->restore();
+        toast("Restore data", "success");
+        return back();
+
+    }
+
+         
 
     // public function SyllabusShow()
     // {
@@ -81,7 +98,7 @@ class SyllabusController extends Controller
     {
 
         $class = InstituteClass::where('school_id', auth()->id())->get();
-
+        
         return view('frontend.school.syllabus.selectform', compact('class'));
     }
 
@@ -92,8 +109,10 @@ class SyllabusController extends Controller
         // return $request;
 
          $syllabus = ClassSyllabus::with('termRelation')->where('class_id', $request->select_class)->get()->groupBy('term_id');
+         $school = School::find(Auth::user()->id);
+         
         if ($syllabus->count()>0){
-            return view('frontend.school.syllabus.show')->with(compact('syllabus'));
+            return view('frontend.school.syllabus.show')->with(compact('syllabus','school'));
         }
         else {
             Alert::error('Sorry', "No record found");

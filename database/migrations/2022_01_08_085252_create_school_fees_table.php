@@ -21,6 +21,7 @@ class CreateSchoolFeesTable extends Migration
             $table->integer('status')->default(0);
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -32,5 +33,6 @@ class CreateSchoolFeesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('school_fees');
+        $table->dropSoftDeletes();
     }
 }

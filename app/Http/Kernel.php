@@ -16,6 +16,7 @@ class Kernel extends HttpKernel
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
         \App\Http\Middleware\TrustProxies::class,
+        \App\Http\Middleware\TrialMiddleware::class,
         \Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
@@ -48,6 +49,15 @@ class Kernel extends HttpKernel
         'language' => [
             \App\Http\Middleware\Language::class
         ],
+        'UnderMaintenance' => [
+            \App\Http\Middleware\UnderMaintenance::class
+        ],
+        'TrialMiddleware' => [
+            \App\Http\Middleware\TrialMiddleware::class
+        ],
+        
+
+        
     ];
 
     /**
@@ -67,5 +77,7 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        // 'TrialMiddleware' => \App\Http\Middleware\TrialMiddleware::class,
+        
     ];
 }

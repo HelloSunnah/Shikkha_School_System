@@ -5,7 +5,7 @@
     <main class="page-content">
         <div class="row">
             <div class="col-xl-6 mx-auto">
-                <div class="card">
+                <div class="card" style="box-shadow:4px 3px 13px  .7px #bf52f2;border-radius:5px">
                     <div class="card-body">
                         <div class="border p-3 rounded">
                             <form class="row g-3" method="get" action="{{route('student.attendance.create.show.post.date')}}" enctype="multipart/form-data">
@@ -22,9 +22,9 @@
                                     </select>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Section Name</label>
+                                    <label class="select-form">Section Name</label>
                                     <select class="form-control mb-3 js-select" id="section_id" name="section_id" onchange="group_chf()" required>
-                                        <option selected>Select one</option>
+                                        <option selected></option>
                                     </select>
                                 </div>
                                 <div class="col-12" id="group-select">

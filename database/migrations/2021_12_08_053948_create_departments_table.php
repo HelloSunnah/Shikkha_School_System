@@ -19,6 +19,8 @@ class CreateDepartmentsTable extends Migration
             $table->string('active')->nullable();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -30,5 +32,8 @@ class CreateDepartmentsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('departments');
+
+                $table->dropSoftDeletes();
+
     }
 }

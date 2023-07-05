@@ -26,6 +26,8 @@ class Transection extends Migration
             $table->tinyInteger('status')->default(1);
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -37,5 +39,7 @@ class Transection extends Migration
     public function down()
     {
         Schema::dropIfExists('transections');
+        $table->dropSoftDeletes();
+
     }
 }

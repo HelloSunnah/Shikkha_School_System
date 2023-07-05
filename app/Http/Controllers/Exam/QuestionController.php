@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers\Exam;
 
-use App\Http\Controllers\Controller;
-use App\Models\ExamRoutine;
-use App\Models\InstituteClass;
-use App\Models\Question;
-use App\Models\Subject;
 use App\Models\Term;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Facade\Ignition\DumpRecorder\Dump;
-use Illuminate\Auth\Events\Validated;
+use App\Models\Subject;
+use App\Models\Question;
+use App\Models\ExamRoutine;
 use Illuminate\Http\Request;
+use App\Models\InstituteClass;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Auth\Events\Validated;
+use Facade\Ignition\DumpRecorder\Dump;
 use function PHPUnit\Framework\isNull;
+
+use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Validator;
 
 class QuestionController extends Controller
 {
@@ -710,6 +711,13 @@ class QuestionController extends Controller
 
         return redirect()->back();
     }
+    public function Question_check_delete(Request $request)
+    {
+        $ids = $request->ids;
+        Question::whereIn('id',$ids)->delete();
+        Alert::success(' Selected Questions are deleted', 'Success Message');
+        return response()->json(['status'=>'success']);
+    }
 
     /**
      * Ajax Delete Question
@@ -741,4 +749,17 @@ class QuestionController extends Controller
         return $pdf->download('question.pdf');
         // return view('frontend.school.question.question_pdf', compact('question'));
     }
+    
+    public function PdeleteQuestion( $id)
+    {
+        Question::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+    }
+    public function restoreQuestion($id){
+        Question::withTrashed()->where('id', $id)->restore();
+        toast("Restore data", "success");
+        return back();
+    }
+
 }

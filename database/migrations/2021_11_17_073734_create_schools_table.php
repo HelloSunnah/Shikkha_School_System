@@ -35,6 +35,10 @@ class CreateSchoolsTable extends Migration
             $table->string('slogan_bn')->nullable();
             $table->string('ein_number')->nullable();
             $table->boolean('is_editor')->default(false);
+            $table->double('billing_add')->nullable();
+            $table->timestamp('trial_end_date')->nullable();
+            $table->integer('subscription_status')->default('0');
+            $table->tinyInteger('is_down')->default('0');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -48,5 +52,6 @@ class CreateSchoolsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('schools');
+        // $table->dropColumn('trial_end_date');
     }
 }

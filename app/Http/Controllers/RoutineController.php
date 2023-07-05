@@ -203,10 +203,22 @@ class RoutineController extends Controller
     }
 
     public function school_Routine_view(){
-        $rows = Routine::where(['school_id' => $this->school->id])->get()
-        ->groupBy('day');
-        $class = Routine::where(['school_id' => $this->school->id])->get()->groupBy('class_id');
-        // return($rows);
+
+        $periods = ClassPeriod::where(['school_id' => $this->school->id, 'shift' => 1])->get();
+        $rows = Routine::with('period', 'class', 'subject', 'section')->where(['school_id' => $this->school->id, 'shift' => 1])->orderBy('day', 'asc')->get();
+        $rowsec = Routine::where(['school_id' => $this->school->id, 'shift' => 1])->orderBy('day', 'asc')->get()->groupBy('section_id');
+        // dd($rows->toArray());
+        // dd($rowsec);
+        $prepare = [];
+        foreach ($rows as $key => $value) {
+            if(!is_null($value->class)  && !is_null($value->section) && !is_null($value->subject))
+            {
+                $prepare[$value->day][$value->class->class_name][$value->section->section_name][$value->subject->subject_name] = $value->period;
+            }
+        }
+        // dd($prepare);
+        $class = Routine::where(['school_id' => $this->school->id , 'shift' => 1])->get()->groupBy('class_id');
+
         $data['institute_classes'] = DB::table('institute_classes')->where('school_id', $this->school->id)->get();
         $data['section'] = DB::table('sections')->where('school_id', $this->school->id)->get();
         $data['periods'] = DB::table('class_periods')->where('school_id', $this->school->id)->get();
@@ -241,18 +253,18 @@ class RoutineController extends Controller
 
         //return $resp;
 
-        return view('frontend.school.routine.School_Routine',compact('rows','data','class'));
+        return view('frontend.school.routine.School_Routine',compact('rows','data','class', 'periods', 'prepare'));
     }
 
      /**
      * Get Teacher by ajax request
-     * 
+     *
      * @param Request
      * @param $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function getTeacher(Request $request)
-    {   
+    {
         $period = ClassPeriod::select('id')->where('shift', $request->shift)->where('school_id', Auth::user()->id)->pluck('id')->toArray();
         $teachers = [];
         foreach ($period as $key => $value) {
@@ -269,7 +281,7 @@ class RoutineController extends Controller
         // $teacher = Routine::where(['shift' => $request['shift'], 'day'   => $request['day'], 'period_id' => $request['period']])->first();
         // $teachers = Teacher::where('school_id', Auth::user()->id)->whereNotIn('id', [$teacher->teacher_id])->get();
         // return response()->json(['teacher' => $teachers, 'period' => $period]);
-        
+
     }
 
 }

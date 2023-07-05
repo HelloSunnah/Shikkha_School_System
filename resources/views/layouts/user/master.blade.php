@@ -39,9 +39,9 @@
     <link href="{{asset('schools/assets/css/header-colors.css')}}" rel="stylesheet" />
     <link href="{{asset('schools/assets/css/style.css')}}" rel="stylesheet" />
 
-    <title>{{isset($seo_array['seoTitle']) ? $seo_array['seoTitle'] : "CC School | CodeCell LTD" }}</title>
-    <meta name="description" content="{{isset($seo_array['seoDescription']) ? $seo_array['seoDescription'] : "CC School | CodeCell LTD" }}">
-    <meta name="keywords" content="{{isset($seo_array['seoKeyword']) ? $seo_array['seoKeyword'] : "CC School | CodeCell LTD" }}">
+    <title>{{isset($seo_array['seoTitle']) ? $seo_array['seoTitle'] : "Shikkha - ".App\Models\School::where('id',Auth::user()->school_id)->first()->school_name }}</title>
+    <meta name="description" content="{{isset($seo_array['seoDescription']) ? $seo_array['seoDescription'] : "Shikkha - ".App\Models\School::where('id',Auth::user()->school_id)->first()->school_name }}">
+    <meta name="keywords" content="{{isset($seo_array['seoKeyword']) ? $seo_array['seoKeyword'] : "Shikkha - ".App\Models\School::where('id',Auth::user()->school_id)->first()->school_name }}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     @stack('css')
 
@@ -115,11 +115,11 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="">
                                     <div class="d-flex align-items-center">
                                         <div class="ms-3">
                                             <h6 class="mb-0 dropdown-user-name">{{Auth::user()->name}}</h6>
-                                            <small class="mb-0 dropdown-user-designation text-secondary">{{__('app.user')}}</small>
+                                            <small class="mb-0 dropdown-user-designation text-secondary">{{__('app.Profile')}}</small>
                                         </div>
                                     </div>
                                 </a>

@@ -1,6 +1,10 @@
 <?php
 namespace App\Http\Controllers;
 use App\Models\Bank;
+use App\Models\EmployeeSalary;
+use App\Models\TeacherSalary;
+use App\Models\Transection;
+use App\Models\StudentMonthlyFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -21,9 +25,21 @@ class BankController extends Controller
             return back();
         } 
         else {
-            $bankadd = Bank::where('school_id', Auth::user()->id)->latest()->get();
+            
+            $teacherPaidSalary = TeacherSalary::where('school_id', Auth::user()->id)->sum("amount");            
+            $StaffPaidSalary = EmployeeSalary::where('school_id', Auth::user()->id)->sum("amount");            
+            $Expense = Transection::where('school_id', Auth::user()->id)->where('type', '1')->sum("amount");
+            
+            $sumFund = Transection::where('school_id', Auth::user()->id)->where('type', '2')->sum("amount");
+            $colected = StudentMonthlyFee::where('school_id', Auth::user()->id)->where('status', '2')->sum("paid_amount");            
+            $accesories = Transection::where('school_id', Auth::user()->id)->where('type', '3')->sum("amount");
 
-            return view('frontend.school.bank_account.table')->with(compact('bankadd'));
+            $ExpenseThisMonth = $Expense + $StaffPaidSalary + $teacherPaidSalary;
+            $totalSchoolFund = $sumFund + $colected + $accesories;
+            $profit = $totalSchoolFund - $ExpenseThisMonth;
+
+            $bankadd = Bank::where('school_id', Auth::user()->id)->latest()->get();
+            return view('frontend.school.bank_account.table')->with(compact('bankadd','profit'));
         }
     }
 

@@ -1,11 +1,8 @@
-
 {{-- @extends('errors::minimal')
 
 @section('title', __('Service Unavailable'))
 @section('code', '503')
 @section('message', __('Service Unavailable')) --}}
-
-
 
 <style>
     body {
@@ -100,30 +97,22 @@
     margin-top: 50px;
     margin-bottom: 0px;
 }
-
-
-
-
-
-
-
 </style>
-
-
-
-
 
 <div class="maintenance">
     <div class="maintenance_contain">
       <img src="{{ asset('images/logo/logo2.png') }}" alt="maintenance">
       <span class="pp-infobox-title-prefix">WE ARE COMING SOON</span>
       <div class="pp-infobox-title-wrapper">
-            <h3 class="pp-infobox-title">The website under maintenance!</h3>
-        </div> 
-    <div class="pp-infobox-description">
-          <p>Sorry for the inconvenience.We're working on this account now.<br>we’ll be come back shortly</p></div>    
-      <span class="title-text pp-primary-title">Thank you for your understanding.</span>
-      
-      
+        <h3 class="pp-infobox-title">The website under maintenance!</h3>
     </div>
-  </div>
+    
+    <div class="pp-infobox-title-wrapper">
+        <h3 class="pp-infobox-title">The website will be back as soon as possible.</h3><h3> </h3>
+    </div>
+
+    <div class="pp-infobox-description">
+        <p>Sorry for the inconvenience. We're working on this account now.<br>we’ll be come back shortly.</p></div>    
+        <span class="title-text pp-primary-title">Thank you for your understanding.</span>      
+    </div>
+</div>

@@ -19,6 +19,8 @@ class CreateMarkTypesTable extends Migration
             $table->string('mark_type');
             $table->bigInteger('school_id');
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -30,5 +32,7 @@ class CreateMarkTypesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('mark_types');
+        $table->dropSoftDeletes();
+
     }
 }

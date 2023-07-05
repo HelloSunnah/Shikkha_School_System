@@ -6,6 +6,7 @@ use App\Models\School;
 use Illuminate\Http\Request;
 use App\Models\InstituteClass;
 use App\Models\OnlineAdmission;
+use App\Models\SEOModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -14,11 +15,20 @@ class OnlineAddmissionController extends Controller
 {
     public function onlineAdmissionForm($unique_id)
     {
+        $seoTitle = SEOModel::where('page_no','=','15')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','15')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','15')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+
         $school=School::where('unique_id', $unique_id)->first();
 
         $classes = InstituteClass::where('school_id', $school->id)->get();
 
-        return view('frontend.school.admission.admissionForm',compact('school', 'classes'));
+        return view('frontend.school.admission.admissionForm',compact('school', 'classes', 'seo_array'));
     }
 
     public function onlineAdmissionSingleShow($id){
@@ -80,6 +90,17 @@ class OnlineAddmissionController extends Controller
 
         return back();
 
+    }
+    
+    public function pDeleteAdmission($id)
+    {
+        OnlineAdmission::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();  }
+    public function restoreAdmission($id){
+        OnlineAdmission::withTrashed()->where('id', $id)->restore();
+        toast("Restore data", "success");
+        return back();
     }
 
     public function onlineAdmissionEdit($id){
@@ -166,5 +187,12 @@ class OnlineAddmissionController extends Controller
         $list=OnlineAdmission::all();
 
         return view('frontend.school.admission.admissionFormList',compact('list'));
+    }
+
+    public function onlineAdmission_Check_Delete(Request $request){
+        $ids = $request->ids;
+        OnlineAdmission::whereIn('id',$ids)->delete();
+        Alert::success(' Selected Admission request are deleted', 'Success Message');
+        return response()->json(['status'=>'success']);
     }
 }

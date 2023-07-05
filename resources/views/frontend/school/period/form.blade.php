@@ -2,6 +2,16 @@
 
 @section('content')
     <!--start content-->
+
+{{-- <style>
+    input[type=time]:checked {
+        -webkit-datetime-edit-hour-field:focus,
+        -webkit-datetime-edit-minute-field:focus,
+        -webkit-datetime-edit-ampm-field:focus,
+        color:red;
+        background :green !important;
+            }
+</style> --}}
     <main class="page-content">
 
         <div class="row">
@@ -14,8 +24,8 @@
                                 @csrf
                                 @method('PUT')
 
-                                <div class="mb-3">
-                                    <label for="">{{__('app.Select')}} {{__('app.Shift')}}</label>
+                                <div class="mb-3 mt-4">
+                                    <label class="select-form" for="">{{__('app.Select')}} {{__('app.Shift')}}</label>
                                     <select  class="form-control mb-3 js-select" name="shift" class="form-select" required>
                                         <option value="2"  {{ ($row->shift == 2) ? 'selected' : '' }}>Day Shift</option>
                                         <option value="1" {{ ($row->shift == 1) ? 'selected' : '' }}>Morning Shift</option>
@@ -32,7 +42,7 @@
                                     <div class="col">
                                         <label for="">{{__('app.Starttime')}}</label>
                                         <input type="time" id="start_time{{ $row->id }}" name="start_time" onclick="this.showPicker()" onchange="validateForm({{ $row->id }})" value="{{date("H:i", strtotime($row->from_time))}}" class="form-control">
-                                        <span class="text-danger" id="startTimeValid{{ $row->id }}"></span>
+                                        <span class="text-danger" id="startTimeValid{{ $row->id }}" ></span>
                                     </div>
 
                                     <div class="col">
@@ -42,15 +52,15 @@
                                     </div>
                                 </div>
 
-                                <button class="btn btn-outline-success">{{__('app.Save')}}</button>
+                                <button class="btn btn-outline-primary">{{__('app.Save')}}</button>
                                 <a href="javascript::" onclick="if(confirm('Are your sure?')){ location.replace('{{route('period.index')}}') }" class="btn btn-outline-danger">{{__('app.Back')}}</a>
                             </form>
                         @else
                             {{-- Insert Form --}}
                             <form action="{{route('period.store')}}" method="post" onsubmit="return validateForm()">
                                 @csrf
-                                <div class="mb-3">
-                                    <label for="">{{__('app.Select')}} {{__('app.Shift')}}</label>
+                                <div class="mb-3 mt-4">
+                                    <label class="select-form" for="">{{__('app.Select')}} {{__('app.Shift')}}</label>
                                     <select  
                                         class="form-control mb-3 js-select"
                                         name="shift" 
@@ -109,7 +119,7 @@
                                         @endfor
                                     @endforelse
                                 </div>
-                                <button class="btn-sm btn-outline-success">{{__('app.Save')}}</button>
+                                <button class="btn-sm btn-outline-primary">{{__('app.Save')}}</button>
                             </form>
                         @endif
                     </div>

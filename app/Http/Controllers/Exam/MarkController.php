@@ -15,28 +15,30 @@ class MarkController extends Controller
 {
     /**
      * Show Mark Type Page
-     * 
+     *
      * @return \Illuminate\Contracts\View
      */
-    public function index()
-    {
+    public function index($id)
+    {   
+        $resultSettingId = $id;
         $classes = InstituteClass::where('school_id', Auth::user()->id)->get();
-        
-        return view('frontend.school.mark_type.mark_type', compact('classes'));
+
+        return view('frontend.school.mark_type.mark_type', compact('classes', 'resultSettingId'));
     }
 
     /**
      * Store Mark Types in Database
-     * 
-     * @param Request 
+     *
+     * @param Request
      * @param $request
      * @return back
      */
     public function store(Request $request)
-    {
+    {   
         try {
             DB::beginTransaction();
-            DB::table('mark_types')->delete();
+            DB::table('mark_types')->where('school_id', Auth::id())->delete();
+
             if(isset($request->subjects))
             {
                 foreach ($request->subjects as $key => $value) {
@@ -48,9 +50,9 @@ class MarkController extends Controller
                         ]);
                     }
                 }
-
                 toast("Mark Type Add Successfully", 'success');
-                return back();
+
+                return redirect()->route("result.mark.set", ['id' => $request->resultSettingId]);
             }
             else
             {

@@ -7,7 +7,8 @@
     <title>Testimonial</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
     <style>
 
         .certificate-container {
@@ -105,7 +106,7 @@
         </div>
     </div>
     <div class="col-12 d-flex justify-content-center mb-5">
-        <button class="btn btn-success" onclick="printDiv()">Print</button>
+        <button class="btn btn-primary" style="background:#7c00a7; border:#7c00a7" title="{{ __('app.Print') }}" onclick="printDiv()"><i class="bi bi-printer"></i></button>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>

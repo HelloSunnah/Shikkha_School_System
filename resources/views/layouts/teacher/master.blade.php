@@ -40,9 +40,9 @@
     <link href="{{asset('schools/assets/css/style.css')}}" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
 
-    <title>{{isset($seo_array['seoTitle']) ? $seo_array['seoTitle'] : "CC School | CodeCell LTD" }}</title>
-    <meta name="description" content="{{isset($seo_array['seoDescription']) ? $seo_array['seoDescription'] : "CC School | CodeCell LTD" }}">
-    <meta name="keywords" content="{{isset($seo_array['seoKeyword']) ? $seo_array['seoKeyword'] : "CC School | CodeCell LTD" }}">
+    <title>{{isset($seo_array['seoTitle']) ? $seo_array['seoTitle'] : "Shikkha - ".App\Models\School::where('id',Auth::user()->school_id)->first()->school_name }}</title>
+    <meta name="description" content="{{isset($seo_array['seoDescription']) ? $seo_array['seoDescription'] : "Shikkha - ".App\Models\School::where('id',Auth::user()->school_id)->first()->school_name }}">
+    <meta name="keywords" content="{{isset($seo_array['seoKeyword']) ? $seo_array['seoKeyword'] : "Shikkha - ".App\Models\School::where('id',Auth::user()->school_id)->first()->school_name }}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     @stack('css')
 
@@ -188,8 +188,8 @@
                         <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                             <div class="user-setting d-flex align-items-center" style="padding: 0 10px;">
                                 <div class="user-name d-none d-sm-block mt-50" style="margin-top: 9px;">
-                                    <h5 style="background-color:#3361FF;color: #f1f1f1;border-radius: 50%; height: 25px;
-                                          width: 25px;text-align: center;"> {{Auth::user()->full_name}} </h5>
+                                    {{-- <h5 style="background-color:#3361FF;color: #f1f1f1;border-radius: 50%; height: 25px;
+                                          width: 25px;text-align: center;"> {{Auth::user()->full_name}} </h5> --}}
                                 </div>
 
                                 <div class="">{{strtoupper(Auth::user()->full_name)}}</div>
@@ -197,12 +197,13 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{{route('teacher.account.Information')}}">                                    
                                     <div class="d-flex align-items-center">
-                                        <div class="ms-3">
-                                            <h6 class="mb-0 dropdown-user-name">{{strtoupper(Auth::user()->full_name)}}</h6>
-                                            <small class="mb-0 dropdown-user-designation text-secondary">Teacher</small>
-                                        </div>
+                                            <div class="ms-3">
+                                                {{-- <h6 class="mb-0 dropdown-user-name">{{strtoupper(Auth::user()->full_name)}}</h6> --}}
+                                                <h6 class="mb-0 dropdown-user-name">{{strtoupper(Auth::user()->full_name)}}</h6>
+                                                <small class="mb-0 dropdown-user-designation text-secondary">{{strtoupper(Auth::user()->designation)}}</small>
+                                            </div>
                                     </div>
                                 </a>
                             </li>
@@ -314,9 +315,9 @@
                         <a href="{{url('/teachers')}}" class="list-group-item"><i class="fadeIn animated bx bx-home-circle"></i>Dashboard</a>
                         <a href="{{route('teacher.myClass.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-chalkboard"></i>My Classes</a>
                         <a href="{{route('all.teachers.attendance.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-folder-open"></i>All Attendance Show</a>
-                        <a href="{{route('all.teachers.result.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-message-alt-edit"></i>Result</a>
-                        <a href="{{route('all.teachers.student.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-user-check"></i>Student Show</a>
-                        <a href="{{route('all.teachers.routine.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-chalkboard"></i>Routine</a>
+                        {{-- <a href="{{route('all.teachers.result.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-message-alt-edit"></i>Result</a>
+                        <a href="{{route('all.teachers.student.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-user-check"></i>Student Show</a> --}}
+                        {{-- <a href="{{route('all.teachers.routine.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-chalkboard"></i>Routine</a> --}}
 
 
 
@@ -331,7 +332,7 @@
                             </div>
                             <small class="mb-0">Get  A Quick View</small>
                         </div>
-                        <a href="{{route('all.assignment.student.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-calendar-check"></i>Assignment</a>
+                        {{-- <a href="{{route('all.assignment.student.show')}}" class="list-group-item"><i class="fadeIn animated bx bx-calendar-check"></i>Assignment</a> --}}
                     </div>
                 </div>
             </div>

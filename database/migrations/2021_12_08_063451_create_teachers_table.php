@@ -36,6 +36,7 @@ class CreateTeachersTable extends Migration
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -47,5 +48,6 @@ class CreateTeachersTable extends Migration
     public function down()
     {
         Schema::dropIfExists('teachers');
+        $table->dropSoftDeletes();
     }
 }

@@ -80,7 +80,7 @@
 
                         <div class="card">
                             <div class="card-body">
-                                <h5>{{getSubjectNameAll($subject_id)->subject_name}}</h5>
+                                <h5>{{getSubjectNameAll($subject_id)}}</h5>
                                 @if(count($dataResult) == 0)
                                     <div class="table-responsive">
                                         <table class="table table-striped table-bordered" style="width:100%">

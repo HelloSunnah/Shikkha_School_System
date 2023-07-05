@@ -80,6 +80,29 @@ class ZktecoController extends Controller
 
     public function test()
     {
+        $result = $this->sendCurlRequestToStellar();
+
+        return $result->device_user;
+    }
+
+
+    protected  function sendCurlRequestToStellar()
+    {
+        $data = array(
+            "operation" => "fetch_user_in_device_list",
+            "auth_user" => "lighthouseCollege",
+            "auth_code" => env('STELLAR_AUTH_CODE'),
+        );
+
+        $datapayload = json_encode($data);
+        $api_request = curl_init('https://rumytechnologies.com/rams/json_api');
+        curl_setopt($api_request, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($api_request, CURLINFO_HEADER_OUT, true);
+        curl_setopt($api_request, CURLOPT_POST, true);
+        curl_setopt($api_request, CURLOPT_POSTFIELDS, $datapayload);
+        curl_setopt($api_request, CURLOPT_HTTPHEADER, array('Content-Type:application/json','Content-Length: ' . strlen($datapayload)));
+        $result = curl_exec($api_request);
         
+        return json_decode($result);
     }
 }

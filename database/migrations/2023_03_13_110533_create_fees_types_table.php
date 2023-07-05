@@ -18,6 +18,8 @@ class CreateFeesTypesTable extends Migration
             $table->foreignId('school_id')->constrained('schools')->cascadeOnUpdate();
             $table->string('title');
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -29,5 +31,7 @@ class CreateFeesTypesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('fees_types');
+        $table->dropSoftDeletes();
+
     }
 }

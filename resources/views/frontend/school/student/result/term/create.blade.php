@@ -3,7 +3,7 @@
 @section('content')
     <!--start content-->
     <main class="page-content">
-        <div class="row">
+        <div class="row mt-5">
             <div class="col-xl-6 mx-auto">
 
                 @if ($errors->any())
@@ -16,7 +16,7 @@
                     </div>
                 @endif
 
-                <div class="card">
+                <div class="card" style="box-shadow:4px 3px 13px  .7px #deaaf7;border-radius:5px">
                     <div class="card-body">
                         <div class="border p-3 rounded">
                             <h6 class="mb-0 text-uppercase">{{__('app.t')}}</h6>

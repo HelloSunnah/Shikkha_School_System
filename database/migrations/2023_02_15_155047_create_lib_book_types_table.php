@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+
 class CreateLibBookTypesTable extends Migration
 {
     /**
@@ -17,6 +18,8 @@ class CreateLibBookTypesTable extends Migration
             $table->id();
             $table->string('book_type');
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -28,5 +31,7 @@ class CreateLibBookTypesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('lib_book_types');
+        $table->dropSoftDeletes();
+
     }
 }

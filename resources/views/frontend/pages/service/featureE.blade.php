@@ -6,7 +6,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-1"></div>
                 <div class="col-lg-5">
-                    <h1 class="fs-1 fw-bold">{{__('app.ep')}}
+                    <h1 style="padding-top:0px;font-size:35px !important" class="fs-1 fw-bold">{{__('app.ep')}}
                         <br>{{__('app.ep1')}}</h1>
                     <p class="text-muted mt-4">{{__('app.ep2')}}</p>
                     <ul class="mt-4">
@@ -18,7 +18,7 @@
                     <div class="hero__search wow fadeInUp" data-wow-delay=".7s">
                         <form method="post" action="{{route('getStarted.post')}}" enctype="multipart/form-data">
                             @csrf
-                            <input type="email" placeholder="Enter your email Address.." name="email" required>
+                            <input type="email" placeholder="{{__('app.email1')}}" name="email" required>
                             <br> <button type="submit" class="w-btn w-btn mt-4">{{__('app.ep6')}} </button>
                         </form>
                     </div>
@@ -44,7 +44,7 @@
                     <div class="trackProgress__left">
                         <div class="text-center"> <img class="w-50" src="" alt=""></div>
 
-                        <h1>{{__('app.ep9')}} </h1>
+                        <h4>{{__('app.ep9')}} </h4>
                         <p>{{__('app.ep10')}} </p>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                         <div class="text-center">
                             <img class="w-50" src="" alt="">
                         </div>
-                        <h1>{{__('app.ep11')}} </h1>
+                        <h4>{{__('app.ep11')}} </h4>
                         <p>{{__('app.ep12')}} </p>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
                             <div class="tab-pane fade" id="sync" role="tabpanel" aria-labelledby="sync-tab">
                                 <div class="features__thumb">
                                     <div class="features__thumb-inner">
-                                        <img class="fea-thumb" src="{{ asset('frontend/assets/img/features/home-2/fea-thumb-2.jpg') }}" alt="">
+                                        <img class="fea-thumb" style="height:100px !important" src="{{ asset('frontend/assets/img/features/home-2/fea-thumb-2.jpg') }}" alt="">
                                         <img class="fea-sm" src="{{ asset('frontend/assets/img/features/home-2/fea-sm.jpg') }}" alt="">
                                         <img class="fea-sm-2" src="{{ asset('frontend/assets/img/features/home-2/fea-sm-2.jpg') }}" alt="">
                                         <img class="fea-2-shape" src="{{ asset('frontend/assets/img/icon/features/home-2/features-shape.png') }}" alt="">
@@ -148,10 +148,10 @@
     <section class="templates pt-30">
         <div class="container">
             <div class="title pb-30">
-                <h1>
+                <h2>
                 {{__('app.ep17')}}
                     <br> {{__('app.ep18')}}
-                </h1>
+                </h2>
             </div>
             <div class="row">
                 <div class="col-lg-4">

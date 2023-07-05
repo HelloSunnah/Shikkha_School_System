@@ -21,6 +21,8 @@ class CreateNoticesTable extends Migration
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->integer('posted_by')->default(0);
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -32,5 +34,7 @@ class CreateNoticesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('notices');
+        $table->dropSoftDeletes();
+
     }
 }

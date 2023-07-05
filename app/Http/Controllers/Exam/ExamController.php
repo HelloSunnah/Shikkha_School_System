@@ -8,6 +8,9 @@ use App\Models\InstituteClass;
 use App\Models\School;
 use App\Models\Subject;
 use App\Models\Term;
+use App\Models\User;
+use Carbon\Carbon;
+use App\Models\ResultSetting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -158,5 +161,72 @@ class ExamController extends Controller
         $pdf->render();
         // return $pdf->download('Exam_Routine.pdf');
         return $pdf->stream('Exam_Routine.pdf', ['Attachment' => false]);
+    }
+
+
+
+    // view admit card
+    public function showAdmitCard(){
+        $class = InstituteClass::where('school_id',Auth::id())->get();
+        $term = ResultSetting::where('school_id',Auth::id())->get();
+        if(count($term)>0){
+            return view('frontend.school.exam.admitCard', compact('class','term'));    
+        }
+        else{
+            $resultSettings = ModelsResultSetting::where('school_id', Auth::user()->id)->orderBy('id', 'asc')->get();
+            return view('frontend.school.student.result.createShow', compact('resultSettings'));
+        }
+    }
+
+    public function showAdmitCardDownload(Request $request){
+        //  return $request -> term_id;
+        $request->validate([
+            'term_id' => 'required',
+            'class_id' => 'required',
+        ]);
+
+        $term = ResultSetting::find($request -> term_id)->title;
+        if($request->section_id){
+            $student = User::where('school_id', Auth::user()->id)->where('class_id', $request->class_id)->where('section_id', $request->section_id)->get();
+        }
+        else{
+            $student = User::where('school_id', Auth::user()->id)->where('class_id', $request->class_id)->get();
+        }
+        $class = InstituteClass::find($request -> class_id)->class_name;
+        $subject = Subject::where('school_id', Auth::user()->id)->where('class_id', $request->class_id)->get();
+        $year = Carbon::now()->format('Y');
+
+        return view('frontend.school.exam.admitCardDownload',compact('term', 'student', 'subject', 'class', 'year'));
+
+    }
+
+    // view sit Plan
+    public function showSitPlan(){
+        $class = InstituteClass::where('school_id',Auth::id())->get();
+        $term = ResultSetting::where('school_id',Auth::id())->get();
+        $year = Carbon::now()->format('Y');
+        return view('frontend.school.exam.sitPlan', compact('class','term', 'year'));
+    }
+
+    public function showSitPlanDownload(Request $request){
+        //  return $request -> term_id;
+        $request->validate([
+            'term_id' => 'required',
+            'class_id' => 'required',
+        ]);
+
+        $term = ResultSetting::find($request -> term_id)->title;
+        
+        if($request->section_id){
+            $student = User::where('school_id', Auth::user()->id)->where('class_id', $request->class_id)->where('section_id', $request->section_id)->get();
+        }
+        else{
+            $student = User::where('school_id', Auth::user()->id)->where('class_id', $request->class_id)->get();
+        }
+        $class = InstituteClass::find($request -> class_id)->class_name;
+        $subject = Subject::where('school_id', Auth::user()->id)->where('class_id', $request->class_id)->get();
+        $year = Carbon::now()->format('Y');
+        return view('frontend.school.exam.sitPlanDownload',compact('term', 'student', 'subject', 'class', 'year'));
+
     }
 }

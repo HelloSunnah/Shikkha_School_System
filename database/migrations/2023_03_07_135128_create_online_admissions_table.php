@@ -45,6 +45,8 @@ class CreateOnlineAdmissionsTable extends Migration
             $table->string('In_class')->nullable();
             $table->string('group')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -56,5 +58,7 @@ class CreateOnlineAdmissionsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('online_admissions');
+        $table->dropSoftDeletes();
+
     }
 }

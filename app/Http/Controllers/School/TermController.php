@@ -117,4 +117,10 @@ class TermController extends Controller
         Alert::error('Success Term Deleted', 'Success Message');
         return back();
     }
+    public function term_check_delete(Request $request){
+        $ids = $request->ids;
+        Term::whereIn('id',$ids)->delete();
+        Alert::success(' Selected Term are deleted', 'Success Message');
+        return response()->json(['status'=>'success']);
+    }
 }

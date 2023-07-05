@@ -1,11 +1,16 @@
 <?php
 
-use App\Models\AssignStudentFee;
-use App\Models\Attendance;
-use App\Models\SchoolCheckout;
 use Carbon\Carbon;
+use App\Models\Employee;
+use App\Models\Attendance;
+use App\Models\ResultSubjectCountableMark;
+use App\Models\SchoolCheckout;
+use App\Models\StaffAttendance;
+use App\Models\AssignStudentFee;
+use App\Models\Result;
+use App\Models\TeacherAttendance;
 use Illuminate\Support\Facades\Auth;
-use PhpParser\Node\Stmt\TryCatch;
+use Illuminate\Support\Facades\DB;
 
 function acquisition()
 {
@@ -47,13 +52,13 @@ function getSchoolData(){
 function getClassName($id)
 {
     $data = \App\Models\InstituteClass::where('id',$id)->where('school_id',Auth::user()->id)->first();
-    return isset($data) ? $data : 0 ;
+    return isset($data) ? $data : null;
 }
 
 function getSectionName($id)
 {
-    $data = \App\Models\Section::where('id',$id)->where('school_id',Auth::user()->id)->first();
-    return isset($data) ? $data : 0 ;
+    $data = \App\Models\Section::where('id', $id)->where('school_id',Auth::user()->id)->first();
+    return isset($data) ? $data : null ;
 }
 
 function getGroupname($id)
@@ -87,6 +92,16 @@ function getUserName($id)
     $data = \App\Models\User::where('school_id',Auth::user()->id)->where('id',$id)->first();
     return isset($data) ? $data : 0 ;
 }
+function getUserRoll($id)
+{
+    $data = \App\Models\User::where('school_id',Auth::user()->id)->where('id',$id)->first();
+    return isset($data) ? $data : 0 ;
+}
+function getStaffName($id)
+{
+    $data = Employee::where('school_id',Auth::user()->id)->where('id',$id)->first();
+    return isset($data) ? $data : 0 ;
+}
 
 function CountUser($schoolId = null)
 {
@@ -94,7 +109,7 @@ function CountUser($schoolId = null)
     $data = \App\Models\User::where('school_id',Auth::user()->id)->count();
     else:
      $data =\App\Models\User::where('school_id',$schoolId)->count();
-    endif;   
+    endif;
     return isset($data) ? $data : 0 ;
 }
 
@@ -113,7 +128,7 @@ function CountStuff($schoolId=null){
     else:
     $data =\App\Models\Employee::where('school_id',$schoolId)->count();
     endif;
-    return isset($data) ?  $data : 0;  
+    return isset($data) ?  $data : 0;
 }
 
 function MonthlyDue()
@@ -124,7 +139,12 @@ function MonthlyDue()
 
 function MonthlyIncome()
 {
-    $data = \App\Models\StudentMonthlyFee::where('school_id',Auth::user()->id)->where('month_name',date('F'))->sum('amount');
+    $fund = \App\Models\Transection::where('school_id',Auth::user()->id)->whereMonth('updated_at',Carbon::now()->format('m'))->where('type', '=', '2')->sum('amount');
+    $accessories = \App\Models\Transection::where('school_id',Auth::user()->id)->whereMonth('updated_at',Carbon::now()->format('m'))->where('type', '=', '3')->sum('amount');
+    $fees = \App\Models\StudentMonthlyFee::where('school_id',Auth::user()->id)->whereMonth('updated_at',Carbon::now()->format('m'))->sum('paid_amount');
+
+    $data = $fund+ $accessories + $fees;
+
     return isset($data) ? $data : 0 ;
 }
 
@@ -157,15 +177,11 @@ function extraFeesCount($class_id){
 
 function totalDuefeature(){
     $total_data = 0;
-    $data = \App\Models\StudentMonthlyFee::where('school_id',Auth::user()->id)->where('status','<',2)->groupby('student_id')->pluck('student_id');
-    $studentFeesGiven = \App\Models\StudentMonthlyFee::where('school_id',Auth::user()->id)->sum('amount');
-//    $studentClass = \App\Models\User::whereIn('id',$data)->groupby('class_id')->pluck('class_id');
-//    $totalStudent = \App\Models\User::where('school_id',Auth::user()->id)->count('id');
-    $studentClassfees = \App\Models\InstituteClass::where('school_id',Auth::user()->id)->get();
-    foreach($studentClassfees as $total_datas){
-        $total_data = $total_data + ($total_datas->class_fees * classWiseStudentCount($total_datas->id) * 12) + (extraFeesCount($total_datas->id) * classWiseStudentCount($total_datas->id)) - $studentFeesGiven;
-    }
-    
+    // $data = \App\Models\StudentMonthlyFee::where('school_id',Auth::user()->id)->where('status','<',2)->groupby('student_id')->pluck('student_id');
+    $studentFees = \App\Models\StudentMonthlyFee::where('school_id',Auth::user()->id)->sum('amount');
+    $total_paid = \App\Models\StudentMonthlyFee::where('school_id',Auth::user()->id)->sum('paid_amount');
+    $total_data = $studentFees - $total_paid;
+
     return isset($total_data) ? abs($total_data) : 0 ;
 }
 
@@ -301,8 +317,8 @@ function getResultHaveorNotById($Student_id,$subject_id,$term_id){
 }
 
 /**
- * Get Result 
- * 
+ * Get Result
+ *
  * @param $Student_id
  * @param $subject_id
  * @param $term_id
@@ -334,12 +350,64 @@ function getAttData($student_id,$class_id,$section_id,$group_id,$month_id,$id)
         $fData = '...';
     }
     elseif($dateStudent->attendance == 1){
-        $fData = '✅';
+        $fData = '<span class="cursor-pointer" title="'.date('g:i:s A', strtotime($dateStaff->access_time)).'">✅</span>';
     }
     elseif($dateStudent->attendance == 0){
         $fData = '❌';
     }
     elseif($dateStudent->attendance == 2){
+        $fData = '⛔';
+    }else{
+        $fData = 'No';
+    }
+
+    return $fData;
+
+}
+function getStaffData($employee_id,$month_id,$id)
+{
+    
+    $dateS  = date("Y").'-'.$month_id.'-'.$id;
+    $dateStaff = \App\Models\StaffAttendance::where('employee_id',$employee_id)
+        ->whereDate('created_at', $dateS)
+        ->first();
+
+    if(is_null($dateStaff)){
+        $fData = '...';
+    }
+    elseif($dateStaff->attendance == 1){
+        $fData = '<span class="cursor-pointer" title="'.date('g:i:s A', strtotime($dateStaff->access_time)).'">✅</span>';
+    }
+    elseif($dateStaff->attendance == 0){
+        $fData = '❌';
+    }
+    elseif($dateStaff->attendance == 2){
+        $fData = '⛔';
+    }else{
+        $fData = 'No';
+    }
+
+    return $fData;
+
+}
+function getTeacherData($teacher_id,$month_id,$id)
+{
+    
+    $dateS  = date("Y").'-'.$month_id.'-'.$id;
+    $dateStaff = \App\Models\TeacherAttendance::where('teacher_id',$teacher_id)
+        ->whereDate('created_at', $dateS)
+        ->first();
+
+    if(is_null($dateStaff)){
+        $fData = '...';
+    }
+    elseif($dateStaff->attendance == 1){
+        $fData = '<span class="cursor-pointer" title="'.date('g:i:s A', strtotime($dateStaff->access_time)).'">✅</span>';
+    }
+    elseif($dateStaff->attendance == 0){
+        $fData = '❌';
+    }
+    elseif($dateStaff->attendance == 2){
         $fData = '⛔';
     }else{
         $fData = 'No';
@@ -390,7 +458,7 @@ function getGroupnameUser($id)
 {
     // $data = \App\Models\Group::where('id',$id)->where('school_id',Auth::user()->school_id)->first();
     if ($id == 1) {
-       $data = "Science"; 
+       $data = "Science";
     } elseif ($id == 2) {
         $data = "Commerce";
     } elseif ($id == 3) {
@@ -515,7 +583,8 @@ function cardColorChange($id){
     }
 }
 function getTermName($id){
-    $data = \App\Models\Term::where('id',$id)->first();
+    // $data = \App\Models\Term::where('id',$id)->first();
+    $data = \App\Models\ResultSetting::where('id', $id)->first();
     return $data;
 }
 
@@ -537,7 +606,7 @@ function RoutineTeacherId($id){
 
 /**
  * Show Student Field Wise Fee
- * 
+ *
  * @param $month_id
  */
 function studentFieldWiseFee($month_id)
@@ -550,26 +619,27 @@ function studentFieldWiseFee($month_id)
                   'class_id'    => Auth::user()->class_id,
                   'month_id'    => $month_id
                 ])->whereBetween('created_at', [$newYear, $currentMonth])->first();
-    
+
     return isset($studentFee->fees_details) ? $studentFee : [] ;
 }
 
 /**
- * Total Mark 
+ * Total Mark
  */
 function totalMark($data)
 {
     return $data->attendance + $data->assignment + $data->class_test + $data->presentation + $data->quiz + $data->practical + $data->written + $data->mcq + $data->others;
-    
+
 }
 
 /**
  * Grade
  */
-function grade($total, $term_id)
-{ 
-    $term = \App\Models\Term::find($term_id);
-    $totalMark = $total * 100 / $term->total_mark;
+// function grade($total, $term_id)
+function grade($total, $result_setting_id, $class_id, $subject_id)
+{
+    $subjectMark = ResultSubjectCountableMark::where(['result_setting_id' => $result_setting_id, 'institute_class_id'  => $class_id, 'subject_id'   => $subject_id,  'school_id' => Auth::user()->id])->first();
+    $totalMark = $total * 100 / $subjectMark->mark;
 
     $grading_scale = array(
         'A+' => 80, 'A' => 70, 'A-' => 60, 'B' => 50, 'C' => 40, 'D' => 33, 'F' => 0
@@ -585,7 +655,7 @@ function grade($total, $term_id)
  * Annual Grade
  */
 function annualGrade($total)
-{ 
+{
     $grading_scale = array(
         'A+' => 80, 'A' => 70, 'A-' => 60, 'B' => 50, 'C' => 40, 'D' => 33, 'F' => 0
     );
@@ -599,10 +669,10 @@ function annualGrade($total)
 /**
  * Final Grade
  */
-function finalGrade($total, $schoolId=null)
-{   
+function finalGrade($total, $schoolId = null)
+{
     if(is_null($schoolId)):
-    $schoolId = Auth::id();
+        $schoolId = Auth::id();
     endif;
 
     try {
@@ -630,10 +700,13 @@ function finalGrade($total, $schoolId=null)
 /**
  * GPA
  */
-function gpa($total, $term_id)
+// function gpa($total, $term_id)
+function gpa($total, $result_setting_id, $class_id, $subject_id)
 {
-    $term = \App\Models\Term::find($term_id);
-    $totalMark = $total * 100 / $term->total_mark;
+    // $term = \App\Models\Term::find($term_id);
+    $subjectMark = ResultSubjectCountableMark::where(['result_setting_id' => $result_setting_id, 'institute_class_id'  => $class_id, 'subject_id'   => $subject_id,  'school_id' => Auth::user()->id])->first();
+    $totalMark = $total * 100 / $subjectMark->mark;
+    // $totalMark = $total * 100 / $term->total_mark;
     $grading_point = array(
         '5' => 80, '4' => 70, '3.5' => 60, '3' => 50, '2' => 40, '1' => 33, '0' => 0
     );
@@ -641,7 +714,6 @@ function gpa($total, $term_id)
     foreach ($grading_point as $gpa => $minimum_score) {
         if ($totalMark >= $minimum_score) {
             return $gpa;
-            
         }
     }
 }
@@ -687,7 +759,7 @@ function finalGpa($total, $schoolId = null)
     foreach ($grading_point as $gpa => $minimum_score) {
         if ($totalMark >= $minimum_score) {
             return $gpa;
-            
+
         }
     }
 }
@@ -704,7 +776,7 @@ function classWiseGpa($total)
     foreach ($grading_point as $gpa => $minimum_score) {
         if ($total >= $minimum_score) {
             return $gpa;
-            
+
         }
     }
 }
@@ -712,7 +784,7 @@ function classWiseGpa($total)
 /**
  * class wise pass fail
  */
-function classWisePassFail($gpa) 
+function classWisePassFail($gpa)
 {
     if ($gpa >= 1) {
         return "Pass";
@@ -729,13 +801,13 @@ function sendtoPaymentPage(){
 
 /**
  * Get Result Teacher Panel
- * 
+ *
  * @param $Student_id
  * @param $subject_id
  * @param $term_id
  * @param $markType
  * @return mixing $data or Null
- * 
+ *
  */
 function teacherGetResultMarks($Student_id, $subject_id, $term_id, $markType)
 {
@@ -749,17 +821,17 @@ function teacherGetResultMarks($Student_id, $subject_id, $term_id, $markType)
 
 /**
  * Get Attendance on Admin Pannel (Sajjad Devel)
- * 
+ *
  * @param $Student_id
  * @param $class_id
  * @param $subject_id
  * @param $section_id
  * @param $date
  * @return mixing $Int or Null
- * 
+ *
  */
 function getAttendance($student_id, $class_id, $section_id, $date)
-{   
+{
     $attend = Attendance::where("school_id", Auth::user()->id)
                             ->where('class_id', $class_id)
                             ->where('section_id', $section_id)
@@ -771,5 +843,101 @@ function getAttendance($student_id, $class_id, $section_id, $date)
         return 0;
     }
 }
+function getStaffAttendance($employee_id,$date)
+{   
+    $attend = StaffAttendance::where("school_id", Auth::user()->id)
+                            ->where('employee_id', $employee_id)
+                            ->whereDate('created_at', $date)->first();
+    if($attend != null) {
+        return $attend->attendance;
+    }else {
+        return 0;
+    }
+}
+function getTeacherAttendance($teacher_id,$date)
+{   
+    $attend = TeacherAttendance::where("school_id", Auth::user()->id)
+                            ->where('teacher_id', $teacher_id)
+                            ->whereDate('created_at', $date)->first();
+    if($attend != null) {
+        return $attend->attendance;
+    }else {
+        return 0;
+    }
+}
+
+/**
+ * Subject Mark
+ */
+function subjectMark($result_setting_id, $class_id, $subject_id)
+{
+    $subjectMark = ResultSubjectCountableMark::where(['result_setting_id' => $result_setting_id, 'institute_class_id'  => $class_id, 'subject_id'   => $subject_id,  'school_id' => Auth::user()->id])->first();
+    // dd($subjectMark);
+    if($subjectMark == null){
+        return "1";
+    }
+    return ($subjectMark->mark);
+}
+
+/**
+ * Find Rank student in class
+ * 
+ * @param $class_id
+ * @param $term_id
+ * @param $student_id
+ * @return $studentRank;
+ */
+function classWiseStudnetRank($class_id, $term_id, $student_id)
+{   
+    $rank = DB::table('results')->join('custom_attendance_input as attendance', 'results.student_id', '=', 'attendance.user_id')
+                ->select('student_id','student_roll_number', 'attendance.present as present' )->selectRaw("SUM(results.total) as finalTotal")
+                ->where('results.institute_class_id', $class_id)
+                ->where('results.term_id', $term_id)
+                ->where('attendance.result_setting_id', $term_id)
+                ->where('results.school_id', Auth::user()->id)
+                ->where('attendance.school_id', Auth::user()->id)
+                ->groupBy('results.student_id','results.student_roll_number', 'present')
+                ->orderBy('finalTotal', 'DESC')
+                ->orderBy('present', 'DESC')
+                ->orderBy('student_roll_number', 'ASC')
+                ->get();
+                            
+    $findRank       = $rank->where('student_id', $student_id);
+    $studentRank    = $findRank->keys()->first() + 1;
+
+    return $studentRank;
+}
+
+/**
+ * Find Rank student in class
+ * 
+ * @param $class_id
+ * @param $section_id
+ * @param $term_id
+ * @param $student_id
+ * @return $studentRank;
+ */
+function sectionWiseStudnetRank($class_id, $section_id, $term_id, $student_id)
+{   
+    $rank = DB::table('results')->join('custom_attendance_input as attendance', 'results.student_id', '=', 'attendance.user_id')
+                ->select('student_id','student_roll_number', 'attendance.present as present' )->selectRaw("SUM(results.total) as finalTotal")
+                ->where('results.institute_class_id', $class_id)
+                ->where('section_id', $section_id)
+                ->where('results.term_id', $term_id)
+                ->where('attendance.result_setting_id', $term_id)
+                ->where('results.school_id', Auth::user()->id)
+                ->where('attendance.school_id', Auth::user()->id)
+                ->groupBy('results.student_id','results.student_roll_number', 'present')
+                ->orderBy('finalTotal', 'DESC')
+                ->orderBy('present', 'DESC')
+                ->orderBy('student_roll_number', 'ASC')
+                ->get();
+                
+    $findRank       = $rank->where('student_id', $student_id);
+    $studentRank    = $findRank->keys()->first() + 1;
+
+    return $studentRank;
+}
+
 
 ?>

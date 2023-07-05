@@ -2,6 +2,11 @@
 
 @push('css')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__display{
+        color: #000000 !important;
+    }
+</style>
 @endpush
 
 @section('content')
@@ -10,9 +15,9 @@
 
         <div class="row">
             <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>{{__('app.Assign Student Fees')}}</h5>
+                <div class="card shadow bg-primary text-white">
+                    <div class="card-header bg-primary border-light">
+                        <h5 class="card-title">{{__('app.Assign Student Fees')}}</h5>
                     </div>
                     <div class="card-body">
 
@@ -26,7 +31,6 @@
                         </div>
                         @endif
                         
-
                         <form action="{{route('school.finance.assign.fees.store')}}" method="POST">
                             @csrf
                             <div class="row">
@@ -70,7 +74,7 @@
                                 @endforeach
                             </div>
 
-                            <button type="submit" class="btn-sm btn-outline-primary">{{__('app.save')}}</button>
+                            <button type="submit" class="btn btn-outline-light px-5">{{__('app.save')}}</button>
                         </form>
                     </div>
                 </div>
@@ -80,7 +84,6 @@
         
     </main>
 
-@endsection
 
 @push('js')   
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -90,3 +93,4 @@
     $(".js-example-responsive").select2({});
 </script>
 @endpush
+@endsection

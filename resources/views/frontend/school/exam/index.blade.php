@@ -8,13 +8,13 @@
 @section('content')
     <!--start content-->
     <main class="page-content">
-        <div class="row">
+        <div class="row mt-5">
             <div class="col-md-12">
-                <div class="card">
+                <div class="card" style="box-shadow:4px 3px 13px  .7px #deaaf7;border-radius:5px">
                     <div class="card-body">
                         <div class="border p-3 rounded">
                             
-                            <div class="p-5 text-center">
+                            <div class="p-3 text-center">
                                 <table class="table d-none" id="tableShow">
                                     <thead>
                                       <tr>
@@ -34,7 +34,7 @@
                                 </table>
                             </div>
                             
-                            <h6 class="mb-0 text-uppercase">{{__('app.E1')}}</h6>
+                            <h3 class="mb-0 text-uppercase text-center">{{__('app.E1')}}</h3>
                             <hr/>
                             <div class="text-danger list">
                             </div>
@@ -47,7 +47,7 @@
                                     <div id="term_class">
                                         <div class="row">
                                             <div class="col-md">
-                                                <label>{{__('app.t')}}</label>
+                                                <label class="select-form">{{__('app.t')}}</label>
                                                 <select class="form-control mb-3 js-select" aria-label="Default select example"  id="term_id" required>
                                                     <option selected="" value="">--{{__('app.select')}}--</option>
                                                     @foreach($terms as $term)
@@ -58,7 +58,7 @@
                                             </div>
 
                                             <div class="col-md">
-                                                <label>{{__('app.shift')}}</label>
+                                                <label class="select-form">{{__('app.shift')}}</label>
                                                 <select class="form-control mb-3 js-select" id="shift_id" required>
                                                     <option selected="" value="">--{{__('app.select')}}--</option>
                                                     @foreach([1 => "Morning", 2=>"Day", 3=>"Evening"] as $key => $shift)
@@ -69,7 +69,7 @@
                                             </div>
                                             
                                             <div class="col-md" id="class">
-                                                <label>{{__('app.class')}}</label>
+                                                <label class="select-form">{{__('app.class')}}</label>
                                                 <select class="form-control mb-3 js-select"aria-label="Default select example"  onchange="showExamRoutine()"  id="class_id"  required>
                                                     <option selected="" value="">--{{__('app.select')}}--</option>
                                                     @foreach($classes as $class)
@@ -270,10 +270,10 @@
                     datatype: "json",
                     success: function(data) {
                         $("#show_routine").append(`
-                            <tr class="text-center">
+                            <tr class:"text-center">
                                 <td colspan="6"> 
-                                    <a href="{{ url('school/student/create/exam/routine/pdf/${class_id}/${term_id}') }}" class="btn btn-primary" ><i class="fas fa-file-pdf"></i></a> 
-                                      <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#resultModal"><i class="bi bi-eye-fill"></i></a> 
+                                    <a href="{{ url('school/student/create/exam/routine/pdf/${class_id}/${term_id}') }}" class="btn btn-primary btn-sm" ><i class="fas fa-file-pdf"></i></a> 
+                                      <a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#resultModal"><i class="bi bi-eye-fill"></i></a> 
                                 </td>
                             </tr> 
                         `);
@@ -330,8 +330,8 @@
             text: "You won't be able to revert this!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#7c00a7',
+            cancelButtonColor: '#6c757d',
             confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {

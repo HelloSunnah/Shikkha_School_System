@@ -8,7 +8,7 @@
                 <div class="card">
 
                     <div class="ms-auto">
-                        <a href="{{ route('syllabus.form.show') }}" class="btn btn-primary">{{ __('app.View') }}</a>
+                        <a href="{{ route('syllabus.form.show') }}" class="btn btn-primary  mt-2 me-2" title="{{ __('app.View') }}"><i class="bi bi-eye"></i></a>
 
                     </div>
 
@@ -16,16 +16,16 @@
                         <div class="border p-3 rounded">
                             <h6 class="mb-0 text-uppercase"></h6>
                             <hr />
-                            <h4>{{ __('app.Syllabus') }}</h4>
+                            <h4>{{ __('app.Syllabus') }} {{ __('app.Create') }}</h4>
                             <form class="row g-3" method="post" action="{{ route('syllabus.create.post') }}">
                                 @csrf
                                 <div class="col-md-12">
                                 </div>
-                                <div class="col-12">
-                                    <label for="">Select Class<span style="color:red;">*</span></label>
+                                <div class="col-12 mt-4">
+                                    <label class="select-form">{{ __('app.select_class') }}<span style="color:red;">*</span></label>
                                     <select class="form-control mb-3 js-select" aria-label="Default select example" name="class_id"
                                         id="class_id" onchange="loadSubject()">
-                                        <option value="" selected>Select One</option>
+                                        <option value="" selected> {{ __('app.select') }}</option>
                                         @foreach ($class as $data)
                                             <option value="{{ $data->id }}">{{ $data->class_name }}</option>
                                         @endforeach
@@ -36,11 +36,11 @@
                                     @enderror
 
                                 </div>
-                                <div class="col-12">
-                                    <label for="">Select Term<span style="color:red;">*</span></label>
+                                <div class="col-12 mt-4">
+                                    <label class="select-form"> {{ __('app.term') }} {{ __('app.select') }}<span style="color:red;">*</span></label>
                                     <select class="form-control mb-3 js-select" aria-label="Default select example" name="term_id"
                                         id="term_id">
-                                        <option value="" selected>Select One</option>
+                                        <option value="" selected> {{ __('app.select') }}</option>
                                         @foreach ($term as $data)
                                             <option value="{{ $data->id }}">{{ $data->term_name }}</option>
                                         @endforeach
@@ -52,11 +52,11 @@
                                 </div>
 
 
-                                <div class="col-12">
-                                    <label for="">Select Subject<span style="color:red;">*</span></label>
+                                <div class="col-12 mt-4">
+                                    <label class="select-form"> {{ __('app.select') }} {{ __('app.Subject') }}<span style="color:red;">*</span></label>
                                     <select class="form-control mb-3 js-select" aria-label="Default select example" name="subject_id"
                                         id="subject_id">
-                                        <option value="" selected>Select One</option>
+                                        <option value="" selected> {{ __('app.select') }}</option>
                                         <!-- @foreach ($subjects as $subject)
                                             <option value="{{ $subject->id }}">{{ $subject->subject_name }}</option>
                                         @endforeach -->

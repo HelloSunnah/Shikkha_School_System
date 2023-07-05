@@ -21,7 +21,7 @@ class AddonController extends Controller
         $id = $request->addon_package_id;
        $addoncheckoutinfo = AddonModel::where('id', $id)->first();
         return view('frontend.school.AddonSchool.AddonCheckoutShow', compact('addoncheckoutinfo'));
-    }
+      }
 //      public function SchoolAddonCheckout($id){
 //         $school = school::find(Auth::user()->id);
 //         $addoncheckoutinfo = AddonModel::find($id);

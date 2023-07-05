@@ -21,6 +21,8 @@ class ClassPeriods extends Migration
             $table->text('to_time');
             $table->integer('shift');
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
+            $table->softDeletes();
+
             
         });
     }
@@ -33,6 +35,8 @@ class ClassPeriods extends Migration
     public function down()
     {
         Schema::dropIfExists('class_periods');
+        $table->dropSoftDeletes();
+
         
     }
 }

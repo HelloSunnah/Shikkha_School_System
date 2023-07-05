@@ -19,9 +19,12 @@ class CreateStudentMonthlyFeesTable extends Migration
             $table->string('month_id')->nullable();
             $table->integer('amount')->default(0);
             $table->integer('status')->default(0);
+            $table->integer('paid_amount')->default(0);
+            $table->foreignId('fees_type_id')->constrained('fees_types')->cascadeOnDelete();
             $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

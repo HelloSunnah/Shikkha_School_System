@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-xl-6 mx-auto">
 
-                <div class="card">
+                <div class="card" style="box-shadow:4px 3px 13px  .7px #deaaf7;border-radius:5px">
                     <div class="card-body">
                         <div class="border p-3 rounded">
                             <h6 class="mb-0 text-uppercase">{{$teacherText}} Form</h6>
@@ -19,22 +19,18 @@
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">Notice Topic <span style="color:red;">*</span></label>
-                                        <div class="input-group mb-3">
-                                            <input type="text" class="form-control" placeholder="Notice Topic" name="topic" required>
-                                        </div>
+                                            <input type="text" class="form-control" name="topic" required>
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">Notice Description <span style="color:red;">*</span></label>
-                                        <div class="input-group mb-3">
-                                            <textarea type="text" class="form-control" placeholder="Notice Description" name="description" rows="10" required></textarea>
-                                        </div>
+                                            <textarea type="text" class="form-control" name="description" rows="10" required></textarea>
                                     </div>
 
                                     <div class="col-12">
-                                        <label class="form-label">Class Name <span style="color:red;">*</span></label>
+                                        <label class="select-form">Class Name</label>
                                         <select class="form-control mb-3 js-select"aria-label="Default select example" name="class_id" required>
-                                            <option selected="">Class Name</option>
-                                            <option value="0" selected>All Student</option>
+                                            {{-- <option selected="">Class Name</option> --}}
+                                            <option value="0" selected>Notice for all</option>
                                             @foreach(\App\Models\InstituteClass::where('school_id',Auth::user()->id)->get() as $data)
                                                 <option value="{{$data->id}}">{{$data->class_name}}</option>
                                             @endforeach

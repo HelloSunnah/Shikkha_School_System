@@ -18,10 +18,11 @@ class CreateUsersTable extends Migration
             $table->string('unique_id')->nullable();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('roll_number')->unique();
+            $table->integer('roll_number')->unique();
             $table->string('phone')->unique();
             $table->string('dob')->nullable();
             $table->string('gender')->nullable();
+            $table->string('discount')->nullable();
             $table->string('blood_group')->nullable();
             $table->string('father_name')->nullable();
             $table->string('mother_name')->nullable();
@@ -37,6 +38,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('shift')->default(2)->comment('1=morning, 2=day, 3=eveing');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -48,5 +50,6 @@ class CreateUsersTable extends Migration
     public function down()
     {
         Schema::dropIfExists('users');
+        $table->dropSoftDeletes();
     }
 }

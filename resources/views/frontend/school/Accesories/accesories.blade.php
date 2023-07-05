@@ -14,7 +14,7 @@
                             <table class="table" style="border:1px solid rgb(43, 60, 188">
                                 <div class="row my-3">
                                     <div class="col">
-                                        <a class="btn btn-success" href="{{route('accesoriesType')}}"> + Accesories </a>
+                                        <a class="btn btn-info" href="{{route('accesoriesType')}}"> + Accesories </a>
                                         <a class="btn btn-primary" href="{{route('receipt.Show')}}">History</a>
                                     </div>
                                 </div>
@@ -78,7 +78,7 @@
                                         <td>
                                             <h5 class="mt-1" id="price"></h5>
                                         </td>
-                                        <td><button id="add" class="btn btn-success">{{__('app.add')}}</button></td>
+                                        <td><button id="add" class="btn btn-primary">{{__('app.add')}}</button></td>
                                     </tr>
                                     <tr>
                                     </tr>
@@ -92,31 +92,27 @@
                 <div class="col-12"></div>
 
                 <div class="col-md-7  mt-4" style="border:1px solid rgb(43, 60, 188)">
-                    <div class="col-lg-2">
-                        <img src="{{ asset($school->school_logo) }}" width="80" class="rounded-circle shadow-8-strong" style="margin-left:50px; margin-top:10px; margin-bottom:8px;" alt="">
-                    </div>
-                    <div class="p-4" id="printDiv">
-                        <div class="text-center">
-                            @if( app()->getLocale() === 'en')
-                            <h4>{{$school->school_name}}</h4>
-                            @else
-                            <h4>{{$school->school_name_bn}}</h4>
-                            @endif
-                            @if( app()->getLocale() === 'en')
-                            <p style="margin-top:-5px !important;font-size:12px">{{$school->slogan}}</p>
-                            @else
-                            <p style="margin-top:-5px !important;font-size:12px">{{$school->slogan_bn}}</p>
-                            @endif
-                            <p style="margin-top:-5px !important;font-size:14px">{{$school->address}}</p>
-                            <div class="row text-center">
-
-                                <h5 style="margin-top:5px !important;font-size:22px;margin-bottom:10px;">Receipt</h5>
-                            </div>
-                        </div>
-
-
-
-
+                    <div class="p-4" id="printDiv"> 
+                        <div class="d-flex justify-content-center">
+                            @if (File::exists(public_path(Auth::user()->school_logo)) && !is_null(Auth::user()->school_logo))
+                                <img src="{{asset(Auth::user()->school_logo)}}" alt="school logo" class="img-fluid" width="80" style="width:80px; height:80px;margin-right:20px;">
+                            @endif                                                                                                                                                                 
+                            <div class="text-center text-dark">
+                                @if( app()->getLocale() === 'en')
+                                <h4>{{$school->school_name}}</h4>
+                                <p style="margin-top:-5px !important;font-size:12px">{{$school->slogan}}</p>
+                                <p style="margin-top:-5px !important;font-size:14px">{{$school->address}}</p>
+                                @else
+                                    <h4>{{$school->school_name_bn}}</h4>
+                                    <p style="margin-top:-5px !important;font-size:12px">{{$school->slogan_bn}}</p>
+                                    <p style="margin-top:-5px !important;font-size:14px">{{$school->address_bn}}</p>
+                                @endif                                
+                                    
+                                <div class="row text-center">
+                                    <h5 style="margin-top:5px !important;font-size:22px;margin-bottom:10px;">{{__('app.Receipt')}}</h5>
+                                </div>                                
+                            </div>                                        
+                        </div><br>
 
                         <div class="row ">
                             <div class="col-5"> <span class="mt-2"> {{__('app.name')}}: </span><span class="mt-2" id="share"></span>
@@ -176,10 +172,182 @@
                         </div>
                     </div>
 
-                    <div class="row my-3 float-right">
-                        <div class="col">
+        {{-- Print Receipt --}}
+                    <div class="col-12" style="display: none">
+                        <div id="printDiv">
+                            <div class="p-4"> 
+                                <div class="d-flex justify-content-center">
+                                    @if (File::exists(public_path(Auth::user()->school_logo)) && !is_null(Auth::user()->school_logo))
+                                        <img src="{{asset(Auth::user()->school_logo)}}" alt="school logo" class="img-fluid" width="80" style="width:80px; height:80px;margin-right:20px;">
+                                    @endif                                                                                                                                                                 
+                                    <div class="text-center text-dark">
+                                        @if( app()->getLocale() === 'en')
+                                        <h4>{{$school->school_name}}</h4>
+                                    @else
+                                        <h4>{{$school->school_name_bn}}</h4>
+                                    @endif
 
-                            <button onclick="printDiv('printDiv')" class="btn btn-success">{{__('app.print')}}</button>
+                                    @if( app()->getLocale() === 'en')
+                                        <p style="margin-top:-5px !important;font-size:12px">{{$school->slogan}}</p>
+                                    @else
+                                        <p style="margin-top:-5px !important;font-size:12px">{{$school->slogan_bn}}</p>
+                                    @endif
+                                        <p style="margin-top:-5px !important;font-size:14px">{{$school->address}}</p>
+                                    <div class="row text-center">
+                                        <h5 style="margin-top:5px !important;font-size:22px;margin-bottom:10px;">{{__('app.School')}} {{__('app.Receipt')}}</h5>
+                                    </div>
+                                        
+                                    </div>                                        
+                                </div><br>
+        
+                                <div class="row ">
+                                    <div class="col-5"> <span class="mt-2"> {{__('app.name')}}: </span><span class="mt-2" id="share"></span>
+        
+                                    </div>
+                                    <div class="col-5"> <span class="mt-2"> {{__('app.roll')}} : </span><span class="mt-2" id="s_roll"></span>
+        
+                                    </div>
+                                </div>
+        
+                                <div class="row">
+                                    <div class="col-5"> <span class="mt-2"> {{__('app.class')}}: </span><span class="mt-2" id="s_class"></span>
+        
+                                    </div>
+                                    <div class="col-5"> <span class="mt-2"> {{__('app.Section')}}: </span><span class="mt-2" id="s_section"></span>
+        
+                                    </div>
+                                </div>
+                                <span class="mt-4"> {{__('app.time')}} : </span><span class="mt-4" id="time"></span>
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6 col-md-6 ">
+                                        <span id="day">{{date('F')}}</span> : <span id="year">{{date('d/m/Y')}}</span>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-md-6 text-right">
+                                    </div>
+                                    <div class="row">
+                                        </span>
+                                        <table id="receipt_bill" class="table mt-3">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center"></th>
+                                                    <th>{{(__('app.Accessories'))}}</th>
+                                                    <th>{{__('app.quantity')}}</th>
+                                                    <th class="text-center">{{__('app.Price')}}</th>
+                                                    <th class="text-center">{{__('app.total')}}</th>
+        
+                                                </tr>
+                                            </thead>
+                                            <tbody id="new">
+        
+                                            </tbody>
+                                            <tr>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td class="text-right text-dark">
+                                                    <h6>{{__('app.total')}}: ৳ </h6>
+                                                </td>
+                                                <td class="text-center text-dark">
+                                                    <h5> <strong><span id="subTotal"></strong></h5>
+                                                </td>
+                                                </td>
+                                            </tr>
+        
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-4"> 
+                                <div class="d-flex justify-content-center">
+                                    @if (File::exists(public_path(Auth::user()->school_logo)) && !is_null(Auth::user()->school_logo))
+                                        <img src="{{asset(Auth::user()->school_logo)}}" alt="school logo" class="img-fluid" width="80" style="width:80px; height:80px;margin-right:20px;">
+                                    @endif                                                                                                                                                                 
+                                    <div class="text-center text-dark">
+                                        @if( app()->getLocale() === 'en')
+                                        <h4>{{$school->school_name}}</h4>
+                                    @else
+                                        <h4>{{$school->school_name_bn}}</h4>
+                                    @endif
+                                    @if( app()->getLocale() === 'en')
+                                        <p style="margin-top:-5px !important;font-size:12px">{{$school->slogan}}</p>
+                                    @else
+                                        <p style="margin-top:-5px !important;font-size:12px">{{$school->slogan_bn}}</p>
+                                    @endif
+                                        <p style="margin-top:-5px !important;font-size:14px">{{$school->address}}</p>
+                                    <div class="row text-center">
+                                        <h5 style="margin-top:5px !important;font-size:22px;margin-bottom:10px;">{{__('app.Student')}} {{__('app.Receipt')}}</h5>
+                                    </div>
+                                        
+                                    </div>                                        
+                                </div><br>
+        
+                                <div class="row ">
+                                    <div class="col-5"> <span class="mt-2"> {{__('app.name')}}: </span><span class="mt-2" id="share"></span>
+        
+                                    </div>
+                                    <div class="col-5"> <span class="mt-2"> {{__('app.roll')}} : </span><span class="mt-2" id="s_roll"></span>
+        
+                                    </div>
+                                </div>
+        
+                                <div class="row">
+                                    <div class="col-5"> <span class="mt-2"> {{__('app.class')}}: </span><span class="mt-2" id="s_class"></span>
+        
+                                    </div>
+                                    <div class="col-5"> <span class="mt-2"> {{__('app.Section')}}: </span><span class="mt-2" id="s_section"></span>
+        
+                                    </div>
+                                </div>
+                                <span class="mt-4"> {{__('app.time')}} : </span><span class="mt-4" id="time"></span>
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6 col-md-6 ">
+                                        <span id="day">{{date('F')}}</span> : <span id="year">{{date('d/m/Y')}}</span>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-md-6 text-right">
+                                    </div>
+                                    <div class="row">
+                                        </span>
+                                        <table id="receipt_bill" class="table mt-3">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center"></th>
+                                                    <th>{{(__('app.Accessories'))}}</th>
+                                                    <th>{{__('app.quantity')}}</th>
+                                                    <th class="text-center">{{__('app.Price')}}</th>
+                                                    <th class="text-center">{{__('app.total')}}</th>
+        
+                                                </tr>
+                                            </thead>
+                                            <tbody id="new">
+        
+                                            </tbody>
+                                            <tr>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td class="text-right text-dark">
+                                                    <h6>{{__('app.total')}}: ৳ </h6>
+                                                </td>
+                                                <td class="text-center text-dark">
+                                                    <h5> <strong><span id="subTotal"></strong></h5>
+                                                </td>
+                                                </td>
+                                            </tr>
+        
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+        {{-- End Print Receipt --}}
+
+                    <div class="row my-3 float-right">
+                        <div class="col d-flex justify-content-cemter">
+
+                            <button onclick="printDiv('printDiv')" class="btn btn-primary">{{__('app.print')}}</button>
                         </div>
                     </div>
 

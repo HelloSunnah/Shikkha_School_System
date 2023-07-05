@@ -9,8 +9,8 @@
                     <div class="card-header py-3 bg-transparent">
                         <div class="d-sm-flex align-items-center">
                             <h5 class="mb-2 mb-sm-0"></h5>
-                            <div class="col-md-2">
-                                <label>{{ __('app.Class_Question') }}</label>
+                            <div class="col-md-6 mt-3">
+                                <label class="select-form">{{ __('app.Class_Question') }}</label>
                                 <select class="form-control mb-3 js-select"aria-label="Default select example" name="exam_term"
                                     id="examTerm" onchange="termWisequestion()">
                                     <option selected="" value="">{{ __('app.select') }}</option>
@@ -21,12 +21,12 @@
                             </div>
 
                             <div class="ms-auto">
-                                <button type="button" class="btn btn-secondary"
-                                    onclick="history.back()">{{ __('app.back') }}</button>
-                                <a href="{{ route('create.question.show') }}"
-                                    class="btn btn-primary">{{ __('app.qstion_create') }}</a>
-                                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal"><i class="lni lni-youtube"></i> Tutorial</button>
+                                <button title="{{ __('app.back') }}" type="button" class="btn btn-secondary btn-sm"
+                                    onclick="history.back()"><i class="bi bi-arrow-left-square"></i></button>
+                                <a title="{{ __('app.qstion_create') }}" href="{{ route('create.question.show') }}"
+                                    class="btn btn-primary btn-sm"> <i class="bi bi-plus-square"></i></a>
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal" title="{{ __('app.Tutorial') }}"><i class="lni lni-youtube"></i></button>
 
                             </div>
                         </div>
@@ -36,9 +36,13 @@
                             
                             <div class="table-responsive">
                                 <table id="example" class="table table-striped table-bordered text-center" style="width:100%">
+                                    <button type="button" class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#delete_all_records" >
+                                        {{__('app.deleteall')}}
+                                       </button>
                                     <thead>
                                         <tr>
-                                            <th>{{ __('app.no') }}</th>
+                                            <th><input type="checkbox" id="select_all_ids"></th>
+                                            <th>{{ __('app.ID') }}</th>
                                             <th>{{ __('app.t') }}</th>
                                             <th>{{ __('app.type') }}</th>
                                             <th>{{ __('app.class') }}</th>
@@ -48,7 +52,8 @@
                                     </thead>
                                     <tbody id="show">
                                         @foreach ($questions as $key => $question)
-                                            <tr class="hide">
+                                            <tr class="hide" id="question_ids{{$question->id}}">
+                                            <td><input type="checkbox" class="check_ids" name="ids" value="{{$question->id}}"></td>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $question->term?->term_name }}</td>
                                                 <td>{{ $question->type }}</td>
@@ -58,18 +63,18 @@
                                                     <div class="btn-group mr-2" role="group" aria-label="First group">
                                                         @if ($question->type == 'MCQ' || $question->type == 'Creative')
                                                             <a href="{{ route('view.mcq.creative.question', $question->id) }}"
-                                                                class="btn btn-outline-info">View</a>
+                                                                class="btn btn-outline-info btn-sm" title="{{__('app.View')}}"><i class="bi bi-eye"></i></a>
                                                         @else
                                                             <a href="{{ route('view.mcq.creative.question', $question->id) }}"
-                                                                class="btn btn-outline-info">View</a>
+                                                                class="btn btn-outline-info btn-sm" title="{{__('app.View')}}"><i class="bi bi-eye"></i></a>
                                                         @endif
                                                         <a href="{{ route('edit.question', $question->id) }}"
-                                                            class="btn btn-outline-success"
-                                                            style="margin-left: 5px; margin-right: 5px;">Edit</a>
+                                                            class="btn btn-outline-primary btn-sm"
+                                                            style="margin-left: 5px; margin-right: 5px;" title="{{__('app.Edit')}}"><i class="bi bi-pencil-square"></i></a>
 
-                                                        <button type="button" class="btn btn-outline-danger"
+                                                        <button type="button" class="btn btn-outline-danger btn-sm"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#deleteModal{{ $key }}">Delete</button>
+                                                            data-bs-target="#deleteModal{{ $key }}" title="{{__('app.Delete')}}"><i class="bi bi-trash-fill"></i></button>
                                                     </div>
                                                 </td>
                                                 <div class="modal fade" id="deleteModal{{ $key }}" tabindex="-1"
@@ -89,9 +94,9 @@
                                                                     Are you sure delete this question !?
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-danger"
+                                                                    <button type="button" class="btn btn-danger btn-sm"
                                                                         data-bs-dismiss="modal">No</button>
-                                                                    <button type="submit" class="btn btn-primary">Yes</button>
+                                                                    <button type="submit" class="btn btn-primary btn-sm">Yes</button>
                                                                 </div>
                                                             </form>
 
@@ -114,6 +119,27 @@
             </div>
         </div>
     </main>
+             <!-- delete checkbox Modal -->
+<div class="modal fade" id="delete_all_records" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" >
+        <div class="modal-header" style="background-color:blueviolet;">
+          <h4 class="modal-title" id="exampleModalLabel" style="color:white;">{{__('app.Question')}} {{__('app.Record')}}</h4>
+          <button type="button" class="btn-close btn-white" style="color:white;" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h5>
+            {{__('app.checkdelete')}}
+          </h5>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__('app.no')}}</button>
+          <button type="button" class="btn btn-primary all_delete" id="all_delete"
+          style="background-color:blueviolet !important;border-color:blueviolet !important;">{{__('app.yes')}}</button>
+        </div>
+      </div>
+    </div>
+</div>
     @include('frontend.partials.tutorial')
 @endsection
 
@@ -227,7 +253,7 @@
                                 <div class="btn-group mr-2" role="group" aria-label="First group">
                                     {{--  <button onclick="showData(${value.id})" data-bs-toggle="modal" data-bs-target="#view_question" class="btn btn-outline-info">View</button> --}}
                                     <a href="{{ url('school/view/mcq/creative/question/') }}/${value.id}"  class="btn btn-outline-info">View</a>
-                                    <a href="{{ url('/school/edit/question/') }}/ ${value.id}" class="btn btn-outline-success" style="margin-left: 5px; margin-right: 5px;">Edit</a>
+                                    <a href="{{ url('/school/edit/question/') }}/ ${value.id}" class="btn btn-outline-primary" style="margin-left: 5px; margin-right: 5px;">Edit</a>
                                     <button onclick="deleteQuestion(${value.id})" class="btn btn-outline-danger">Delete</button>
                                     {{-- <a href="{{ route('pdf.question', $question->id) }}" class="btn btn-outline-warning" style="margin-left: 5px; margin-right: 5px;">PdF</a> --}}
                                 </div>
@@ -267,5 +293,32 @@
             });
             termWisequestion();
         }
+        $(function(e){
+         $("#select_all_ids").click(function(){
+            $('.check_ids').prop('checked',$(this).prop('checked'));
+         });
+         $("#all_delete").click(function(e){
+            e.preventDefault();
+            var all_ids=[];
+            $('input:checkbox[name=ids]:checked').each(function(){
+                all_ids.push($(this).val());
+            });
+            //console.log(all_ids);
+            $.ajax({
+                url:"{{route('Question.check.delete')}}",
+                type:"DELETE",
+                data:{
+                    ids:all_ids,
+                    _token:"{{csrf_token()}}"
+                },
+                success:function(response){
+                    $.each(all_ids,function(key,val){
+                        $('#question_ids'+val).remove();
+                        window.location.reload(true);
+                    });
+                }
+            });
+         });
+        });
     </script>
 @endpush

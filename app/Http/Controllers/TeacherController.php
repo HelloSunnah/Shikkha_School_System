@@ -19,6 +19,7 @@ use App\Models\Todolist;
 use App\Models\User;
 use App\Models\ClassPeriod;
 use App\Models\MarkType;
+use App\Models\School;
 use App\Models\VaccineTeacher;
 use Exception;
 use Carbon\Carbon;
@@ -43,8 +44,6 @@ class TeacherController extends Controller
         $data = AssignTeacher::where('teacher_id',Auth::user()->id)->get();
         $showData = Notice::where('school_id',Auth::user()->school_id)->orderby('id','desc')->get()->toArray();
         $todo = \App\Models\Todolist::where('teacher_id',Auth::user()->id)->where('date', '>=', $abc )->orderBy('date', 'asc')->get();
-        // return $todo;
-        //return $abc = \App\Models\Routine::where('teacher_id',Auth::user()->id)->get()->groupBy('subject_id');
         return view('frontend.teacher.dashboard',compact('data','showData','todo'));
     }
 
@@ -56,11 +55,12 @@ class TeacherController extends Controller
     }
 
     public function profile(){
+        // $data = Auth::user()->id->first();
         return view('frontend.teacher.profile');
     }
 
     public function profileUpdate(Request $request,$id){
-       // dd($request->all());
+    // dd($request->all());
         $validator = Validator::make($request->all(),[
             'email' => 'required',
             'phone' => 'required|unique:teachers',
@@ -69,6 +69,14 @@ class TeacherController extends Controller
         ]);
           //  dd($request->all());
         $user = Teacher::where('id',$id)->first();
+
+        if ($request->hasFile('image')) {
+            // File::delete(public_path($teacher->image));
+            $fileName = time() . '.' . $request->file('image')->getclientOriginalExtension();
+            $request->file('image')->move(public_path('/uploads/teacher'), $fileName);
+            $fileName = "/uploads/teacher/" . $fileName;
+            $user->image = $fileName;
+        }
 
         $user->email = $request->email;
         $user->phone = $request->phone;
@@ -79,6 +87,8 @@ class TeacherController extends Controller
         $user->blood_group = $request->blood_group;
         $user->shift = $request->shift;
         $user->about = $request->about;
+        $user->M_status = $request->M_status;
+        $user->shift = $request->shift;
         $user->department_name = $request->department_name;
         $user->save();
         toast('Teacher Updated Successfully','success');
@@ -88,17 +98,30 @@ class TeacherController extends Controller
     }
 
     public function changePassword(Request $request){
-        // dd($request->all());
-        $user = Teacher::where('id',Auth::user()->id)->first();
-        if(Hash::check($request->password, $user->password)){
+        dd($request->all());
 
+        $request->validate([
+            'old_password' => 'required',
+            'password' => 'required',
+            'change_password' => 'required|confirmed',
+        ],
+        [
+            'old_password' =>'Not Matched With Password.',
+            'change_password' =>'Not Matched With Password.',
+        ]);
+        
+        $user = Teacher::where('id',Auth::user()->id)->first();
+        
+        if(Hash::check($request->old_password, $user->password)){
             $user->password = Hash::make($request->new_password);
             $user->save();
             toast('Password Updated Successfully','success');
+            return back()->with('success', 'Password changed successfully!');
         }else{
-            toast('Sorry Worng Password','error');
+            toast('Sorry Password Not Matched','error');
         }
-        return back();
+        return back()->with('error', 'Password not changed!');
+        
     }
 
     public function accountVaccine(){
@@ -409,6 +432,10 @@ class TeacherController extends Controller
         $showData = Notice::where('school_id',Auth::user()->school_id)->orderby('id','desc')->get()->toArray();
         return view('frontend.teacher.allResultShow',compact('data','showData','classes'));
     }
+  
+    public function  teacherShow(){}
+
+    
 
     public function teacherResultDataShow(Request $request,$subject_id){
         $dataTerm = Term::orderby('id','desc')->where('school_id',Auth::user()->school_id)->first();

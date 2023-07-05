@@ -19,6 +19,8 @@ class CreateStaffTypesTable extends Migration
             $table->string('position_name_bn');
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -30,5 +32,7 @@ class CreateStaffTypesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('staff_types');
+        $table->dropSoftDeletes();
+
     }
 }

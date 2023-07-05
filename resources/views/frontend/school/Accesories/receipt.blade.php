@@ -4,7 +4,7 @@
   <center>
     <h1>Accesories History</h1>
   </center>   
-   <a class="btn btn-success" href="{{route('reciept.create')}}">Back</a>
+   <a class="btn btn-secondary" href="{{route('reciept.create')}}">Back</a>
 
   <div class="col">
     <div class="card">

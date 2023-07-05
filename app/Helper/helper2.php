@@ -1,10 +1,121 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
-use App\Models\Attendance;
-use App\Models\InstituteClass;
-use App\Models\StudentFee;
 use App\Models\Subject;
+use App\Models\Attendance;
+use App\Models\CustomAttendanceInput;
+use App\Models\StudentFee;
+use App\Models\InstituteClass;
+use App\Models\StudentMonthlyFee;
+use App\Models\User;
+use App\Models\SEOModel;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * get student Monthly fees
+ * 
+ * @param int $classId
+ * 
+ * @param int $schoolId
+ * 
+ * @return mixed
+ */
+function studentMonthlyFee(int $classId, int $schoolId)
+{
+    $raw = InstituteClass::where(['id' =>  $classId, 'school_id'   =>  $schoolId])->first();
+
+    if(!is_null($raw))
+    {
+        return $raw->class_fees;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+
+/**
+ * get working hours
+ * 
+ * @param $schoolId
+ * @param $userId
+ * @param $resultSettingId
+ */
+function getWorkingDays($schoolId, $userId = null, $resultSettingId = null)
+{
+    $query = CustomAttendanceInput::where('school_id', $schoolId)->whereYear("created_at", date("Y"));
+
+    if(!is_null($resultSettingId))
+    {
+        $query->where('result_setting_id', $resultSettingId);
+    }
+
+    if(!is_null($userId))
+    {
+        $query->where('user_id', $userId);
+    }
+
+
+    if($query->exists())
+    {
+        return $query->first()->working_days;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+/**
+ * Get Present Day
+ */
+function getPresentDays($schoolId, $studentId, $resultSettingId = null)
+{
+    $query = CustomAttendanceInput::where('school_id', $schoolId)->where('user_id', $studentId)
+            ->whereYear("created_at", date("Y"));
+
+    if(!is_null($resultSettingId))
+    {
+        $query->where('result_setting_id', $resultSettingId);
+    }
+
+    if($query->exists())
+    {
+        return $query->first()->present;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+/**
+ * Get Present Day
+ */
+function getAbsentDays($schoolId, $studentId, $resultSettingId = null)
+{
+    $query = CustomAttendanceInput::where('school_id', $schoolId)->where('user_id', $studentId)
+            ->whereYear("created_at", date("Y"));
+
+    if(!is_null($resultSettingId))
+    {
+        $query->where('result_setting_id', $resultSettingId);
+    }
+
+    if($query->exists())
+    {
+        return $query->first()->absent;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+
 
 /**
  * class selected
@@ -13,6 +124,7 @@ function commonClassSelected($schoolId, $className)
 {
     return InstituteClass::where('school_id', $schoolId)->where('class_name', $className)->exists();
 }
+
 
 
 
@@ -2057,7 +2169,38 @@ function getStudentFees($schoolId, $classId, $feesType)
 {
     return StudentFee::where(['school_id' => $schoolId, 'class_id' => $classId, 'fees_type_id' => $feesType])->first();
 }
+function getFees($schoolId,$studentId,$monthId)
+{ 
+return StudentMonthlyFee::where(['school_id' => $schoolId,'student_id'=>$studentId,'month_id'=>$monthId])->sum('amount');
+}
+function getPaid($schoolId,$studentId,$monthId)
+{ 
+return StudentMonthlyFee::where(['school_id' => $schoolId,'student_id'=>$studentId,'month_id'=>$monthId])->sum('paid_amount');
+}
+function getDue($schoolId,$studentId,$monthId)
+{ 
+    $data1= StudentMonthlyFee::where(['school_id' => $schoolId,'student_id'=>$studentId,'month_id'=>$monthId])->sum('amount');
 
-?>
+  $data2=StudentMonthlyFee::where(['school_id' => $schoolId,'student_id'=>$studentId,'month_id'=>$monthId])->sum('paid_amount');
+$due=$data1-$data2;
+return $due;
+}
 
+function getStatus($schoolId,$studentId,$monthId){
+    $fee1='Due';
+    $fee2='Partial';
+    $fee3='Paid';
+    $StudentFees=StudentMonthlyFee::where(['school_id' => $schoolId,'student_id'=>$studentId,'month_id'=>$monthId])->get();
+    foreach($StudentFees as $fees ){
+        if($fees->status==0){
+            return '<span class="badge bg-danger">'. $fee1.'</span>' ;
+        }
+        elseif ($fees->status==1){
+            return '<span class="badge bg-primary">'. $fee2.'</span>' ;
+        }
+        else{
+            return '<span class="badge bg-success">'. $fee3.'</span>' ;
+        }
 
+    }
+}

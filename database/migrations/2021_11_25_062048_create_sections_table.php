@@ -19,6 +19,8 @@ class CreateSectionsTable extends Migration
             $table->string('active')->nullable();
             $table->foreignId('class_id')->constrained('institute_classes')->cascadeOnDelete();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
+            $table->softDeletes();
+
             $table->timestamps();
         });
     }
@@ -31,5 +33,7 @@ class CreateSectionsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('sections');
+        $table->dropSoftDeletes();
+
     }
 }

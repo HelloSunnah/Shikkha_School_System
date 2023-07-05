@@ -116,9 +116,9 @@
                                                 <p>{{__('app.Demo1')}}</p>
                                             </a>
                                         </li>
-                                           {{-- Blog --}} 
+                                        
                                         <li class="navigation__dropdown-menu__item">
-                                            <a href="{{url('/blog')}}" target="_blank" class="navigation__dropdown-menu__link orange"><span>
+                                            <a href="{{route('blog.page')}}" target="_blank" class="navigation__dropdown-menu__link orange"><span>
                                                     <svg width="24" height="22" viewBox="0 0 24 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M1 7V19C1 20.1046 1.89543 21 3 21H21C22.1046 21 23 20.1046 23 19V7M1 7V3C1 1.89543 1.89543 1 3 1H21C22.1046 1 23 1.89543 23 3V7M1 7H23M12 11H20M12 14H18M12 17H15M5.5 15H7.5C8.32843 15 9 14.3284 9 13.5V11.5C9 10.6716 8.32843 10 7.5 10H5.5C4.67157 10 4 10.6716 4 11.5V13.5C4 14.3284 4.67157 15 5.5 15Z" stroke="#FFC800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                                     <circle cx="4" cy="4" r="1" fill="#FFC800"/>
@@ -131,7 +131,7 @@
                                         </li>
                                         {{-- Video --}}
                                         <li class="navigation__dropdown-menu__item">
-                                            <a href="{{url('/videos')}}" target="_blank" class="navigation__dropdown-menu__link light-purple"><span>
+                                            <a href="{{route('videos.page')}}" target="_blank" class="navigation__dropdown-menu__link light-purple"><span>
                                                 <svg width="27" height="28" viewBox="0 0 581 394" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M288.508 20L20 118L288.508 210L554 118L288.508 20Z" stroke="#8930FD" stroke-width="40" stroke-linejoin="round"/>
                                                     <path d="M118 164V288.304C139.5 338.318 228 349 288.5 349C391.239 349 457 314.039 457 288.304C457 253.829 457 224.21 457 164" stroke="#8930FD" stroke-width="40" stroke-linejoin="round"/>
@@ -144,7 +144,7 @@
                                         </li>
                                         {{-- Rules --}}
                                         <li class="navigation__dropdown-menu__item">
-                                            <a href="{{url('/term-condition')}}" target="_blank" class="navigation__dropdown-menu__link dark-blue"><span>
+                                            <a href="{{route('term.condition')}}" target="_blank" class="navigation__dropdown-menu__link dark-blue"><span>
                   <svg width="17" height="22" viewBox="0 0 17 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M3 14C3 13.4477 3.44772 13 4 13H13C13.5523 13 14 13.4477 14 14C14 14.5523 13.5523 15 13 15H4C3.44772 15 3 14.5523 3 14Z" fill="#5577FF"/>
                   <path d="M3 17C3 16.4477 3.44772 16 4 16H11C11.5523 16 12 16.4477 12 17C12 17.5523 11.5523 18 11 18H4C3.44772 18 3 17.5523 3 17Z" fill="#5577FF"/>

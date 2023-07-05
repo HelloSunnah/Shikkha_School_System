@@ -3,13 +3,15 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class Subject extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $fillable = [
-        'class_id', 'subject_name', 'school_id', 'active'
+        'class_id', 'subject_name', 'result_total_mark', 'school_id', 'active'
     ];
 
     public function class_name()

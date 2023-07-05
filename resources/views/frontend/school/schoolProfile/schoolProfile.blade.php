@@ -9,14 +9,14 @@
 
                 <div class="card">
 
-                    <div style="background-color:#05a5f5; color:white;" class="card-header">
+                    <div style="background-color:#ae12e2; color:white;" class="card-header">
                         <div class="row">
                             <div class="col-lg-2">
                                 <img src="{{ asset($school->school_logo) }}" width="120"
                                     class="rounded-circle shadow-8-strong"
                                     style="margin-left:50px; margin-top:10px; margin-bottom:8px;" alt="">
                             </div>
-                            <div class="col-lg-10">
+                            <div class="col-lg-10 mt-4">
                                 @if (app()->getLocale() === 'en')
                                     <center>
                                         <h3 styleS="margin-top:40px;font-size:40px">{{ $school->school_name }}</h3>
@@ -48,8 +48,15 @@
                                             <th>School Name</th>
                                             <td>{{ $school->school_name }}</td>
                                         </tr>
-                                        <th>School Name Bangla</th>
-                                        <td>{{ $school->school_name_bn ? $school->school_name_bn : '' }}</td>
+                                            <th>School Name In Bangla</th>
+                                            <td>{{ $school->school_name_bn ? $school->school_name_bn : '' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>School Slogan</th>
+                                            <td>{{ $school->slogan }}</td>
+                                        </tr>
+                                            <th>School Slogan In Bangla</th>
+                                            <td>{{ $school->slogan_bn ? $school->slogan_bn : '' }}</td>
                                         </tr>
                                         <tr>
                                             <th>Ein Number</th>
@@ -107,11 +114,15 @@
                                             <th>Address</th>
                                             <td> {{ $school->address }}</td>
                                         </tr>
+                                        <tr>
+                                            <th>Address In Bangla</th>
+                                            <td> {{ $school->address_bn ? $school->address_bn : "" }}</td>
+                                        </tr>
 
                                         <tr>
                                             <th>Edit Profile</th>
                                             <td><a href="{{ route('school.profileEdit', $school->id) }}"
-                                                    class="btn btn-primary btn-sm">Edit</a></td>
+                                                    class="btn btn-primary btn-sm" title="{{__('app.Edit')}}"><i class="bi bi-pencil-square"></i></a></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -129,9 +140,9 @@
     <div class="modal fade" id="loginPassword" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{ __('app.sign5') }} {{ __('app.Change') }} </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header" style="background: #7c00a7">
+                    <h5 class="modal-title text-white" id="exampleModalLabel">{{ __('app.sign5') }} {{ __('app.Change') }} </h5>
+                    <button type="button" class="btn-close btn-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="" id="addPassword" method="post">
                     @csrf
@@ -153,9 +164,9 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"
+                        <button type="button" class="btn btn-secondary btn-sm"
                             data-bs-dismiss="modal">{{ __('app.close') }}</button>
-                        <button type="submit" class="btn btn-success add_btn">{{ __('app.Save') }}</button>
+                        <button type="submit" class="btn btn-primary btn-sm add_btn">{{ __('app.Save') }}</button>
                     </div>
                 </form>
             </div>

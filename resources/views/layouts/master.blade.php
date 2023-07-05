@@ -21,7 +21,7 @@
 
     <link href="{{ asset('assets/admin/css/animate.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/admin/css/style.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
 
 
 </head>
@@ -32,12 +32,12 @@
         <ul>
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+    @endforeach
+    </ul>
     </div>
-@endif --}}
+    @endif --}}
     <div id="wrapper">
-       
+
         @include('layouts.sidebar')
 
         <div id="page-wrapper" class="gray-bg dashbard-1">
@@ -45,18 +45,18 @@
             @include('layouts.topnav')
 
             @yield('content')
-            
+
             <div class="footer">
                 <div class="float-right">
-                    10GB of <strong>250GB</strong> Free.
+                    Best Software Company for ERP Soluation.
                 </div>
                 <div>
-                    <strong>Copyright</strong> Example Company &copy; 2014-2018
+                    <strong>Copyright</strong> Codecell Ltd. &copy; 2018
                 </div>
             </div>
 
         </div>
-        <div class="small-chat-box fadeInRight animated">
+        {{-- <div class="small-chat-box fadeInRight animated">
 
             <div class="heading" draggable="true">
                 <small class="chat-date float-right">
@@ -141,8 +141,8 @@
                 <i class="fa fa-comments"></i>
 
             </a>
-        </div>
-        <div id="right-sidebar" class="animated">
+        </div> --}}
+        {{-- <div id="right-sidebar" class="animated">
             <div class="sidebar-container">
 
                 <ul class="nav nav-tabs navs-3">
@@ -410,8 +410,7 @@
                             </span>
                             <div class="switch">
                                 <div class="onoffswitch">
-                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox"
-                                        id="example">
+                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox" id="example">
                                     <label class="onoffswitch-label" for="example">
                                         <span class="onoffswitch-inner"></span>
                                         <span class="onoffswitch-switch"></span>
@@ -425,8 +424,7 @@
                             </span>
                             <div class="switch">
                                 <div class="onoffswitch">
-                                    <input type="checkbox" name="collapsemenu" checked class="onoffswitch-checkbox"
-                                        id="example2">
+                                    <input type="checkbox" name="collapsemenu" checked class="onoffswitch-checkbox" id="example2">
                                     <label class="onoffswitch-label" for="example2">
                                         <span class="onoffswitch-inner"></span>
                                         <span class="onoffswitch-switch"></span>
@@ -440,8 +438,7 @@
                             </span>
                             <div class="switch">
                                 <div class="onoffswitch">
-                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox"
-                                        id="example3">
+                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox" id="example3">
                                     <label class="onoffswitch-label" for="example3">
                                         <span class="onoffswitch-inner"></span>
                                         <span class="onoffswitch-switch"></span>
@@ -455,8 +452,7 @@
                             </span>
                             <div class="switch">
                                 <div class="onoffswitch">
-                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox"
-                                        id="example4">
+                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox" id="example4">
                                     <label class="onoffswitch-label" for="example4">
                                         <span class="onoffswitch-inner"></span>
                                         <span class="onoffswitch-switch"></span>
@@ -470,8 +466,7 @@
                             </span>
                             <div class="switch">
                                 <div class="onoffswitch">
-                                    <input type="checkbox" checked name="collapsemenu" class="onoffswitch-checkbox"
-                                        id="example5">
+                                    <input type="checkbox" checked name="collapsemenu" class="onoffswitch-checkbox" id="example5">
                                     <label class="onoffswitch-label" for="example5">
                                         <span class="onoffswitch-inner"></span>
                                         <span class="onoffswitch-switch"></span>
@@ -485,8 +480,7 @@
                             </span>
                             <div class="switch">
                                 <div class="onoffswitch">
-                                    <input type="checkbox" checked name="collapsemenu" class="onoffswitch-checkbox"
-                                        id="example6">
+                                    <input type="checkbox" checked name="collapsemenu" class="onoffswitch-checkbox" id="example6">
                                     <label class="onoffswitch-label" for="example6">
                                         <span class="onoffswitch-inner"></span>
                                         <span class="onoffswitch-switch"></span>
@@ -500,8 +494,7 @@
                             </span>
                             <div class="switch">
                                 <div class="onoffswitch">
-                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox"
-                                        id="example7">
+                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox" id="example7">
                                     <label class="onoffswitch-label" for="example7">
                                         <span class="onoffswitch-inner"></span>
                                         <span class="onoffswitch-switch"></span>
@@ -525,7 +518,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 
     <!-- Mainly scripts -->
@@ -535,6 +528,7 @@
     <script src="{{ asset('assets/admin/js/plugins/metisMenu/jquery.metisMenu.js') }}"></script>
     <script src="{{ asset('assets/admin/js/plugins/slimscroll/jquery.slimscroll.min.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/29.1.0/classic/ckeditor.js"></script>
 
     <!-- Flot -->
     <script src="{{ asset('assets/admin/js/plugins/flot/jquery.flot.js') }}"></script>
@@ -570,12 +564,23 @@
     <script src="{{ asset('assets/admin/js/plugins/chartJs/Chart.min.js') }}"></script>
 
     <!-- ckeditor 4-->
-    <script src="https://cdn.ckeditor.com/4.17.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('sweetalert::alert')
+    <style>
+        function toggle-status(id) {}
+    </style>
+
+    @include('sweetalert::alert')
+    <style>
+        function toggle-status(id) {}
+    </style>
+
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
     <script>
-        CKEDITOR.replace( 'editor1' );
+        CKEDITOR.replace('editor1');
     </script>
     <script>
-        CKEDITOR.replace( 'editor2' );
+        CKEDITOR.replace('editor2');
     </script>
 
     <!-- Toastr -->
@@ -583,175 +588,39 @@
     <script src="http://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
     {!! Toastr::message() !!}
 
-        <!-- Page-Level Scripts -->
+    <!-- Page-Level Scripts -->
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
             $('.dataTables-example').DataTable({
                 pageLength: 25,
                 responsive: true,
                 dom: '<"html5buttons"B>lTfgitp',
                 buttons: [
-                   // { extend: 'copy'},
-                   // {extend: 'csv'},
-                   // {extend: 'excel', title: 'ExampleFile'},
-                   // {extend: 'pdf', title: 'ExampleFile'},
+                    // { extend: 'copy'},
+                    // {extend: 'csv'},
+                    // {extend: 'excel', title: 'ExampleFile'},
+                    // {extend: 'pdf', title: 'ExampleFile'},
 
-                    {extend: 'print',
-                        customize: function (win){
+                    {
+                        extend: 'print',
+                        customize: function(win) {
                             $(win.document.body).addClass('white-bg');
                             $(win.document.body).css('font-size', '10px');
 
                             $(win.document.body).find('table')
-                                    .addClass('compact')
-                                    .css('font-size', 'inherit');
-                    }
+                                .addClass('compact')
+                                .css('font-size', 'inherit');
+                        }
                     }
                 ]
 
             });
 
         });
-
     </script>
 
 
-    <script>
-        // $(document).ready(function() {
-        //     setTimeout(function() {
-        //         toastr.options = {
-        //             closeButton: true,
-        //             progressBar: true,
-        //             showMethod: 'slideDown',
-        //             timeOut: 4000
-        //         };
-        //         toastr.success('Responsive Admin Theme', 'Welcome to INSPINIA');
 
-        //     }, 1300);
-
-
-            var data1 = [
-                [0, 4],
-                [1, 8],
-                [2, 5],
-                [3, 10],
-                [4, 4],
-                [5, 16],
-                [6, 5],
-                [7, 11],
-                [8, 6],
-                [9, 11],
-                [10, 30],
-                [11, 10],
-                [12, 13],
-                [13, 4],
-                [14, 3],
-                [15, 3],
-                [16, 6]
-            ];
-            var data2 = [
-                [0, 1],
-                [1, 0],
-                [2, 2],
-                [3, 0],
-                [4, 1],
-                [5, 3],
-                [6, 1],
-                [7, 5],
-                [8, 2],
-                [9, 3],
-                [10, 2],
-                [11, 1],
-                [12, 0],
-                [13, 2],
-                [14, 8],
-                [15, 0],
-                [16, 0]
-            ];
-            $("#flot-dashboard-chart").length && $.plot($("#flot-dashboard-chart"), [
-                data1, data2
-            ], {
-                series: {
-                    lines: {
-                        show: false,
-                        fill: true
-                    },
-                    splines: {
-                        show: true,
-                        tension: 0.4,
-                        lineWidth: 1,
-                        fill: 0.4
-                    },
-                    points: {
-                        radius: 0,
-                        show: true
-                    },
-                    shadowSize: 2
-                },
-                grid: {
-                    hoverable: true,
-                    clickable: true,
-                    tickColor: "#d5d5d5",
-                    borderWidth: 1,
-                    color: '#d5d5d5'
-                },
-                colors: ["#1ab394", "#1C84C6"],
-                xaxis: {},
-                yaxis: {
-                    ticks: 4
-                },
-                tooltip: false
-            });
-
-            var doughnutData = {
-                labels: ["App", "Software", "Laptop"],
-                datasets: [{
-                    data: [300, 50, 100],
-                    backgroundColor: ["#a3e1d4", "#dedede", "#9CC3DA"]
-                }]
-            };
-
-
-            var doughnutOptions = {
-                responsive: false,
-                legend: {
-                    display: false
-                }
-            };
-
-
-            var ctx4 = document.getElementById("doughnutChart").getContext("2d");
-            new Chart(ctx4, {
-                type: 'doughnut',
-                data: doughnutData,
-                options: doughnutOptions
-            });
-
-            var doughnutData = {
-                labels: ["App", "Software", "Laptop"],
-                datasets: [{
-                    data: [70, 27, 85],
-                    backgroundColor: ["#a3e1d4", "#dedede", "#9CC3DA"]
-                }]
-            };
-
-
-            var doughnutOptions = {
-                responsive: false,
-                legend: {
-                    display: false
-                }
-            };
-
-
-            var ctx4 = document.getElementById("doughnutChart2").getContext("2d");
-            new Chart(ctx4, {
-                type: 'doughnut',
-                data: doughnutData,
-                options: doughnutOptions
-            });
-
-        });
-    </script>
 </body>
 
 </html>

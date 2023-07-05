@@ -42,10 +42,10 @@
                                         <div>
                                             <div class="row">
                                                 <div class="col-md-3">
-                                                    <label>Exam Term</label>
+                                                    <label class="select-form">Exam Term</label>
                                                     <select class="form-control mb-3 js-select" aria-label="Default select example"
                                                         name="exam_term" id="term_id" required>
-                                                        <option selected="" value="">--Select Term--</option>
+                                                        <option selected="" value=""></option>
                                                         @foreach ($terms as $term)
                                                             <option value="{{ $term->id }}"
                                                                 {{ $question->term_id == $term->id ? 'selected' : '' }}>
@@ -55,7 +55,7 @@
                                                 </div>
 
                                                 <div class="col-md-2">
-                                                    <label>Class</label>
+                                                    <label class="select-form">Class</label>
                                                     <select class="form-select mb-3" aria-label="Default select example"
                                                         name="class_name" id="class_id" required>
                                                         <option selected="" value="">--Select Class Name--</option>
@@ -67,7 +67,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label>Subject</label>
+                                                    <label class="select-form">Subject</label>
                                                     <select class="form-control mb-3 js-select" aria-label="Default select example"
                                                         name="subject_name" id="subject_id" required>
                                                         @foreach ($subjects as $subject)
@@ -79,7 +79,7 @@
                                                 </div>
 
                                                 <div class="col-md-2">
-                                                    <label class="text-center">Hours/Min</label>
+                                                    <label class="text-center form-label">Hours/Min</label>
                                                     <div class="">
                                                         <div class="">
 
@@ -88,7 +88,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="text-center">Total Marks</label>
+                                                    <label class="text-center form-label">Total Marks</label>
                                                     <div class="">
                                                         <div class="">
                                                             <input type="number" name="total_mark" value="{{ $question->total_marks }}" placeholder="Total Mark" class="form-control" id="">
@@ -106,13 +106,13 @@
                                                 @foreach ($question['question_title'] as $key => $value)
                                                     <div class="row">
                                                         <div class="col-md-8 mt-3">
-                                                            <label for="">Question Title</label>
+                                                            <label class="form-label">Question Title</label>
                                                             <input name="question_title[{{ $key }}]"
                                                                 value="{{ $value }}" class="form-control"
                                                                 type="text">
                                                         </div>
                                                         <div class="col-md-3 mt-3">
-                                                            <label for="">Mark</label>
+                                                            <label class="form-label">Mark</label>
                                                             <input name="question_mark[{{ $key }}]"
                                                                 value="{{ $question['question_mark'][$key] }}"
                                                                 class="form-control" type="text">
@@ -131,7 +131,7 @@
                                             </div>
 
                                             <div class=" d-flex justify-content-between mt-3">
-                                                <button class="btn btn-success d-block "
+                                                <button class="btn btn-info d-block "
                                                     data-count="{{ count($question['question_title']) }}"
                                                     id="plusbtn">+</button>
                                                 <button type="submit" class="btn btn-primary d-block">Update</button>
@@ -161,7 +161,7 @@
                                                             </div>
 
                                                             <div class="col-md-3 mt-3">
-                                                                <label for="">Mark</label>
+                                                                <label class="form-label">Mark</label>
                                                                 <input
                                                                     name="creQuestion_mark[{{ $key }}][{{ $k }}]"
                                                                     value="{{ $question['question_mark'][$key][$k] }}"
@@ -178,7 +178,7 @@
                                             </div>
 
                                             <div class=" d-flex justify-content-between mt-3">
-                                                <button class="btn btn-success d-block "
+                                                <button class="btn btn-info d-block "
                                                     data-count="{{ count($question['question']) }}"
                                                     id="plusbtn">+</button>
                                                 <button type="submit" class="btn btn-primary d-block">Update</button>
@@ -203,7 +203,7 @@
                                                         @endphp
                                                         @foreach ($question->mcq_question[$key] as $k => $mcq)
                                                             <div class="col-md-6 mt-3">
-                                                                <label for="">{{ $arr[$loop->iteration] }}</label>
+                                                                <label class="form-label">{{ $arr[$loop->iteration] }}</label>
                                                                 <input
                                                                     name="mcqQuestion_no[{{ $key }}][{{ $k }}]"
                                                                     value="{{ $mcq }}" class="form-control"
@@ -215,7 +215,7 @@
                                             </div>
 
                                             <div class=" d-flex justify-content-between mt-3">
-                                                <button class="btn btn-success d-block "
+                                                <button class="btn btn-info d-block "
                                                     data-count="{{ count($question->question) }}"
                                                     id="plusbtn">+</button>
                                                 <button type="submit" class="btn btn-primary d-block">Update</button>

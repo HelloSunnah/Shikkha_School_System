@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\InstituteClass;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class SubjectController extends Controller
 {
@@ -89,5 +90,12 @@ class SubjectController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function Subject_Check_Delete(Request $request){
+        $ids=$request->ids;
+        Subject::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
     }
 }

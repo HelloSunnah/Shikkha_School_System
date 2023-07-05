@@ -22,6 +22,8 @@ class CreateAttendancesTable extends Migration
             $table->foreignId('section_id')->constrained('sections')->cascadeOnDelete();
             $table->integer('group_id')->nullable();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
+            $table->time('access_time')->nullable();
+            $table->date('access_date')->nullable();
             $table->timestamps();
         });
     }

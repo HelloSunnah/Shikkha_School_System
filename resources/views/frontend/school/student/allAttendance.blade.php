@@ -5,7 +5,7 @@
     <main class="page-content">
         <div class="row">
             <div class="col-xl-6 mx-auto">
-                <div class="card">
+                <div class="card" style="box-shadow:4px 3px 13px  .7px #bf52f2;border-radius:5px;">
                     <div class="card-body">
                         <div class="border p-3 rounded">
                             <form class="row g-3" method="get" action="{{route('student.attendance.create.show.post.date.all')}}" enctype="multipart/form-data">
@@ -13,30 +13,30 @@
                                 <div class="col-md-12">
                                     @include('frontend.layouts.message')
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label">Class</label>
+                                <div class="col-12 mt-4">
+                                    <label class="select-form">{{__('app.class')}}</label>
                                     <select class="form-control mb-3 js-select"aria-label="Default select example" name="class_id" id="class_id" required onchange="loadSection()">
-                                        <option value="" selected>Select One</option>
+                                        <option value="" selected></option>
                                         @foreach($class as $data)
                                             <option value="{{$data->id}}">{{$data->class_name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label">Section</label>
-                                    <select class="form-control mb-3 js-select"id="section_id" name="section_id" onchange="loadClass()" required>
-                                        <option value="" selected>Select one</option>
+                                <div class="col-12 mt-4">
+                                    <label class="select-form">{{__('app.Section')}}</label>
+                                    <select class="form-control mb-3 js-select" aria-label="Default select example" id="section_id" name="section_id" onchange="loadClass()" required>
+                                        <option value="" selected></option>
                                     </select>
                                 </div>
-                                <div class="col-12" id="group-select">
-                                    {{-- <label class="form-label">Group Name</label>
+                                {{-- <div class="col-12" id="group-select">
+                                    <label class="form-label">Group Name</label>
                                     <select class="form-control mb-3 js-select" id="group_id" name="group_id">
                                         <option selected>Select one</option>
-                                    </select> --}}
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">{{__('app.Month')}}</label>
-                                    <select class="form-control mb-3 js-select" id="month_id" name="month_id" required>
+                                    </select>
+                                </div> --}}
+                                <div class="col-12 mt-4">
+                                    <label class="select-form">{{__('app.Month')}}</label>
+                                    <select class="form-control js-select" id="month_id" name="month_id" required>
                                         <option value="" selected>Select one</option>
                                         <option value="01">January</option>
                                         <option value="02">February</option>

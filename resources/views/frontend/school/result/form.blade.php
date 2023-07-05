@@ -6,8 +6,9 @@
 
        <div class="row">
             <div class="col-lg-5 mx-auto">
-                <div class="card">
+                <div class="card mt-5 " style="box-shadow:4px 3px 13px  .13px #bc53ed;border-radius:5px;background:#7c00a7;color:white">
                     <div class="card-body">
+                        <div class="border p-3 rounded">
                         @isset($data)
                             <form action="{{route('send.sms.result')}}" method="post">
                                 @csrf
@@ -45,9 +46,10 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <button class="btn btn-outline-primary"> <i class="bi bi-envelope"></i> {{__('app.send')}} <i class="bi bi-arrow-right"></i> </button>
+                                <button class="btn btn-light" style="color:blueviolet;font-weight:800"> <i class="bi bi-envelope"></i> {{__('app.send')}} <i class="bi bi-arrow-right"></i> </button>
                             </form>
                         @endisset
+                    </div>
                     </div>
                 </div>
             </div>

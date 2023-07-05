@@ -16,7 +16,8 @@ class CreateStudentDocumentUploadsTable extends Migration
         Schema::create('student_document_uploads', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->integer('student_id');
+            $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->string('uploadfile');
             $table->timestamps();
         });

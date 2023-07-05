@@ -46,19 +46,7 @@
                                             </tr>
                                             <tr>
                                                 <td>{{__('app.Balance')}}</td>
-                                                @php
-                                                    $add = App\Models\Transection::where('school_id', Auth::user()->id) 
-                                                        ->where('type', 2)
-                                                        ->where('account', App\Models\Bank::where('account_number',$item->account_number)->first()->id)
-                                                        ->where('payment_method', 2)
-                                                        ->sum('amount') ;
-                                                    $sub = App\Models\Transection::where('school_id', Auth::user()->id) 
-                                                        ->where('type', 1)
-                                                        ->where('account', App\Models\Bank::where('account_number',$item->account_number)->first()->id)
-                                                        ->where('payment_method', 2)
-                                                        ->sum('amount') ;
-                                                @endphp
-                                                <td align="right" class="text-success"><h5 class="m-0">{{ ( $item->balance + $add ) - $sub }} ৳</h5></td>
+                                                <td align="right" class="text-success"><h5 class="m-0">{{ $profit }} ৳</h5></td>
                                             </tr>
                                             <tr>
                                                 <td>{{__('app.action')}}</td>

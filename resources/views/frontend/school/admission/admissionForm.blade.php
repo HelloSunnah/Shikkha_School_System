@@ -6,12 +6,17 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
   <title>Shikkha - {{$school->school_name}}</title>
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+  <style>
+    .bg-primary{
+      background: #7a00a7 !important;
+    }
+  </style>
 </head>
 
 <body>
 
     
-  <section class="container my-2 bg-dark w-100 text-light p-2">
+  <section class="container my-2 bg-primary w-100 text-light p-2">
     <form class="row g-3 p-3" action="{{route('online.Admission.Form.Post')}}" method="post" enctype="multipart/form-data">
       @csrf
 
@@ -272,6 +277,7 @@
 <script>
   $(document).ready(function(){
       $("#datepicker").datepicker({
+        yearRange: "1950:2030",
           dateFormat: "yy-mm-dd",
           changeMonth: true,
           changeYear: true,

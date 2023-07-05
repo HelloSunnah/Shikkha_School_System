@@ -1,8 +1,6 @@
 @extends('layouts.school.master')
 
 @section('content')
-
-
 <main class="page-content">
 
     <form>
@@ -12,22 +10,25 @@
                 <div class="card">
                     <div class="card-body">
                         <center>
-                            <h5 class="card-title">{{__('app.book_list')}}</h5>
+                            <h2 class="card-title">{{__('app.book_list')}}</h2>
                         </center>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#book">
-                            {{__('app.Add_book')}}
-                        </button>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#booktype">
-                            {{__('app.Add_type')}}
-                        </button>
-                        <form action="">
-                            <!-- <div class="card-body"> -->
-
-                            <!-- <div class="card-body table-responsive"> -->
-
+                        <div class="mb-2">
+                            <button type="button" class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#delete_all_records">
+                                {{__('app.deleteall')}}
+                            </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#book">
+                                {{__('app.Add_book')}}
+                            </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#booktype">
+                                {{__('app.Add_type')}}
+                            </button>
+                        </div>
+                        <div class="table-responsive">
                             <table id="example" class="table table-striped table-bordered" style="width:100%">
+
                                 <thead>
                                     <tr>
+                                        <th><input type="checkbox" id="select_all_ids"></th>
                                         <th scope="col">{{__('app.Id')}}</th>
                                         <th scope="col">{{__('app.Book_name')}}</th>
                                         <th scope="col">{{__('app.Author_name')}}</th>
@@ -39,8 +40,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        @foreach($allData as $key=>$data)
+                                    @foreach($allData as $key=>$data)
+                                    <tr id="books_ids{{$data->id}}">
+                                        <td><input type="checkbox" class="check_id" name="ids" value="{{$data->id}}"></td>
+                                        <td>{{$key++ +1}} </td>
                                         <th scope="row">{{$key++ +1}}</th>
                                         <td>{{$data->book_name}}</td>
                                         <td>{{$data->author_name}}</td>
@@ -51,19 +54,109 @@
                                         <td>
 
 
-                                            <a class="btn btn-success" href="{{route('books.edit',$data->id)}}"><i class="bi bi-pencil-square"></i></a>
-                                            <button type="button" class="btn btn-danger" onclick="if(confirm('Are You sure?')){ location.replace('{{route('books.delete',$data->id)}}') }">
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="if(confirm('Are You sure?')){ location.replace('{{route('books.delete',$data->id)}}') }">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
 
+                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal{{$key}}">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+
                                         </td>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="exampleModal{{$key}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+
+                                                        <form action="{{route('books.edit.post',$data->id)}}" method="post" enctype="multipart/form-data">
+                                                            @method("PUT")
+                                                            @csrf
+                                                            <div class="form-group mb-3">
+                                                                <label for="exampleInputEmail1">Book Name</label>
+                                                                <input type="text" class="form-control" value="{{$data->book_name}}" name="book_name" id="book_name" placeholder="Book Name">
+                                                                @error('book_name')<div class="alert alert-danger">{{$message}}</div>@enderror
+
+                                                            </div>
+                                                            <div class="form-group mb-3">
+                                                                <label for="exampleInputPassword1">Book Type</label>
+                                                                <select class="form-control mb-3 js-select" name="book_type_id" value="{{$data->book_type_id}}" id="book_type_id" class="form-control">
+                                                                    @foreach($bookTypes as $book)
+                                                                    <option value="{{$book->id}}">{{$book->book_type}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                                @error('book_type')<div class="alert alert-danger">{{$message}}</div>@enderror
+
+                                                            </div>
+                                                            <div class="form-group mb-3">
+                                                                <label for="author_name">Author Name</label>
+                                                                <input type="text" class="form-control" value="{{$data->author_name}}" id="author_name" name="author_name" placeholder="Author Name">
+                                                                @error('author_name')<div class="alert alert-danger">{{$message}}</div>@enderror
+
+                                                            </div>
+                                                            <div class="form-group mb-3">
+                                                                <label for="rack_no">Rack No</label>
+                                                                <input type="number" class="form-control" value="{{$data->rack_no}}" name="rack_no" id="rack_no" placeholder="Rack No">
+                                                                @error('rack_no')<div class="alert alert-danger">{{$message}}</div>@enderror
+
+                                                            </div>
+                                                            <div class="form-group mb-3">
+                                                                <label for="rack_no">Quantity</label>
+                                                                <input type="number" class="form-control" value="{{$data->quantity}}" name="quantity" id="quantity" placeholder="Rack No">
+                                                                @error('quantity')<div class="alert alert-danger">{{$message}}</div>@enderror
+
+                                                            </div>
+                                                            <div class="form-group mb-3">
+                                                                <label for="image">Image</label>
+                                                                <input type="file" class="form-control" name="image" id="image" placeholder="image">
+                                                                <img width="150" src="{{asset($data->image)}}" alt="{{$data->image}}" class="img-fluid">
+                                                                @error('image')<div class="alert alert-danger">{{$message}}</div>@enderror
+
+                                                            </div>
+                                                            <br>
+                                                            <div class="text-center">
+                                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                                <a class="btn btn-secondary" href="{{route('books.create')}}">Back</a>
+                                                            </div>
+
+                                                        </form>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                     </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-                            <!-- </div> -->
-                            <!-- </div>    -->
-                        </form>
+                        </div>
+
+
 
                     </div>
                 </div>
@@ -71,7 +164,26 @@
         </div>
 </main>
 
-
+<!-- delete checkbox Modal -->
+<div class="modal fade" id="delete_all_records" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:blueviolet;">
+                <h4 class="modal-title" id="exampleModalLabel" style="color:white;">{{__('app.book_list')}} {{__('app.Record')}}</h4>
+                <button type="button" class="btn-close btn-white" style="color:white;" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5>
+                    {{__('app.checkdelete')}}
+                </h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__('app.no')}}</button>
+                <button type="button" id="all_delete" class="btn btn-primary" style="background-color:blueviolet !important;border-color:blueviolet !important;">{{__('app.yes')}}</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -103,16 +215,16 @@
 
                             <form action="{{route('books.create.post')}}" method="post" enctype="multipart/form-data">
                                 @csrf
-                                <div class="form-group mb-3">
-                                    <label for="exampleInputEmail1">{{__('app.Book_name')}}</label>
-                                    <input type="text" class="form-control" value="{{old('book_name')}}" name="book_name" id="book_name">
+                                <div class="form-group mb-3 mt-4">
+                                    <label class="form-label">{{__('app.Book_name')}}</label>
+                                    <input type="text" class="form-control" value="{{old('book_name')}}" name="book_name" id="book_name" required>
                                     @error('book_name')<div class="alert alert-danger">{{$message}}</div>@enderror
 
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1">{{__('app.Book_type')}}</label>
-                                    <select class="form-select mb-3" name="book_type_id" id="book_type_id" value="{{old('book_type_id')}}" class="form-control">
-                                        <option value="">{{__('app.select')}}</option>
+                                <div class="form-group mt-4">
+                                    <label class="select-form">{{__('app.Book_type')}}</label>
+                                    <select class="form-select mb-3 js-select" name="book_type_id" id="book_type_id" value="{{old('book_type_id')}}" class="form-control">
+                                        <option value="">{{__('app.select')}}</option required>
                                         @foreach($bookType as $book)
                                         <option value="{{$book->id}}">{{$book->book_type}}</option>
                                         @endforeach
@@ -120,38 +232,38 @@
                                     @error('book_type')<div class="alert alert-danger">{{$message}}</div>@enderror
 
                                 </div>
-                                <div class="form-group">
-                                    <label for="author_name">{{__('app.Author_name')}}</label>
-                                    <input type="text" class="form-control" value="{{old('author_name')}}" id="author_name" name="author_name">
+                                <div class="form-group mt-4">
+                                    <label class="form-label" for="author_name">{{__('app.Author_name')}}</label>
+                                    <input type="text" class="form-control" value="{{old('author_name')}}" id="author_name" name="author_name" required>
                                     @error('author_name')<div class="alert alert-danger">{{$message}}</div>@enderror
 
                                 </div>
-                                <div class="form-group">
-                                    <label for="rack_no">{{__('app.rack')}}</label>
-                                    <input type="number" class="form-control" value="{{old('rack_no')}}" name="rack_no" id="rack_no" placeholder="Rack No">
+                                <div class="form-group mt-4">
+                                    <label class="form-label" for="rack_no">{{__('app.rack')}}</label>
+                                    <input type="number" class="form-control" value="{{old('rack_no')}}" name="rack_no" id="rack_no" required>
                                     @error('rack_no')<div class="alert alert-danger">{{$message}}</div>@enderror
 
                                 </div>
-                                <div class="form-group">
-                                    <label for="rack_no">{{__('app.quantity')}}</label>
-                                    <input type="number" class="form-control" value="{{old('quantity')}}" name="quantity" id="quantity" placeholder="Quantity">
+                                <div class="form-group mt-4">
+                                    <label for="rack_no" class="form-label">{{__('app.quantity')}}</label>
+                                    <input type="number" class="form-control" value="{{old('quantity')}}" name="quantity" id="quantity"  required>
                                     @error('quantity')<div class="alert alert-danger">{{$message}}</div>@enderror
 
                                 </div>
-                                <div class="form-group">
-                                    <label for="rack_no">{{__('app.available')}}</label>
-                                    <input type="number" class="form-control" value="{{old('available')}}" name="available" id="available" placeholder="Quantity">
+                                <div class="form-group mt-4">
+                                    <label class="form-label">{{__('app.available')}}</label>
+                                    <input type="number" class="form-control" value="{{old('available')}}" name="available" id="available"  required>
                                     @error('available')<div class="alert alert-danger">{{$message}}</div>@enderror
 
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group mt-4">
                                     <label for="image">{{__('app.image')}}</label>
                                     <input type="file" accept="image/*" class="form-control" value="{{old('image')}}" name="image" id="image" placeholder="image">
                                     @error('image')<div class="alert alert-danger">{{$message}}</div>@enderror
 
                                 </div>
                                 <br>
-                                <button type="submit" class="btn btn-primary">{{__('app.submit')}}</button>
+                                <button type="submit" class="btn btn-primary btn-sm">{{__('app.submit')}}</button>
 
                             </form>
 
@@ -168,11 +280,6 @@
 </div>
 
 
-
-
-
-
-
 <!-- Modal -->
 <div class="modal fade" id="booktype" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 
@@ -182,33 +289,28 @@
                 <h5 class="modal-title" id="exampleModalLabel">{{__('app.Book_type')}}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body border mt-4 mb-4 ms-4 me-4">
+                <button type="button" class="btn btn-info btn-sm mb-4" data-bs-toggle="modal" data-bs-target="#booktypeList">
+                    <i class="bi bi-list-task"></i> Book List
+                </button>
                 <form action="{{route('books.type.post')}}" method="post">
                     @csrf
 
                     <div>
-                        <label for="">{{__('app.Book_type')}}</label>
+                        <label class="form-label">{{__('app.Book_type')}}</label>
                         <input type="book_type" value="{{old('book_type')}}" class="form-control" required name="book_type">
 
                     </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-sm mt-3">{{__('app.save')}}</button>
+                        </div>
+                </form>
 
-
-            </div>
-            <div class="modal-footer">
-
-                <button type="submit" class="btn btn-primary">{{__('app.save')}}</button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#booktypeList">
-                    Book List
-                </button>
             </div>
         </div>
-        </form>
+        
     </div>
 </div>
-
-
-
-
 
 <div class="modal fade" id="booktypeList" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 
@@ -220,30 +322,62 @@
             <div class="modal-body">
 
 
-            <table id="example" class="table table-striped table-bordered" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">{{__('app.Id')}}</th>
-                                        <th scope="col">Book Type</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        @foreach($bookType as $key=>$data)
-                                        <th scope="row">{{$key++ +1}}</th>
-                                        <td>{{$data->book_type}}</td>
-                               <td>
-                                        <button type="button" class="btn btn-danger" onclick="if(confirm('Are You sure?')){ location.replace('{{route('books.type.delete',$data->id)}}') }">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </button>
+                <table id="example" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{__('app.Id')}}</th>
+                            <th scope="col">Book Type</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            @foreach($bookType as $key=>$data)
+                            <th scope="row">{{$key++ +1}}</th>
+                            <td>{{$data->book_type}}</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="if(confirm('Are You sure?')){ location.replace('{{route('books.type.delete',$data->id)}}') }">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
 
-                                        </td>
-                                    </tr>
-                                    @endforeach
+                            </td>
+                        </tr>
+                        @endforeach
 
             </div>
         </div>
 
 
         @endsection
+        @push('js')
+        <script>
+            $(function(e) {
+                $("#select_all_ids").click(function() {
+                    $('.check_id').prop('checked', $(this).prop('checked'));
+                });
+                $("#all_delete").click(function(e) {
+                    e.preventDefault();
+                    var all_ids = [];
+                    $('input:checkbox[name=ids]:checked').each(function() {
+                        all_ids.push($(this).val());
+                    });
+                    // console.log(all_ids);
+                    $.ajax({
+                        url: "{{route('books.Check.delete')}}",
+                        type: "DELETE",
+                        data: {
+                            ids: all_ids,
+                            _token: "{{csrf_token()}}"
+                        },
+                        success: function(response) {
+                            $.each(all_ids, function(key, val) {
+                                $('#books_ids' + val).remove();
+                                window.location.reload(true);
+                            });
+                        }
+                    });
+
+                });
+            });
+        </script>
+        @endpush

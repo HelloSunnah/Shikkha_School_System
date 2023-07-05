@@ -4,7 +4,7 @@
     <main class="page-content">
         <div class="row">
             <div class="col-lg-9 mx-auto">
-                <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#5c84f6">
+                <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#7c00a7">
 
                 <div class="card">
 
@@ -58,7 +58,7 @@
                 </div>
             </div>
             <div class=" col-xl-3 mx-auto">
-                <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#5c84f6">
+                <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#7c00a7">
                 <div class="card">
                     <div class="mt-10">
                         <div style="margin-left:15px; margin-right:15px; margin-top:10px;">
@@ -77,7 +77,7 @@
                             <div class=" col-xl-3 mx-auto"></div>
 
                             <div class=" col-xl-9 mx-auto">
-                                <button class="btn btn-primary mb-3" data-bs-target="#addModal"
+                                <button class="btn btn-primary btn-sm mb-3" data-bs-target="#addModal"
                                     data-bs-toggle="modal">{{ __('app.Change') }} {{ __('app.sign5') }}</button>
                                 @error('password')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -89,18 +89,18 @@
                     </div>
                 </div>
 
-                <!-- Modal -->
+                <!-- Modal For Change Password-->
                 <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel"> {{ __('app.sign5') }}
+                            <div class="modal-header" style="background: #7c00a7">
+                                <h5 class="modal-title text-white" id="exampleModalLabel"> {{ __('app.sign5') }}
                                     {{ __('app.Change') }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                <button type="button" class="btn-close btn-white" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <form action="" method="post" id="addpassword">
+                            <form action="{{route('change.teacher.pass')}}" method="post" id="addpassword">
                                 @csrf
                                 <input type="hidden" id="id" value="{{ $data->id }}">
                                 <div class="modal-body">
@@ -127,16 +127,19 @@
 
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">{{ __('app.close') }}</button>
-                                    <button type="submit" class="btn btn-primary  add_btn">
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        data-bs-dismiss="modal">{{ __('app.Back') }}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm  add_btn">
                                         {{ __('app.Save') }}</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
-            @endsection
+            </div>
+        </div>
+    </main>
+@endsection
 
             
 @push('js')
@@ -147,39 +150,5 @@
             }
         });
     </script>
-    <script>
-        $(document).ready(function() {
-            $(document).on('click', ' .add_btn', function(e) {
-                e.preventDefault();
-                let id = $('#id').val();
-                let password = $('#password').val();
-                let password_confirmation = $('#password_confirmation').val();
-                //console.log(name+price);
-                $.ajax({
-                    url: "{{ route('change.teacher.pass') }}",
-                    method: 'post',
-                    data: {
-                        id: id,
-                        password: password,
-                        password_confirmation: password_confirmation
-                    },
-                    success: function(res) {
-                        if (res.status == 'success') {
-                            $('#addModal').modal('hide');
-                            $('#addpassword')[0].reset('hide');
-                            // $('.table').load(location.href + ' .table');
-                            location.reload();
-                        }
-                    },
-                    error: function(err) {
-                        let error = err.responseJSON;
-                        $.each(error.errors, function(index, value) {
-                            $('.errmsgcontainer').append('<span class="text-danger">' +
-                                value + '</span>' + '<br>')
-                        });
-                    }
-                });
-            });
-        });
-    </script>
+   
 @endpush

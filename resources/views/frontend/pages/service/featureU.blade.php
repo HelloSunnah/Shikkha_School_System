@@ -7,7 +7,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-1"></div>
                 <div class="col-lg-5">
-                    <h1 class="fs-1 fw-bold">{{__('app.userpage1')}} </h1><br>
+                    <h1 style="padding-top:0px;font-size:35px !important" class="fs-1 fw-bold">{{__('app.userpage1')}} </h1><br>
                     <p class="text-muted mt-4">{{__('app.userpage2.1')}}</p>
                     <ul class="mt-4">
                         <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.userpage3')}}</li>
@@ -46,7 +46,7 @@
                     <div class="trackProgress__left">
                         <div class="text-center"> <img class="w-50" src="" alt=""></div>
 
-                        <h1>{{__('app.user3')}}</h1>
+                        <h4>{{__('app.user3')}}</h4>
                         <p>{{__('app.user4')}}</p>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                         <div class="text-center">
                             <img class="w-50" src="" alt="">
                         </div>
-                        <h1>{{__('app.user5')}}</h1>
+                        <h4>{{__('app.user5')}}</h4>
                         <p>{{__('app.user6')}}</p>
                     </div>
                 </div>

@@ -5,9 +5,9 @@
 
 @section('content')
     <main class="page-content">
-        <div class="row">
+        <div class="row mt-5">
             <div class="col-xl-6 mx-auto">
-                <div class="card">
+                <div class="card"  style="box-shadow:4px 3px 13px  .13px #bc53ed;border-radius:5px;">
                     <h2 style="margin:10px; text-align:center; ">New Record</h2>
                     @if (\Session::has('insert'))
                         <div id="" class="alert alert-success">
@@ -36,7 +36,7 @@
                                         <div class="row">
 
                                             <div class="col-md-6">
-                                                <label class="form-label">{{ __('app.Book_name') }}</label>
+                                                <label class="select-form">{{ __('app.Book_name') }}</label>
                                                 <select class="form-control mb-3 js-select" id="book_id" name="book_id">
                                                     <option value="" selected>{{ __('app.select') }}</option>
                                                     @foreach ($books as $book)
@@ -46,7 +46,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-6" id="group-select">
-                                                <label class="form-label">{{ __('app.member') }}</label>
+                                                <label class="select-form">{{ __('app.member') }}</label>
                                                 <select class="form-control mb-3 js-select" id="Student_id" name="student_id">
                                                     <option value="" selected> {{ __('app.select') }}</option>
                                                     @foreach ($students as $student)
@@ -61,14 +61,14 @@
                                     <div class="col-12">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <label>{{ __('app.borrow_date') }}</label>
+                                                <label class="select-form">{{ __('app.borrow_date') }}</label>
                                                 <input type="text" id="datepicker" class="form-control" placeholder="YYYY-MM-DD" name="borrow_date" value="{{ $defaultDate }}" required>
                                                 @error('borrow_date')
                                                     <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                             <div class="col-md-6">
-                                                <label>{{ __('app.p_return_date') }}</label>
+                                                <label class="select-form">{{ __('app.p_return_date') }}</label>
                                                 <input type="text" id="datepicker2" class="form-control" placeholder="YYYY-MM-DD" name="possible_borrow_date" required>
                                                 @error('possible_borrow_date')
                                                     <div class="alert alert-danger">{{ $message }}</div>

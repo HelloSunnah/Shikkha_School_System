@@ -221,4 +221,19 @@ class ClassPeriodController extends Controller
         Alert::error('Success Subject deleted', 'Success Message');
         return redirect(route('period.index'));
     }
+    
+
+ public function periodDeletepar(Request $request)
+ {
+     $ids = $request->ids;
+     ClassPeriod::withTrashed()->where('id', $id)->forcedelete();
+     toast("Data delete permanently", "success");
+     return back();
+ }
+
+ public function periodrestore($id){
+    ClassPeriod::withTrashed()->where('id', $id)->restore();
+     toast("Restore data", "success");
+     return back();
+ }
 }

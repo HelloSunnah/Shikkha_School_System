@@ -119,8 +119,13 @@
                                 <h6 class="mb-0">{{getSectionNameUser(Auth::user()->section_id)->section_name }}</h6>
                             </div>
                             <div class="text-center">
-                                <h6 class="mb-0">Group {{  is_null(Auth::user()->group_id) ? 'N/A' :getGroupNameUser(Auth::user()->group_id)->group_name}}</h6>
-
+                                <h6 class="mb-0">Group 
+                                    @if((Auth::user()->group_id) == 1) Science
+                                    @elseif ((Auth::user()->group_id) == 2) Commerce
+                                    @elseif ((Auth::user()->group_id) == 3) Humanities
+                                    @else General
+                                    @endif
+                                </h6>
                             </div>
                         </div>
                         <div class="text-center mt-4">

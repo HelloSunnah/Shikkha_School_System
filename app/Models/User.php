@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable,SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -52,6 +53,7 @@ class User extends Authenticatable
     public function sectionRelation(){
         return $this->belongsTo(Section::class, 'section_id', 'id');
     }
+    
     public function schoolRelation(){
         return $this->belongsTo(Section::class,'school_id','id');
     }
@@ -90,6 +92,11 @@ class User extends Authenticatable
     public function section()
     {
         return $this->hasOne(Section::class, 'id', 'section_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
     }
 
 }

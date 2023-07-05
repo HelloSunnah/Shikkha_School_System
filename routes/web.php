@@ -2,12 +2,18 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ResultSetting;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AjaxController;
+use App\Http\Controllers\BankController;
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SchoolController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoutineController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\AdminPageController;
@@ -32,6 +38,7 @@ use App\Http\Controllers\OnlineAddmissionController;
 use App\Http\Controllers\Notice\NoticeViewController;
 use App\Http\Controllers\School\AssignFeesController;
 use App\Http\Controllers\School\AttendanceController;
+use App\Http\Controllers\Finance\SchoolFeesController;
 use App\Http\Controllers\Lib\LanguageDetectController;
 use App\Http\Controllers\School\CertificateController;
 
@@ -48,11 +55,19 @@ Route::post("detect/language", [LanguageDetectController::class, 'detecLanguage'
 Route::get("language/{local?}", [PageController::class, 'changeLanguage'])->name('change.language');
 Route::post('/payment/success', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
 
+Route::get('/forgot/pass', [LoginController::class, 'forgotPassword'])->name('user.forgot.password');
+Route::get('/reset/pass/{token}', [LoginController::class, 'resetPassword'])->name('user.reset.password');
+Route::post('/forgot/pass/post', [LoginController::class, 'forgotPasswordPost'])->name('user.forgot.password.post');
+Route::post('/reset/pass/post', [LoginController::class, 'resetPasswordpost'])->name('user.reset.password.post');
+
+
 
 Route::middleware('language')->group(function () {
     // View Page load
     Route::get('/', [PageController::class, 'home'])->name('home');
     Route::get('/contact', [PageController::class, 'contactPage'])->name('contact.page');
+    Route::get('/Blog/view/{slug}', [PageController::class, 'blogView'])->name('blog.view');
+
     Route::post('/contact', [PageController::class, 'contactSuppport'])->name('contact.support');
     Route::get('/feature-page', [PageController::class, 'featurePage'])->name('feature.page');
     Route::get('/feature-page/user-management', [PageController::class, 'featureU'])->name('feature.page.u');
@@ -66,189 +81,15 @@ Route::middleware('language')->group(function () {
     Route::get('/signup/post/otp', [LoginController::class, 'getSignupOtp'])->name('signup.post.otp');
     Route::get('/signup', [PageController::class, 'getSignupView'])->name('signup.get');
     Route::post('/signup/post', [PageController::class, 'getSignup'])->name('signup.post');
+
+
+
     Route::post('/otp/send', [PageController::class, 'otpPost'])->name('otp.post');
     Route::post('/otp/resend', [PageController::class, 'otpResent'])->name('resend.otp');
+    Route::get('/term-condition', [PageController::class, 'termsCondition'])->name('term.condition');
+    Route::get('/videos', [PageController::class, 'video'])->name('videos.page');
+    Route::get('/blog', [PageController::class, 'blog'])->name('blog.page');
 
-    Route::get('/home',    [App\Http\Controllers\HomeController::class, 'index'])->name('user.dashboard');
-    Route::view('/payment', 'amarpayment');
-    Route::view('/about', 'about');
-    Route::view('/privacy', 'privacy');
-    Route::view('/changelog', 'changelog');
-    Route::view('/feature', 'feature');
-    Route::view('/term-condition', 'term_condition');
-    Route::view('/videos', 'videos');
-    Route::view('/blog', 'blog');
-    Auth::routes();
-    Route::get('/login', function () {
-        return redirect()->route('school.login');
-    })->name('login');
-
-    Route::get('/login/admin', [LoginController::class, 'showAdminLoginForm']);
-    Route::get('/login/school', [LoginController::class, 'showSchoolLoginForm'])->name('school.login');
-    Route::get('/login/teachers', [LoginController::class, 'showTeacherLoginForm'])->name('teachers.login');
-    Route::get('/register/admin', [RegisterController::class, 'showAdminRegisterForm']);
-    Route::get('/register/school', [RegisterController::class, 'showSchoolRegisterForm']);
-    Route::post('/login/admin', [LoginController::class, 'adminLogin']);
-    Route::post('/login/schools', [LoginController::class, 'schoolLogin']);
-    Route::post('/login/teachers', [LoginController::class, 'teacherLogin']);
-    Route::post('/register/admin', [RegisterController::class, 'createAdmin']);
-    Route::get('logout', [LoginController::class, 'logout']);
-
-    Route::group(['middleware' => 'auth:schools'], function () {
-
-        Route::get('school', function () {
-            return redirect(route('school.dashboard'));
-        });
-
-        //school-profile
-        Route::get('/receipt/show', [App\Http\Controllers\ExpenseController::class, 'receipt'])->name('Reciept.Create');
-        Route::get('/getPrice/{id}', [App\Http\Controllers\ExpenseController::class, 'getPrice'])->name('getPrice');
-
-        Route::get('/accesories/create', [App\Http\Controllers\ExpenseController::class, 'accesoriesType'])->name('accesoriesType')->middleware('language');
-        Route::post('/accesories/create/post', [App\Http\Controllers\ExpenseController::class, 'accesoriesTypePost'])->name('accesoriesType.post')->middleware('language');
-        Route::get('/accesories/list', [App\Http\Controllers\ExpenseController::class, 'accesoriesTypeList'])->name('accesoriesType.list')->middleware('language');
-        Route::get('/accesories/delete/{id}', [App\Http\Controllers\ExpenseController::class, 'accesoriesTypeListdelete'])->name('accesories.delete')->middleware('language');
-
-
-        Route::get("school/profile/", [SettingsController::class, 'school_profile'])->name('school.profile');
-        Route::get("school/profileEdit/{id}", [SettingsController::class, 'school_profileEdit'])->name('school.profileEdit');
-        Route::put("school/profileUpdate/{id}", [SettingsController::class, 'school_profile_Update'])->name('school.profile.Update');
-        Route::post("school/Password", [SettingsController::class, 'school_Password'])->name('school.Password');
-
-        Route::get('/school/dashboard',    [App\Http\Controllers\SchoolController::class, 'school'])->name('school.dashboard');
-        Route::get('/school/checkout/package',    [App\Http\Controllers\SchoolController::class, 'schoolPackageAfter'])->name('school.package.after');
-        Route::post('/school/checkout/package/post',    [App\Http\Controllers\SchoolController::class, 'schoolPackageAfterPost'])->name('school.package.after.post');
-        Route::get('/school/message/package',    [App\Http\Controllers\SchoolController::class, 'schoolMessage'])->name('school.message');
-        Route::post('/school/message/package/post',    [App\Http\Controllers\SchoolController::class, 'schoolMessagePost'])->name('school.message.post');
-        // Route::post('/school/message/package/post/checkout',    [App\Http\Controllers\SchoolController::class, 'schoolMessagePostCheckout'])->name('school.message.post.checkout');
-        Route::post('/school/message/package/post/checkout',    [App\Http\Controllers\PaymentController::class, 'paymentindex'])->name('school.message.post.checkout');
-        Route::get('/school/message/statement/show',    [App\Http\Controllers\SchoolController::class, 'StatementShow'])->name('school.message.post.checkout.show');
-        Route::get('/school/message/usage/show',    [App\Http\Controllers\SchoolController::class, 'smsUsagesData'])->name('school.message.usage.show');
-        Route::get('/pdf/statement/{id}', [App\Http\Controllers\SchoolController::class, 'StatementShowMessage'])->name('pdf.show.statement');
-        Route::get('/otp',    [App\Http\Controllers\SchoolController::class, 'otpLogin'])->name('otp.login');
-        Route::post('/otp/post',    [App\Http\Controllers\SchoolController::class, 'otpPostLogin'])->name('otp.login.post');
-        Route::get('/acquisition',    [App\Http\Controllers\SchoolController::class, 'acquisition'])->name('acquisition');
-        Route::post('/acquisition/post',    [App\Http\Controllers\SchoolController::class, 'acquisitionPost'])->name('acquisition.post');
-
-        Route::post('/select/price/post',    [App\Http\Controllers\SchoolController::class, 'selectPricePost'])->name('selectPrice.post');
-        Route::get('/price/suggest/{id}',    [App\Http\Controllers\SchoolController::class, 'priceSuggest'])->name('price.suggest');
-        Route::post('/color/change',    [App\Http\Controllers\SchoolController::class, 'UserColor'])->name('user.update.post.color');
-
-        Route::get('/StudentIdCard', [CardController::class, 'idCard'])->name('id.Card');
-
-        Route::post('/idCardPost', [CardController::class, 'store'])->name('id.Card.post');
-
-        Route::prefix('school')->group(function () {
-
-            // send sms for result
-            Route::get('sms/result', [SMSController::class, 'index'])->name('sms.result');
-            Route::post('sms/result', [SMSController::class, 'resultSendToSms'])->name('send.sms.result');
-
-            // fingerprint device
-            Route::get('device', [DeviceController::class, 'index'])->name('device.index');
-            Route::post('device/fetch-log', [DeviceController::class, 'getFetchLog'])->name('device.fetch.log');
-            Route::post('device/update', [DeviceController::class, 'update'])->name('device.update');
-            Route::get("get/attendance", [AttendanceController::class, 'getAttendanceFromDevice'])->name('get.attendance.device');
-
-            //syllabus part
-            Route::get('/ajax', [AjaxController::class, 'ajaxLoaderSubject'])->name('ajax.load.subject');
-            Route::get('/ajax/students', [AjaxController::class, 'ajaxLoadStudents'])->name('ajax.load.students');
-            Route::get('syllabus/create', [SyllabusController::class, 'SyllabusCreate'])->name('syllabus.create');
-            Route::post('/create/post', [SyllabusController::class, 'SyllabusCreatePost'])->name('syllabus.create.post');
-            Route::get('/ShowData', [SyllabusController::class, 'SyllabusDataShow'])->name('syllabus.data.show');
-
-            Route::get('syllabus/FormShow', [SyllabusController::class, 'SyllabusFormShow'])->name('syllabus.form.show');
-            Route::post('/FormShowPost', [SyllabusController::class, 'SyllabusFormPost'])->name('syllabus.form.post');
-
-            Route::get('/edit/{id}', [SyllabusController::class, 'syllabusEdit'])->name('syllabus.edit');
-            Route::PUT('/editPost/{id}', [SyllabusController::class, 'syllabusEditPost'])->name('syllabus.edit.post');
-            Route::get('/delete/{id}', [SyllabusController::class, 'syllabusDelete'])->name('syllabus.delete');
-
-            // library
-            Route::get("booksCategory", [LibraryController::class, 'booksType'])->name('books.type.create');
-            Route::post("booksCategory/Post", [LibraryController::class, 'booksTypePost'])->name('books.type.post');
-
-            Route::get("booksCreate", [LibraryController::class, 'booksCreate'])->name('books.create');
-            Route::post("booksCreate/post", [LibraryController::class, 'booksCreatePost'])->name('books.create.post');
-            Route::get("    /{id}", [LibraryController::class, 'booksEdit'])->name('books.edit');
-            Route::put("booksCreatePost/{id}", [LibraryController::class, 'booksEditPost'])->name('books.edit.post');
-            Route::get("booksDelete/{id}", [LibraryController::class, 'booksDelete'])->name('books.delete');
-            Route::get("booksTypeDelete/{id}", [LibraryController::class, 'bookstypeDelete'])->name('books.type.delete');
-
-
-            //borrowrer
-            Route::get('borrowerinfo', [LibraryController::class, 'borrowerinfo'])->name('borrowerinfo');
-            Route::get('borrowerCreate', [LibraryController::class, 'borrowerCreate'])->name('borrower.Create');
-            Route::post('borrowerstore', [LibraryController::class, 'borrower_store'])->name('borrower.store');
-            Route::get('borrowerdelete/{id}', [LibraryController::class, 'borrower_delete'])->name('borrower.delete');
-            Route::get('borrowerEdit/{id}', [LibraryController::class, 'borrower_Edit'])->name('borrower.Edit');
-            Route::put('borrowerUpdate/{id}', [LibraryController::class, 'borrower_Update'])->name('borrower.Update');
-
-            // settings
-            Route::get("setttings", [SettingsController::class, 'index'])->name('settings');
-            Route::post("setttings/store", [SettingsController::class, 'store'])->name('settings.store');
-
-            //  school period
-            Route::resource('period', ClassPeriodController::class);
-            Route::get('period/create/{shift?}', [ClassPeriodController::class, 'create'])->name('period.create');
-            Route::get('/delete/period/{id}', [ClassPeriodController::class, 'periodDelete'])->name('period.delete');
-            //  routine
-            Route::resource('routine', RoutineController::class);
-            Route::get('routine/show', [RoutineController::class, 'show'])->name('routine.show');
-            Route::get('class/routine/edit', [RoutineController::class, 'editRoutine']);
-            Route::get('/get/teacher/', [RoutineController::class, 'getTeacher'])->name('get.teacher');
-
-            Route::get('School/routine/view', [RoutineController::class, 'school_Routine_view'])->name('school.Routine.view');
-
-            //class section for school start...
-            Route::get('/pdf/{student_id}/{class_id}/{month}/{amount}', [App\Http\Controllers\SchoolController::class, 'pdfShow'])->name('pdf.show');
-
-            Route::get('/payment/details', [App\Http\Controllers\SchoolController::class, 'schoolPaymentShow'])->name('school.payment.info');
-            Route::get('/payment/statement/details', [App\Http\Controllers\SchoolController::class, 'schoolPaymentStatementShow'])->name('school.payment.status');
-            Route::post('/payment/details/checkout/post', [App\Http\Controllers\PaymentController::class, 'paymentindex'])->name('school.payment.info.school.checkout');
-            // Route::post('/payment/details/checkout/post/create', [App\Http\Controllers\PaymentController::class, 'schoolPaymentShowCheckout'])->name('school.payment.info.school.checkout.post.create');
-            Route::get('/pdf/statement/{id}', [App\Http\Controllers\SchoolController::class, 'StatementShowSchoolCheckout'])->name('pdf.show.statement.schoolCheckout');
-
-            //Amar pay payment
-            // Route::get('/payment','paymentController@paymentindex');
-            // Route::post('/payment/success',[App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
-            // Route::post('/fail','paymentController@fail')->name('fail');
-
-
-
-            Route::prefix('class')->group(function () {
-                Route::get('/create', [App\Http\Controllers\SchoolController::class, 'classCreate'])->name('class.create');
-                Route::post('/create/post', [App\Http\Controllers\SchoolController::class, 'classCreatePost'])->name('class.create.post');
-                Route::get('/show', [App\Http\Controllers\SchoolController::class, 'classShow'])->name('class.show');
-                Route::get('/edit/{id}', [App\Http\Controllers\SchoolController::class, 'classEdit'])->name('class.edit');
-                Route::post('/update/post/{id}', [App\Http\Controllers\SchoolController::class, 'classUpdatePost'])->name('class.update.post');
-                Route::get('/delete/{id}', [App\Http\Controllers\SchoolController::class, 'classDelete'])->name('class.delete');
-            });
-
-            //class section for school end...
-
-            //term section for school start...
-            Route::prefix('term')->group(function () {
-                Route::get('/create', [TermController::class, 'create'])->name('term.create');
-                Route::post('/store', [TermController::class, 'store'])->name('term.store');
-                Route::get('/index', [TermController::class, 'index'])->name('term.index');
-                Route::get('/edit/{id}', [TermController::class, 'edit'])->name('term.edit');
-                Route::post('/update/{id}', [TermController::class, 'update'])->name('term.update');
-                Route::get('/delete/{id}', [TermController::class, 'destroy'])->name('term.delete');
-            });
-            //term section for school end...
-
-            //Section section for school start...
-            Route::prefix('section')->group(function () {
-                Route::get('/create', [App\Http\Controllers\SchoolController::class, 'sectionCreate'])->name('section.create');
-                Route::post('/create/post', [App\Http\Controllers\SchoolController::class, 'sectionCreatePost'])->name('section.create.post');
-                Route::get('/show', [App\Http\Controllers\SchoolController::class, 'sectionShow'])->name('section.show');
-                Route::get('/edit/{id}', [App\Http\Controllers\SchoolController::class, 'sectionEdit'])->name('section.edit');
-                Route::post('/update/post/{id}', [App\Http\Controllers\SchoolController::class, 'sectionUpdatePost'])->name('section.update.post');
-                Route::get('/delete/{id}', [App\Http\Controllers\SchoolController::class, 'sectionDelete'])->name('section.delete');
-            });
-
-            //Section section for school end...
 
             //group section for school start...
             Route::prefix('group')->group(function () {
@@ -278,6 +119,8 @@ Route::middleware('language')->group(function () {
             //subject for school start...
             Route::get("subject", [SubjectController::class, 'index'])->name('subject.index');
             Route::get("subject/show", [SubjectController::class, 'show'])->name('subject.show');
+            Route::delete("Subject/Check/Delete", [SubjectController::class, 'Subject_Check_Delete'])->name('Subject.Check.Delete');
+
 
             Route::prefix('subject')->group(function () {
 
@@ -290,6 +133,8 @@ Route::middleware('language')->group(function () {
                 Route::get('/delete/subject/{id}/{class_id}', [App\Http\Controllers\SchoolController::class, 'subjectDeletePost'])->name('subject.delete');
                 Route::post('/onchange/group/name', [App\Http\Controllers\SchoolController::class, 'showAjaxGroup'])->name('admin.show.group');
                 Route::post('/onchange/subject/name', [App\Http\Controllers\SchoolController::class, 'showAjaxSubject'])->name('admin.show.subject');
+                Route::get('/restore/subject/{id}', [App\Http\Controllers\SchoolController::class, 'restoreSubject'])->name('restore.subject');
+                Route::get('/pdelete/subject/{id}', [App\Http\Controllers\SchoolController::class, 'pdeletesubject'])->name('Pdelete.subject');
             });
 
             //subject for school end...
@@ -313,14 +158,17 @@ Route::middleware('language')->group(function () {
 
             Route::prefix('teacher')->group(function () {
                 Route::post('/active/{id}', [App\Http\Controllers\SchoolController::class, 'teacherActiveInactive'])->name('teacher.active');
+                Route::post('/multiple/active/inactive', [SchoolController::class, 'teacher_multiple_ActiveInactive'])->name('teacher.multiple.active');
                 Route::get('/show', [App\Http\Controllers\SchoolController::class, 'teacherShow'])->name('teacher.Show');
                 Route::get('/SingleView/{id}', [App\Http\Controllers\SchoolController::class, 'singleView'])->name('single.view');
 
                 Route::get('/create', [App\Http\Controllers\SchoolController::class, 'teacherCreate'])->name('teacher.create');
                 Route::post('/create/post', [App\Http\Controllers\SchoolController::class, 'teacherCreatePost'])->name('teacher.create.post');
-                Route::get('/edit/{id}', [App\Http\Controllers\SchoolController::class, 'teacherEdit'])->name('teacher.edit');
                 Route::post('/update/{id}', [App\Http\Controllers\SchoolController::class, 'teacherUpdate'])->name('teacher.update');
                 Route::get('/delete/{id}', [App\Http\Controllers\SchoolController::class, 'teacherDelete'])->name('teacher.delete');
+                Route::get('/restoreteacher/{id}', [SchoolController::class, 'restoreteacher'])->name('restore.teacher');
+                Route::get('/Pdeleteteacher/{id}', [SchoolController::class, 'Pdelete_teacher'])->name('Pdelete.teacher');
+                Route::delete('/teacher/checkdelete', [App\Http\Controllers\SchoolController::class, 'teacher_Check_Delete'])->name('teacher.Check.Delete');
 
                 Route::post('/show/subject/teacher', [App\Http\Controllers\SchoolController::class, 'getSubjectTeacher'])->name('subject.teacher.show');
                 Route::post('teacher/Pass/Edit', [App\Http\Controllers\SchoolController::class, 'teacherPassChange'])->name('change.teacher.pass');
@@ -329,7 +177,7 @@ Route::middleware('language')->group(function () {
 
             //teacher for school end...
 
-            Route::prefix('assign/teacher')->group(function () {
+            Route::prefix('teacher/assign')->group(function () {
                 Route::get('/show', [App\Http\Controllers\SchoolController::class, 'teacherShow'])->name('teacher.Show');
                 Route::get('/create/show', [App\Http\Controllers\SchoolController::class, 'assignCreateShow'])->name('assign.teacher.create.show');
                 Route::post('/create/show/post', [App\Http\Controllers\SchoolController::class, 'assignCreateShowPost'])->name('assign.teacher.create.show.post');
@@ -348,6 +196,7 @@ Route::middleware('language')->group(function () {
                 Route::get('/edit/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffEdit'])->name('school.staff.edit');
                 Route::post('/update/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffUpdate'])->name('school.staff.update');
                 Route::get('/type/delete/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffTypeDelete'])->name('school.staffType.delete');
+                Route::delete('/stafftype/Check/delete', [SchoolController::class, 'stafftype_Check_delete'])->name('stafftype.Check.delete');
                 Route::post('/create/post', [App\Http\Controllers\SchoolController::class, 'schoolStaffCreatePost'])->name('school.staff.create.post');
 
                 Route::get('/list', [App\Http\Controllers\SchoolController::class, 'schoolStaffList'])->name('school.staff.List');
@@ -355,21 +204,24 @@ Route::middleware('language')->group(function () {
                 Route::get('/list/create', [App\Http\Controllers\SchoolController::class, 'schoolStaffListCreate'])->name('school.staff.List.create');
                 Route::post('/list/create/post', [App\Http\Controllers\SchoolController::class, 'schoolStaffAddData'])->name('school.staff.List.create.post');
                 Route::get('/view/create/{id}', [App\Http\Controllers\SchoolController::class, 'staffview'])->name('staff.view');
+                Route::get('/restorestaff/{id}', [SchoolController::class, 'restoreStaff'])->name('restore.staff');
+                Route::get('/PDelete/staff/{id}', [SchoolController::class, 'pDeleteStaff'])->name('p.delete.staff');
+
+
                 Route::get('/delete/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffDelete'])->name('school.staff.delete');
+                Route::delete('/staff/checkdelete', [App\Http\Controllers\SchoolController::class, 'staff_Check_Delete'])->name('staff.Check.delete');
                 Route::post('/list/create/update/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffListCreateUpdate'])->name('school.staff.List.create.update');
             });
 
             Route::prefix('staff-salary')->group(function () {
                 Route::get('/list', [App\Http\Controllers\SchoolController::class, 'schoolStaffList'])->name('school.staff.salary.List');
-                Route::get('teacher/show', [App\Http\Controllers\SchoolController::class, 'teacherShow'])->name('teacher.salary.Show');
-
-                Route::get('/add/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffAdd'])->name('school.staff.salary.Add');
-                Route::get('/edit/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffSalaryEdit'])->name('school.staff.salary.edit');
                 Route::post('/update/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffSalaryUpdate'])->name('school.staff.salary.update');
-
-                Route::get('teacher/add/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolTeacherAdd'])->name('school.teacher.salary.Add');
-                Route::get('teacher/edit/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolTeacherSalaryEdit'])->name('school.teacher.salary.edit');
+                Route::get('teacher/show', [App\Http\Controllers\SchoolController::class, 'teacherShow'])->name('teacher.salary.Show');
                 Route::post('teacher/update/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolTeacherSalaryUpdate'])->name('school.teacher.salary.update');
+                // Route::get('/add/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffAdd'])->name('school.staff.salary.Add');
+                // Route::get('/edit/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolStaffSalaryEdit'])->name('school.staff.salary.edit');
+                // Route::get('teacher/add/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolTeacherAdd'])->name('school.teacher.salary.Add');
+                // Route::get('teacher/edit/salary/{id}', [App\Http\Controllers\SchoolController::class, 'schoolTeacherSalaryEdit'])->name('school.teacher.salary.edit');
             });
 
             //teacher for school start...
@@ -385,6 +237,8 @@ Route::middleware('language')->group(function () {
 
             Route::prefix('student')->group(function () {
                 Route::get('/create/show', [App\Http\Controllers\SchoolController::class, 'studentCreateShow'])->name('student.teacher.create.show');
+
+
                 Route::get('show', [App\Http\Controllers\SchoolController::class, 'findStudents'])->name('student.find');
                 Route::get('assign/subject/delete/{id}', [App\Http\Controllers\SchoolController::class, 'assignSubjectDelete'])->name('assign.subject.delete');
                 Route::get('data/show/{class_id}/{section_id}/{group_id}', [App\Http\Controllers\SchoolController::class, 'assignStudentDataShow'])->name('assign.student.dataShow');
@@ -392,9 +246,12 @@ Route::middleware('language')->group(function () {
                 // Route::get('/show',[App\Http\Controllers\SchoolController::class, 'studentShow'])->name('student.Show');
                 Route::get('/create', [App\Http\Controllers\SchoolController::class, 'studentCreate'])->name('student.create');
                 Route::post('/create/post', [App\Http\Controllers\SchoolController::class, 'studentCreatePost'])->name('student.create.post');
-                Route::get('/edit/{id}', [App\Http\Controllers\SchoolController::class, 'studentEdit'])->name('student.edit');
                 Route::post('/update/post/{id}', [App\Http\Controllers\SchoolController::class, 'studentUpdatePost'])->name('student.update.post');
                 Route::get('/delete/{id}', [App\Http\Controllers\SchoolController::class, 'studentDelete'])->name('student.delete');
+                Route::get('/restorestudent/{id}', [SchoolController::class, 'restorestudent'])->name('restore.student');
+                Route::get('/Pdeletestudent/{id}', [SchoolController::class, 'Pdelete_student'])->name('Pdelete.student');
+
+                Route::delete('/checkdelete', [App\Http\Controllers\SchoolController::class, 'student_Check_Delete'])->name('student.Check.delete');
 
                 Route::get('/upload', [App\Http\Controllers\SchoolController::class, 'studentUpload'])->name('student.upload');
                 Route::post('/upload/post', [App\Http\Controllers\SchoolController::class, 'studentUploadPost'])->name('student.upload.post');
@@ -402,8 +259,8 @@ Route::middleware('language')->group(function () {
                 Route::post('/student/singlePassword', [App\Http\Controllers\SchoolController::class, 'singlePassword'])->name('student.Password');
 
                 //Attendance
-                Route::get('/student/attendance/show/date/all', [App\Http\Controllers\SchoolController::class, 'studentAttendanceShowDateAll'])->name('student.attendance.show.date.all');
-                Route::get('/student/attendance/show/date', [App\Http\Controllers\SchoolController::class, 'studentAttendanceShowDate'])->name('student.attendance.show.date');
+                Route::get('/attendance/show/date/all', [App\Http\Controllers\SchoolController::class, 'studentAttendanceShowDateAll'])->name('student.attendance.show.date.all');
+                Route::get('/attendance/show/date', [App\Http\Controllers\SchoolController::class, 'studentAttendanceShowDate'])->name('student.attendance.show.date');
 
                 Route::get('/create/show/post/date/all', [App\Http\Controllers\SchoolController::class, 'studentAttendanceShowPostDateAll'])->name('student.attendance.create.show.post.date.all');
                 Route::get('/create/show/post/date', [App\Http\Controllers\SchoolController::class, 'studentAttendanceShowPostDate'])->name('student.attendance.create.show.post.date');
@@ -425,6 +282,8 @@ Route::middleware('language')->group(function () {
                 Route::post('fees/update/{id}', [App\Http\Controllers\SchoolController::class, 'studentFeesUpdate'])->name('student.fees.update');
                 Route::get('fees/delete/{id}', [App\Http\Controllers\SchoolController::class, 'studentFeesDelete'])->name('student.fees.delete');
                 Route::post('fees/create/post', [App\Http\Controllers\SchoolController::class, 'studentFeesCreatePost'])->name('student.fees.create.post');
+                Route::post('fees/paid/post', [App\Http\Controllers\SchoolController::class, 'studentPaymentPost'])->name('student.payment.post');
+                Route::get('fees/paid/pdf/{student_id}/{paid_amount}/{month_name}', [App\Http\Controllers\SchoolController::class, 'studentMonthlyPaymentDomPdf'])->name('student.monthly.payment.domPDF');
 
                 //finance
 
@@ -439,6 +298,7 @@ Route::middleware('language')->group(function () {
 
                     //expenses
 
+                    Route::delete('/expense/check/delete', [ExpenseController::class, 'expense_check_delete'])->name('expense.check.delete');
                     Route::get('/expense/show', [App\Http\Controllers\ExpenseController::class, 'expenseShow'])->name('expense.show');
                     Route::get('/expense/list', [App\Http\Controllers\ExpenseController::class, 'expenselist'])->name('expense.list');
 
@@ -453,22 +313,48 @@ Route::middleware('language')->group(function () {
 
                     //fund
                     Route::get('/fund/show', [App\Http\Controllers\ExpenseController::class, 'fundlist'])->name('fund.show');
+                    Route::delete('/fund/check/delete', [ExpenseController::class, 'fund_check_delete'])->name('fund.check.delete');
 
                     Route::get('/student/fee/scholarship/{key}/{status}', [FinanceController::class, 'scholarshipStatus'])->name('scholarship.status');
                     Route::put('/school/finance/student/school/scholarship/{id}', [FinanceController::class, 'studentSchoolScholarship'])->name('student.school.scholarship');
-
                 });
 
 
+                Route::get('result/create/setting', [ResultSetting::class, 'createSetting'])->name('show.create.setting');
+                Route::get('result/setting/all', [ResultSetting::class, 'resultSettingAll'])->name('result.setting.all');
+                Route::post('result/save/create/setting', [ResultSetting::class, 'saveSetting'])->name('save.result.setting');
+                Route::post('result/update/create/setting', [ResultSetting::class, 'updateSetting'])->name('update.result.setting');
+                Route::get('result/setting/delete/{id}', [ResultSetting::class, 'deleteSetting'])->name('delete.result.setting');
+                Route::get('result/setting/edit/{id}', [ResultSetting::class, 'editResultSetting'])->name('edit.result.setting');
+                Route::get('just/result/setting/edit/{id}', [ResultSetting::class, 'justEditResultSetting'])->name('just.edit.result.setting');
                 Route::get('result/create/show', [App\Http\Controllers\SchoolController::class, 'resultCreateShow'])->name('result.school.admin.create.show');
                 Route::get('result/create/show/all', [App\Http\Controllers\SchoolController::class, 'resultCreateShow'])->name('result.school.admin.create.show.all');
+                Route::get('/result/setting/duplicate/{id}', [ResultSetting::class, 'duplicateResultSetting'])->name('duplicate.result.setting');
+                Route::get('result/upload/first/all/step/{id}', [App\Http\Controllers\SchoolController::class, 'resultUpFirstStep'])->name('result.up.first.step');
                 Route::get('result/create/show/post', [App\Http\Controllers\SchoolController::class, 'resultCreateShowPost'])->name('result.school.create.show.post');
                 Route::get('result/data/show/{class_id}/{section_id}/{subject_id}/{term_id}', [App\Http\Controllers\SchoolController::class, 'resultStudentDataShow'])->name('school.result.dataShow');
                 Route::get('all/result/data/show/{class_id}/{section_id}/{term_id}', [App\Http\Controllers\SchoolController::class, 'resultStudentDataShowAll'])->name('school.result.dataShowAll');
                 Route::post('result/create/post', [App\Http\Controllers\SchoolController::class, 'resultCreatePost'])->name('result.create.post');
-                Route::post('result/create/update/post/{id}', [App\Http\Controllers\SchoolController::class, 'resultUpdatePost'])->name('result.update.post');
+                Route::get('result/mark/{id}', [App\Http\Controllers\SchoolController::class, 'resultmarkSet'])->name('result.mark.set');
+                Route::post("result/mark/store", [ResultSetting::class, 'storeSubjectMark'])->name("store.subject.mark");
+                Route::get("result/pdf", [ResultSetting::class, 'resultPdf'])->name("result.pdf");
+                Route::post("result/pdf/download", [ResultSetting::class, 'resultPdfDownload'])->name("result.pdf.download");
+                Route::get('result/restore/{id}', [ResultSetting::class, 'resultrestore'])->name('restore.result');
+                Route::get('result/permanent/delete/{id}', [ResultSetting::class, 'pdeleteresult'])->name('Pdelete.result');
+
+                Route::get('resultSetting/restore/{id}', [ResultSetting::class, 'resultSettingrestore'])->name('restore.resultSetting');
+                Route::get('resultSetting/permanent/delete/{id}', [ResultSetting::class, 'pdeleteresultSetting'])->name('Pdelete.resultSetting');
+
+
+                Route::get('resultCountable/restore/{id}', [ResultSetting::class, 'resultCountablemarkrestore'])->name('restore.resultCountablemark');
+                Route::get('resultCountable/permanent/delete/{id}', [ResultSetting::class, 'pdeleteresultCountablemark'])->name('Pdelete.resultCountablemark');
+                // Ajax with result
+                Route::get('show/latest/result/setting', [ResultSetting::class, 'showResultSetting'])->name('show.result.setting');
+                //Ajax Get With Section
+                Route::get('get/section/ajax/{id}', [ResultSetting::class, 'getSectionWithAjax'])->name('get.section.ajax');
 
                 //Notice Route Start
+                Route::delete('notice/checkall/delete', [App\Http\Controllers\SchoolController::class, 'notice_Check_Delete'])->name('notice.Check.delete');
                 Route::get('notice/delete/{id}', [App\Http\Controllers\SchoolController::class, 'noticeCreateDelete'])->name('notice.delete');
                 Route::get('notice', [App\Http\Controllers\SchoolController::class, 'noticeCreateShow'])->name('notice.school.admin.create.show');
                 Route::get('notice/create', [App\Http\Controllers\SchoolController::class, 'noticeCreate'])->name('notice.school.admin.create');
@@ -476,7 +362,7 @@ Route::middleware('language')->group(function () {
                 //Notice Route End
 
                 //Mark Types Start Saj
-                Route::get('/mark/type/create/show', [MarkController::class, 'index'])->name('show.mark.type');
+                Route::get('/mark/type/create/show/{id}', [MarkController::class, 'index'])->name('show.mark.type');
                 Route::post('/mark/type/store', [MarkController::class, 'store'])->name('mark.type.store');
                 //Mark Types End
 
@@ -515,6 +401,14 @@ Route::middleware('language')->group(function () {
             Route::post('/create/question/store', [QuestionController::class, 'questionStore'])->name('question.store');
             Route::get('/show/question', [QuestionController::class, 'showQuestion'])->name('show.question');
 
+            // admitCard
+            Route::get('/show/admit/card', [ExamController::class, 'showAdmitCard'])->name('show.admit.card');
+            Route::post('/show/admit/card/download', [ExamController::class, 'showAdmitCardDownload'])->name('show.admit.card.download');
+
+            // sitPlan
+            Route::get('/show/sit/plan', [ExamController::class, 'showSitPlan'])->name('show.sit.plan');
+            Route::post('/show/sit/plan/download', [ExamController::class, 'showSitPlanDownload'])->name('show.sit.plan.download');
+
             //Ajax
             Route::get('/view/single/question/{id}', [QuestionController::class, 'viewSingleQuestion'])->name('view.single.question');
             Route::get('/term/wiese/question/{id}', [QuestionController::class, 'termWiseQuestion'])->name('term.wise.question');
@@ -526,7 +420,11 @@ Route::middleware('language')->group(function () {
             Route::get('/edit/question/{id}', [QuestionController::class, 'editQuestion'])->name('edit.question');
             Route::post('/update/question/{id}', [QuestionController::class, 'updateQuestion'])->name('update.question');
             Route::get('/delete/question/{id}', [QuestionController::class, 'deleteQuestion'])->name('delete.question');
+            Route::delete('/question/check/delete', [QuestionController::class, 'Question_check_delete'])->name('Question.check.delete');
             Route::get('/pdf/question/{id}', [QuestionController::class, 'pdfQuestion'])->name('pdf.question');
+            Route::get('/restore/Question/{id}', [QuestionController::class, 'restoreQuestion'])->name('restore.question');
+            Route::get('/pDelete/Question/{id}', [QuestionController::class, 'PdeleteQuestion'])->name('Pdelete.admission');
+
 
             //----------------Question Route End------------------
 
@@ -646,7 +544,7 @@ Route::middleware('language')->group(function () {
         Route::get('/routine/show', [UserController::class, 'showRoutine'])->name('student.show.routine');
         Route::get('/show/payment', [UserController::class, 'showPayment'])->name('show.student.payment');
         Route::get('/school/finance/student/{sid}/{month?}/fee', [UserController::class, 'findStudent'])->name('find.student.fee');
-
+        Route::get('/student/profile', [UserController::class, 'student_profile'])->name('student.profile');
     });
 
     Route::group(['middleware' => 'auth:teachers'], function () {
@@ -676,7 +574,11 @@ Route::middleware('language')->group(function () {
             Route::get('/attendance/show', [\App\Http\Controllers\TeacherController::class, 'teacherAttendanceShow'])->name('all.teachers.attendance.show');
             Route::get('/attendance/show/class/{class_id}/{section_id}/{group_id}', [\App\Http\Controllers\TeacherController::class, 'classAttendanceShow'])->name('allAttendance.show.all.teacher');
             Route::get('/result/show', [\App\Http\Controllers\TeacherController::class, 'teacherResultShow'])->name('all.teachers.result.show');
+            Route::get('/result/easy/show', [\App\Http\Controllers\TeacherController::class, 'teacherShow'])->name('teacher.attendance.show');
+
             Route::get('/result/show/class/{subject_id}', [\App\Http\Controllers\TeacherController::class, 'teacherResultDataShow'])->name('allResult.show.all.teacher');
+
+
 
             Route::get('/student/show', [\App\Http\Controllers\TeacherController::class, 'teacherStudentShow'])->name('all.teachers.student.show');
             Route::get('/student/show/class/{class_id}/{section_id}/{group_id}', [\App\Http\Controllers\TeacherController::class, 'classStudentShow'])->name('allStudent.show.all.teacher');
@@ -697,6 +599,10 @@ Route::middleware('language')->group(function () {
  * ================================================================*/
 Route::get('/online/admission/form/{unique_id}', [OnlineAddmissionController::class, 'onlineAdmissionForm'])->name('online.Admission.Form')->middleware('language');
 Route::post('/online/admission/form/post', [OnlineAddmissionController::class, 'onlineAdmissionFormPost'])->name('online.Admission.Form.Post');
+Route::get('/restorAdmission/{id}', [OnlineAddmissionController::class, 'restoreAdmission'])->name('restore.admission');
+Route::get('/pdeleteAdmission/{id}', [OnlineAddmissionController::class, 'pDeleteAdmission'])->name('Pdelete.admission');
+
+
 
 Route::middleware(['auth:schools', 'language'])
     ->prefix('school')
@@ -706,6 +612,7 @@ Route::middleware(['auth:schools', 'language'])
         Route::get('/online/admission/edit/{id}', [OnlineAddmissionController::class, 'onlineAdmissionEdit'])->name('online.Admission.Edit');
         Route::put('/online/admission/editPost/{id}', [OnlineAddmissionController::class, 'onlineAdmissionEditPost'])->name('online.Admission.Edit.Post');
         Route::get('/online/admission/delete/{id}', [OnlineAddmissionController::class, 'onlineAdmissionDelete'])->name('online.Admission.Delete');
+        Route::delete('/online/admission/Check/delete', [OnlineAddmissionController::class, 'onlineAdmission_Check_Delete'])->name('online.Admission.Check.Delete');
     });
 //** ====================== Online Admission end here  ======================*/
 
@@ -742,6 +649,13 @@ Route::middleware(['auth:schools', 'language'])
     ->group(function () {
         Route::get('/school/finance/dashboard', [FinanceController::class, 'dashboard'])->name('dashoboard');
         Route::resource('/school/finance/fees', FinanceController::class)->names(['as' => 'fees']);
+
+        // school Fees
+        Route::get("school/finance/school-fees", [SchoolFeesController::class, 'index'])->name('schoolFees');
+        Route::post("school/finance/school-fees-create", [SchoolFeesController::class, 'createSchoolFees'])->name('schoolFees.create');
+        Route::post("school/finance/school-fees/store", [SchoolFeesController::class, 'storeSchoolFees'])->name('schoolFees.store');
+        Route::post("school/finance/school-fees/destory", [SchoolFeesController::class, 'destorySchoolFees'])->name('schoolFees.destroy');
+
         Route::post('/school/finance/fees/update', [FinanceController::class, 'update'])->name('fees.update');
         Route::get('/school/delete/finance/fees/title/{id}', [FinanceController::class, 'financeTitleDelete'])->name('fees.title.delete');
 
@@ -750,13 +664,20 @@ Route::middleware(['auth:schools', 'language'])
         Route::post("school/assign/fees", [AssignFeesController::class, 'store'])->name('assign.fees.store');
 
         // students list
-        Route::get('/school/finance/students', [FinanceController::class, 'students'])->name('students');
+        Route::get('/school/finance/collect/fees', [FinanceController::class, 'userList'])->name('userlist');
+        Route::post('/school/finance/collect/fees', [FinanceController::class, 'collectFees'])->name('collect.fees');
+        Route::get('/school/finance/collect/fees/userInfo', [FinanceController::class, 'getUserInfo'])->name('userInfo.get');
+
         Route::get('/school/finance/student/{sid}/{month?}/fee', [FinanceController::class, 'findStudent'])->name('find.student.fee');
-    //    Route::put('/school/finance/student/school/scholarship/{id}', [FinanceController::class, 'studentSchoolScholarship'])->name('student.school.scholarship');
         Route::post('school/finance/history/get', [FinanceController::class, 'getFinanceHistory'])->name('history');
 
         // received student fees
         Route::post('/school/finance/payment/receive', [FinanceController::class, 'receivedFees'])->name('fees.received');
+        Route::post('/onclick/filter/amount', [FinanceController::class, 'showAjaxfilter'])->name('dashoboard.filtered');
+        Route::post('/onclick/filter/amount', [FinanceController::class, 'showAjaxfilterMonthly'])->name('dashoboard.filtered.monthly');
+
+
+        Route::get('/school/finance/students', [FinanceController::class, 'students'])->name('students');
     });
 //** ====================== Finance end here  ======================*/
 
@@ -800,6 +721,8 @@ Route::middleware('auth:admin')
 
         Route::post('school/Register', [AdminPageController::class, 'school_Register'])->name('Schools.Register');
         Route::get('school/SingleView/{id}', [AdminPageController::class, 'school_SingleView'])->name('School.SingleView');
+        Route::get('school/edit/{id}', [AdminPageController::class, 'school_edit'])->name('School.edit');
+        Route::put('school/update/{id}', [AdminPageController::class, 'school_update'])->name('School.update');
 
         Route::get('changestatus/{id}', [AdminPageController::class, 'changestatus'])->name('changestatus');
 
@@ -811,14 +734,51 @@ Route::middleware('auth:admin')
         Route::put('AppReleased/Update/{id}', [AdminPageController::class, 'AppReleased_Update'])->name('AppReleased.Update');
 
         //Addon in admin panel
+        
+        Route::get('AddonList', [TicketController::class, 'support'])->name('support');
+
         Route::get('AddonList', [AdminPageController::class, 'AddonList'])->name('AddonList');
+
+        Route::get('Blog/List', [AdminPageController::class, 'blogList'])->name('bloglist');
+        Route::get('Blog/Create', [AdminPageController::class, 'blogCreate'])->name('blog.create');
+        Route::get('Blog/edit/{id}', [AdminPageController::class, 'blogedit'])->name('blog.edit');
+        Route::post('Blog/update/{id}', [AdminPageController::class, 'blogeditpost'])->name('blog.edit.post');
+        Route::get('Blog/delete{id}', [AdminPageController::class, 'blogdelete'])->name('blog.delete');
+
+        Route::post('Blog/Create/post', [AdminPageController::class, 'blogCreatepost'])->name('blog.create.post');
         Route::get('Addonform', [AdminPageController::class, 'Addon_form'])->name('Addon.form');
         Route::post('Addon/create', [AdminPageController::class, 'Addon_create'])->name('Addon.create');
         Route::get('Addon/Edit/{id}', [AdminPageController::class, 'Addon_Edit'])->name('Addon.Edit');
         Route::put('Addon/Update/{id}', [AdminPageController::class, 'Addon_Update'])->name('Addon.Update');
         Route::get('Addon/Delete/{id}', [AdminPageController::class, 'Addon_Delete'])->name('Addon.Delete');
+
+        //billing add
+        Route::get('billing/index', [AdminPageController::class, 'billing_index'])->name('');
+        Route::get('billing/page/{id}', [AdminPageController::class, 'billing_page'])->name('billing.page');
+        Route::post('billing/store', [AdminPageController::class, 'billing_store'])->name('billing.store');
+        Route::get('billing/status/{id}', [AdminPageController::class, 'billing_status'])->name('billing.status');
+        // SEO 
+        Route::get('SEO/Tools', [AdminPageController::class, 'SEO_Tool_List'])->name('seo.tool');
+        Route::get('SEO/Form', [AdminPageController::class, 'SEO_form'])->name('SEO.form');
+        Route::post('SEO/create', [AdminPageController::class, 'SEO_create'])->name('SEO.create');
+        Route::get('SEO/Edit/{id}', [AdminPageController::class, 'SEO_Edit'])->name('SEO.Edit');
+        Route::put('SEO/Update/{id}', [AdminPageController::class, 'SEO_Update'])->name('SEO.Update');
+        Route::get('SEO/Delete/{id}', [AdminPageController::class, 'SEO_Delete'])->name('SEO.Delete');
+    
+    
+        Route::get('/setting/under/maintainnace', [App\Http\Controllers\AdminPageController::class, 'showMaintainance'])->name('under.maintenance.show');
+        Route::get('/maintenance-mode', [App\Http\Controllers\AdminPageController::class, 'setMaintenanceMode'])->name('admin.maintenance.set');
+        Route::get('/maintenance-mode/up', [App\Http\Controllers\AdminPageController::class, 'resetsetMaintenanceMode'])->name('admin.maintenance.reset');
+               
+
+
+
+        Route::get('/admin/ticket/list', [App\Http\Controllers\TicketController::class, 'adminticketmessagelist'])->name('ticketmessage.list.admin');
+        Route::get('/admin/ticket/reply', [App\Http\Controllers\TicketController::class, 'adminticketreply'])->name('ticket.reply.admin');
+        Route::get('/admin/ticket/delete', [App\Http\Controllers\TicketController::class, 'ticketDelete'])->name('ticket.delete');
+
     });
-//** ====================== Finance end here  ======================*/
+//** ====================== Super admin end here  ======================*/
 
 
 /** ----------- Addon checkout page (LIZA)
@@ -842,7 +802,113 @@ Route::middleware('auth:schools', 'language')
         Route::get('document/download/{uploadfile}', [StudentController::class, 'document_download'])->name('document.download');
         Route::get('document/view/{id}', [StudentController::class, 'document_view'])->name('document.view');
     });
-//** ====================== Transfer and testimonial certificate end here  ======================*/
+//** ====================== Document of Student here end here  ======================*/
+
+
+
+/** ----------- Attendance of Staff start  (LIZA)
+ * ================================================================*/
+Route::middleware('auth:schools', 'language')
+    ->prefix('school/Staff/')
+    ->group(function () {
+        Route::get('StaffAttendancePage', [AttendanceController::class, 'StaffAttendancePage'])->name('StaffAttendancePage');
+        Route::get('StaffAttendance/Date', [AttendanceController::class, 'StaffAttendance_DatePost'])->name('StaffAttendance.DatePost');
+        Route::get('Staff/Attendance/{date}', [AttendanceController::class, 'StaffAttendance'])->name('StaffAttendance');
+        Route::post('StaffAttendance/post', [AttendanceController::class, 'StaffAttendance_post'])->name('StaffAttendance.post');
+        Route::post('StaffAttendance/confirm-absent-present/{id}', [AttendanceController::class, 'Staff_confirmabsentpresent'])->name('Staff.confirmabsentpresent');
+        Route::get('StaffAttendance/All/View', [AttendanceController::class, 'StaffAttendance_AllView'])->name('StaffAttendance.AllView');
+        Route::get('StaffAttendance/AllView/Post', [AttendanceController::class, 'StaffAttendance_AllView_Post'])->name('StaffAttendance.AllView.Post');
+        Route::get('StaffAttendance/Month/{date}', [AttendanceController::class, 'StaffAttendance_Month'])->name('StaffAttendance.Month');
+    });
+//** ====================== Attendance of Staff end here  ======================*/
+
+
+
+/** ----------- Attendance of Teacher start  (LIZA)
+ * ================================================================*/
+Route::middleware('auth:schools', 'language')
+    ->prefix('school/Teacher/')
+    ->group(function () {
+        Route::get('datepage', [AttendanceController::class, 'Teacher_datepage'])->name('Teacher.datepage');
+        Route::get('datepage/post', [AttendanceController::class, 'datepage_post'])->name('datepage.post');
+        Route::get('TeacherView/Attendance/page/{date}', [AttendanceController::class, 'TeacherAttendance_page'])->name('TeacherAttendance.page');
+        Route::post('TeacherAttendance/post', [AttendanceController::class, 'TeacherAttendance_post'])->name('TeacherAttendance.post');
+        Route::get('TeacherAttendance/All/View', [AttendanceController::class, 'TeacherAttendance_AllView'])->name('TeacherAttendance.AllView');
+        Route::get('TeacherAttendance/Viewpost', [AttendanceController::class, 'TeacherAttendance_Viewpost'])->name('TeacherAttendance.Viewpost');
+        Route::get('Teacher-Attendance-Month/{date}', [AttendanceController::class, 'TeacherAttendance_Month'])->name('TeacherAttendance.Month');
+        Route::post('TeacherAttendance/confirmabsentpresent/{id}', [AttendanceController::class, 'Teacher_confirmabsentpresent'])->name('Teacher.confirmabsentpresent');
+    });
+//** ====================== Attendance of Teacher end here  ======================*/
+
+
+/** ----------- Recycle Bin of School  (LIZA)
+ * ================================================================*/
+Route::middleware('auth:schools', 'language')
+    ->prefix('school/Recycle/')
+    ->group(function () {
+        Route::get('Recyclepage', [SettingsController::class, 'Recyclepage'])->name('Recyclepage');
+    });
+Route::middleware('auth:schools', 'language')
+    ->prefix('school/support/')
+    ->group(function () {
+        Route::get('/ticket/create', [TicketController::class, 'SupportTicketCreate'])->name('support.ticket.create');
+        Route::get('/ticket/message ', [TicketController::class, 'ticketmessage'])->name('ticketmessage.create');
+        Route::get('/ticket/message/post ', [TicketController::class, 'ticketmessage'])->name('ticketmessage.create.post');
+        Route::post('/ticket/post', [TicketController::class, 'SupportTicketPost'])->name('support.ticket.post');
+    });
+Route::get('/school/finance/feerestore/{id}', [FinanceController::class, 'feerestore'])->name('restore.fee');
+Route::get('/school/finance/assignFessrestore/{id}', [FinanceController::class, 'assignFessrestore'])->name('restore.assignFess');
+Route::get('/school/finance/staffSalaryrestore/{id}', [FinanceController::class, 'staffSalaryrestore'])->name('restore.staffSalary');
+Route::get('/school/finance/TeacherSalaryrestore/{id}', [FinanceController::class, 'TeacherSalaryrestore'])->name('restore.TeacherSalary');
+Route::get('/school/finance/expenserestore/{id}', [FinanceController::class, 'expenserestore'])->name('restore.expense');
+Route::get('/school/finance/fundrestore/{id}', [FinanceController::class, 'fundrestore'])->name('restore.fund');
+Route::get('/school/finance/studentMontyFeerestore/{id}', [FinanceController::class, 'studentMontyFeerestore'])->name('restore.studentMontyFee');
+
+Route::get('/school/finance/assignFesspdelete/{id}', [FinanceController::class, 'assignFesspdelete'])->name('pdelete.assignFess');
+Route::get('/school/finance/feepdelete/{id}', [FinanceController::class, 'feepdelete'])->name('pdelete.fee');
+Route::get('/school/finance/staffSalarypdelete/{id}', [FinanceController::class, 'staffSalarypdelete'])->name('pdelete.staffSalary');
+Route::get('/school/finance/TeacherSalarypdelete/{id}', [FinanceController::class, 'TeacherSalarypdelete'])->name('pdelete.TeacherSalary');
+Route::get('/school/finance/expensepdelete/{id}', [FinanceController::class, 'expensepdelete'])->name('pdelete.expense');
+Route::get('/school/finance/fundpdelete/{id}', [FinanceController::class, 'fundpdelete'])->name('pdelete.fund');
+Route::get('/school/finance/studentMontyFeepdelete/{id}', [FinanceController::class, 'studentMontyFeepdelete'])->name('pdelete.studentMontyFee');
+
+
+//** ====================== End Recycle Bin of School  ======================*/
+
+/** ---------- upload attendance (LIZA)
+ * =========================================================*/
+Route::middleware(['auth:schools', 'language'])
+    ->group(function () {
+
+        Route::get("/student/attendance/dashboard/", [AttendanceController::class, 'Attendance_dashboard'])->name('Attendance.dashboard');
+        Route::get("/student/attendance/profile/", [AttendanceController::class, 'Attendance_profile'])->name('Attendance.profile');
+    });
+
+/** ========================= upload attendance ==================== */
+
+/** ----------- Billing of school  (LIZA)
+ * ================================================================*/
+Route::middleware(['auth:schools', 'language'])
+    ->group(function () {
+
+        Route::get("/school/billing", [SettingsController::class, 'school_billing'])->name('school.billing');
+    });
+/** ========================= Billing of school  ==================== */
+
+
+
+/** ----------- Start search,pagination,filter of school  (LIZA)
+ * ================================================================*/
+Route::middleware(['auth:schools', 'language'])
+    ->group(function () {
+
+        Route::get("/school/billing", [SettingsController::class, 'school_billing'])->name('school.billing');
+    });
+/** ========================= End search,pagination,filter of school of school  ==================== */
+Route::post("/school/dashboard1", [AttendanceController::class, 'Studentdetailsdashboard'])->name('Studentdetailsdashboard');
+
+
+
 //Cache Clear (sazzad)
 Route::get('/cache-clear', function () {
     Artisan::call('cache:clear');

@@ -43,7 +43,7 @@
                                 <h6 class="mb-0">
                                     {{ !isset($s->class_id) ? '' : getClassnameUser($s->class_id)->class_name }} , {{ !isset($s->section_id) ? '' : getSectionnameUser($s->section_id)->section_name }}   {{ (!isset($s->group_id) ) ? '' : getGroupnameUser($s->group_id)->group_name ?? '' }}
                                 </h6>
-                                <p class="mb-0">{{getSubjectNameAll($s->subject_id)->subject_name}}</p>
+                                <p class="mb-0">{{getSubjectNameAll($s->subject_id)?->subject_name}}</p>
                             </div>
                             <div class="my-2">
                                 <p class="mb-1 font-13">Days go</p>
@@ -118,9 +118,9 @@
                                 </div>
                                 <div class="text-center my-3">
                                     <h6 class="mb-0">
-                                        {{ !isset($s2[0]->class_id) ? '' : \App\Models\InstituteClass::find($s2[0]->class_id)?->class_name }}, {{ !isset($s2[0]->section_id) ? '' : \App\Models\Section::find($s2[0]->section_id)->section_name }}   {{ (!isset($s2[0]->group_id) ) ? '' : getGroupnameUser($s2[0]->group_id)->group_name ?? '' }}
+                                        {{ !isset($s2[0]->class_id) ? '' : \App\Models\InstituteClass::find($s2[0]->class_id)?->class_name }}, {{ !isset($s2[0]->section_id) ? '' : \App\Models\Section::find($s2[0]->section_id)->section_name }}   {{ (!isset($s2[0]->group_id) ) ? '' : getGroupnameUser($s2[0]->group_id)?->group_name ?? '' }}
                                     </h6>
-                                    <p class="mb-0">{{getSubjectNameAll($s2[0]->subject_id)->subject_name}}</p>
+                                    <p class="mb-0">{{getSubjectNameAll($s2[0]?->subject_id)}}</p>
                                 </div>
                                 <div class="my-2">
                                     <p class="mb-1 font-13">Days go</p>

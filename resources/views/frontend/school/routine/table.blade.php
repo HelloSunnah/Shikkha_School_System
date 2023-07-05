@@ -4,7 +4,10 @@
     <!--start content-->
     <main class="page-content">
         <div class="row">
-            <div class="col-xl-12 mb-5">
+            <div class="col-xl-12 mb-2">
+                <div class="text-end mb-1">
+                    <button class="btn btn-info btn-sm" onclick="printDiv()" title="{{__('app.print')}}"><i class="bi bi-printer"></i></button>
+                </div>
                <div class="card">
                    <div class="card-header py-3 bg-transparent">
                        <div class="text-center">
@@ -43,7 +46,7 @@
                                         @endforeach
 
                                         <td>
-                                            <a href="{{url('school/class/routine/edit?class='.$period->class_id.'&section='.$period->section_id.'&period='.$period->period_id.'&shift='.$period->shift.'&day='.$key)}}" class="btn-sm btn-danger">
+                                            <a href="{{url('school/class/routine/edit?class='.$period->class_id.'&section='.$period->section_id.'&period='.$period->period_id.'&shift='.$period->shift.'&day='.$key)}}" class="btn-sm btn-primary" title="{{__('app.Edit')}}">
                                                 <i class="bi bi-pen"></i>
                                             </a>
                                         </td>
@@ -55,18 +58,67 @@
                                 @endforelse
                             </tbody>
                         </table>
-                    </div>
+                    </div>                    
                 </div>
+
+                <div class="col-12" style="display: none">
+                    <div class="card" id="printDiv">
+                        <div class="card-header py-3 bg-transparent">
+                            <div class="text-center">
+                                <h4 class="mb-2 mb-sm-0 font-weight-bold "> {{__('app.Routine')}} </h4>
+                                <h5 class="mb-2 mb-sm-0 ">  {{instituteClass($data['class'])->class_name}} {{getSectionName ($data['section'])->section_name}}</h5>
+                             </div>
+                        </div>
+                         <div class="card-body">
+                             <table class="table table-bordered table-hover">
+                                 <thead>
+                                     <tr>
+                                         <th>{{__('app.Day')}} \ {{__('app.Period')}}</th>
+                                         @foreach ($data['periods'] as $key => $row)
+                                         <th>
+                                             {{ordinalNumber(++$key)." Class"}} <br>
+                                             ({{date("h:i a", strtotime($row->from_time)) . " - " . date("h:i a", strtotime($row->to_time))}})
+                                             {{-- {{ date('h:i a', strtotime($row->from_time)).' - '. date('h:i a', strtotime($row->to_time)) }} --}}
+                                         </th> 
+                                         @endforeach
+                                     </tr>
+                                 </thead>
+                                 <tbody>
+                                     @forelse ($rows as $key => $row)
+                                         <tr>
+                                             <td>{{$key}}</td>
+     
+                                             @foreach ($row as $period)
+                                             <td>
+                                                 {{instituteSubject($period->subject_id)?->subject_name}} <br>
+                                                 {{strtoupper( getTeacherName($period->teacher_id)?->full_name)}} <br>
+                                                 @if (!is_null($period->note))
+                                                     Room No: {{$period->note}}
+                                                 @endif
+                                             </td>
+                                             @endforeach
+                                         </tr>
+                                     @empty
+                                     <tr text-align="center">
+                                         <td colspan="{{count($data['periods'])+1}}">Not Found</td>
+                                     </tr>
+                                     @endforelse
+                                 </tbody>
+                             </table>
+                         </div>                    
+                     </div>
+                </div>
+                
             </div>
 
             <div class="col-12">
-                <div class="card">
+                <div class="card"  style="box-shadow:4px 3px 13px  .13px #cf74f9;">
                     <div class="card-body">
                         @if(isset($data['dataFor']) && $data['dataFor'] == 'create')
                             <form action="{{route('routine.store')}}" method="post">
                                 @csrf
-                                <div class="mb-3">
-                                    <label for=""><b>{{__('app.Select Day')}}</b> <small class="text-danger">(* Required)</small> </label>
+                                <div class="mb-3 mt-4">
+                                    <label class="select-form" for="">{{__('app.Select Day')}} <small class="text-danger">(* Required)</small> </label>
                                     <select name="day" class="form-control mb-3 js-select" id="select_day" required>
                                         <option value="" selected>Select One</option>
                                         <option value="Saturday"> Saturday</option>
@@ -96,10 +148,10 @@
 
                                         <input type="hidden" name="period[]" id="period_id" value="{{$item->id}}" >
 
-                                        <div class="col-lg mb-3">
-                                            <label for=""><b>{{__('app.Select Subject')}}</b> <small class="text-danger">*</small></label>
+                                        <div class="col-lg mb-3 mt-4">
+                                            <label class="select-form" for="">{{__('app.Select Subject')}} <small class="text-danger">*</small></label>
                                             <select name="subject[]" onchange="teacher({{ $item->id }});" class="form-control mb-3 js-select">
-                                                <option value="">Select One</option>
+                                                <option value=""></option>
 
                                                 @foreach ($data['subjects'] as $subject)
                                                     <option value="{{$subject->id}}">{{$subject->subject_name}}</option>
@@ -114,32 +166,32 @@
                                             </select>
                                         </div> --}}
 
-                                        <div class="col-lg mb-3">
-                                            <label for=""><b>{{__('app.Select Teacher')}}</b> <small class="text-danger">*</small></label>
+                                        <div class="col-lg mb-3 mt-4">
+                                            <label class="select-form" for="">{{__('app.Select Teacher')}} <small class="text-danger">*</small></label>
                                             <select name="teacher[]" id="teacherAdd{{ $item->id }}" class="form-control mb-3 js-select">
-                                                <option value=" ">Select Teacher</option>
+                                                <option value=" "></option>
                                             </select>
                                         </div>
 
-                                        <div class="col-lg mb-3">
-                                            <label for=""><b>{{__('app.RoomNo')}}</b></label>
+                                        <div class="col-lg mb-3 mt-4">
+                                            <label class="form-label">{{__('app.RoomNo')}}</label>
                                             <input type="text" name="note[]" class="form-control">
                                         </div>
                                     </div>
                                     @endforeach
                                 </div>
 
-                                <button class="btn btn-outline-primary">{{__('app.Save')}}</button>
+                                <button class="btn btn-primary">{{__('app.Save')}}</button>
                             </form>
 
                         @elseif(isset($data['dataFor']) && $data['dataFor'] == 'edit')
                             <form action="{{route('routine.store')}}" method="post">
                                 @csrf
                                 <input type="hidden" value="update_routine" name="edit">
-                                <div class="mb-3">
-                                    <label for=""><b>{{__('app.Select')}} {{__('app.a')}} {{__('app.Day')}}</b> <small class="text-danger">(* Required)</small> </label>
+                                <div class="mb-3 mt-4">
+                                    <label class="select-form">{{__('app.Select')}} {{__('app.a')}} {{__('app.Day')}} <small class="text-danger">(* Required)</small> </label>
                                     <select name="day" class="form-control mb-3 js-select" id="select_day" required>
-                                        <option value="" selected>Select</option>
+                                        <option value="" selected></option>
                                         <option value="Saturday" {{ ($data['day'] == "Saturday") ? "selected" : "" }}> Saturday</option>
                                         <option value="Sunday" {{ ($data['day'] == "Sunday") ? "selected" : "" }}> Sunday</option>
                                         <option value="Monday" {{ ($data['day'] == "Monday") ? "selected" : "" }}> Monday</option>
@@ -168,10 +220,10 @@
 
                                         <input type="hidden" name="period[]"  value="{{$item->period_id}}">
 
-                                        <div class="col-lg mb-3">
-                                            <label for=""><b>{{__('app.Select')}} {{__('app.Subject')}}</b><small class="text-danger">*</small></label>
+                                        <div class="col-lg mb-3 mt-4">
+                                            <label class="select-form">{{__('app.Select')}} {{__('app.Subject')}}<small class="text-danger">*</small></label>
                                             <select name="subject[]" class="form-control mb-3 js-select">
-                                                <option value="">Select One</option>
+                                                <option value=""></option>
 
                                                 @foreach ($data['subjects'] as $subject)
                                                     <option value="{{$subject->id}}" {{ ($item->subject_id == $subject->id) ? 'selected' : '' }}>{{$subject->subject_name}}</option>
@@ -179,10 +231,10 @@
                                             </select>
                                         </div>
 
-                                        <div class="col-lg mb-3">
-                                            <label for=""><b>{{__('app.Select')}} {{__('app.Teacher')}}</b><small class="text-danger">*</small></label>
+                                        <div class="col-lg mb-3 mt-4">
+                                            <label class="select-form">{{__('app.Select')}} {{__('app.Teacher')}}<small class="text-danger">*</small></label>
                                             <select name="teacher[]" id="teacherAdd{{ $item->period_id }}" class="form-control mb-3 js-select">
-                                                <option value=" ">Select One</option>
+                                                <option value=" "></option>
 
                                                 @foreach ($data['teachers'] as $teacher)
                                                     <option value="{{$teacher->id}}" {{ ($item->teacher_id == $teacher->id) ? 'selected' : '' }}>{{strtoupper($teacher->full_name)}}</option>
@@ -191,8 +243,8 @@
                                         </div>
                                       
 
-                                        <div class="col-lg mb-3">
-                                            <label for=""><b>{{__('app.RoomNo')}}</b></label>
+                                        <div class="col-lg mb-3 mt-4">
+                                            <label class="select-form">{{__('app.RoomNo')}}</label>
                                             <input type="text" name="note[]" value="{{$item->note}}" class="form-control">
                                         </div>
                                     </div>
@@ -207,7 +259,7 @@
                                 >
                                     {{__('app.cancel')}}
                                 </a> --}}
-                                <button class="btn btn-outline-primary">{{__('app.save_changes')}}</button>
+                                <button class="btn btn-primary">{{__('app.Update')}}</button>
                                 
                             </form>
                         @endif
@@ -283,4 +335,19 @@
             $("#period").append(html);
         })
     </script> --}}
+
+
+    <script>
+        function printDiv(printDiv) {
+            var printContents = document.getElementById('printDiv').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+        }
+    </script>
+
 @endpush 

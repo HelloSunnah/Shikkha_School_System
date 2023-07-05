@@ -28,6 +28,7 @@ class StudentController extends Controller
 
         return view('frontend.school.student.finance.createShow', compact('data')); 
     }
+
     public function documentpost(Request $request ){
         $request->validate([
             'title'  => 'required',
@@ -41,11 +42,14 @@ class StudentController extends Controller
         StudentDocumentUpload::create([
             'title'=>$request->title,
             'student_id'=>$request->student_id,
+            'school_id'=>Auth::user()->id,
             'uploadfile'=>$fileName,
         ]);
         Alert::success('Successfully Document Uploaded', 'Success Message');
         return back();
     }
+
+
     public function document_delete($id){
         $documents=StudentDocumentUpload::find($id);
         $fileName=$documents->uploadfile;
@@ -61,5 +65,37 @@ class StudentController extends Controller
     public function document_view($id){
         $document = StudentDocumentUpload::find($id);
         return view('frontend.school.student.student_document_view',compact('document'));
+    }
+
+
+    /**
+     * show student list
+     */
+    public function showStudent()
+    {
+         if (Auth::user()->status == 0) {
+            return redirect()->route('school.payment.info');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
+            return back();
+        }
+        if (Auth::user()->is_editor != 3) {
+            return back();
+        } else {
+            
+            $seoTitle = 'Students | ' . Auth::user()->school_name;
+            $seoDescription = 'Student | ' . Auth::user()->school_name;
+            $seoKeyword = 'Student | ' . Auth::user()->school_name;
+            $data['seo_array'] = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
+
+            $data['classes'] = $class = InstituteClass::where('school_id', Auth::user()->id)->pluck('class_name', 'id');
+            $data['students'] = User::where(['school_id'=>auth()->id()])->orderBy('roll_number')->limit(40)->latest()->get();
+
+            return view('frontend.school.student.list')->with($data);
+        }
     }
 }

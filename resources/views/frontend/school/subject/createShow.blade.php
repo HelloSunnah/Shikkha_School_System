@@ -3,13 +3,12 @@
 @section('content')
     <!--start content-->
     <main class="page-content">
-        <x-page-title title="{{__('app.Subject')}} {{__('app.Show')}}"/>
         <div class="row">
-            <div class="col-xl-6 mx-auto">
-                <div class="card">
+            <div class="col-xl-6 mx-auto mt-5">
+                <div class="card" style="box-shadow:4px 3px 13px  .7px #deaaf7;border-radius:5px">
                     <div class="card-body">
                         <div class="border p-3 rounded">
-                            <h6 class="mb-0 text-uppercase">{{__('app.Subject')}}</h6>
+                            <h6 class="mb-0 text-uppercase text-center text-primary">{{__('app.Subject')}} {{__('app.Show')}}</h6>
                             <hr/>
                                 <form class="row g-3" method="get" action="{{route('subject.create.show.post')}}" enctype="multipart/form-data">
                                     @csrf
@@ -17,7 +16,7 @@
                                         @include('frontend.layouts.message')
                                     </div>
                                     <div class="col-12">
-                                        <label for="Select Class">{{__('app.select')}} {{__('app.class')}}</label>
+                                        <label class="select-form" for="Select Class">{{__('app.select')}} {{__('app.class')}}</label>
                                         @if(count($classes) > 0)
                                             <select class="form-control mb-3 js-select"aria-label="Default select example" name="class_id" id="class_id">
                                                 <option value="" selected>Select a Class</option>

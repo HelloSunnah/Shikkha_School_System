@@ -2,6 +2,7 @@
 @section('content')
 
     <main class="page-content">
+        {{-- @dd(session()) --}}
         <div class="row">
             <div class="col-md-6">
                 <div class="card radius-10 w-100">
@@ -43,10 +44,10 @@
                                         </div>
                                         <div class="progress mt-2">
                                             <p class="mb-2"> <span class="float-end" style="font-weight:600;padding:0px 5px;">
-                                                {{!isset(RoutineTeacherId($data->assign_teacher_id)->class_id) ? '' : getClassnameUser(RoutineTeacherId($data->assign_teacher_id)->class_id)->class_name}}
-                                                ({{!isset(RoutineTeacherId($data->assign_teacher_id)->section_id) ? '' : getSectionnameUser(RoutineTeacherId($data->assign_teacher_id)->section_id)->section_name }} ,
-                                                {{(!isset(RoutineTeacherId($data->assign_teacher_id)->group_id) ) ? '' : getGroupnameUser(RoutineTeacherId($data->assign_teacher_id)->group_id)->group_name ,}}
-                                                {{(!isset(RoutineTeacherId($data->assign_teacher_id)->subject_id) ) ? '' : getSubjectNameTeacher(RoutineTeacherId($data->assign_teacher_id)->subject_id)->subject_name }})
+                                                {{!isset(RoutineTeacherId($data->assign_teacher_id)?->class_id) ? '' : getClassnameUser(RoutineTeacherId($data->assign_teacher_id)?->class_id)?->class_name}}
+                                                ({{!isset(RoutineTeacherId($data->assign_teacher_id)?->section_id) ? '' : getSectionnameUser(RoutineTeacherId($data->assign_teacher_id)?->section_id)?->section_name }} ,
+                                                {{(!isset(RoutineTeacherId($data->assign_teacher_id)?->group_id) ) ? '' : getGroupnameUser(RoutineTeacherId($data->assign_teacher_id)?->group_id)?->group_name ,}}
+                                                {{(!isset(RoutineTeacherId($data->assign_teacher_id)?->subject_id) ) ? '' : getSubjectNameTeacher(RoutineTeacherId($data->assign_teacher_id)?->subject_id)?->subject_name }})
                                             </span></p>
                                         </div>
                                     </div>
@@ -149,9 +150,9 @@
                                 @foreach(\App\Models\Routine::where('teacher_id',Auth::user()->id)->get()->groupBy('subject_id') as $s => $select)
                                {{-- @dd($select[0]); --}}
                                 <option value="{{$select[0]->id}}">
-                                    {{!isset($select[0]->class_id) ? '' : getClassnameUser($select[0]->class_id)->class_name}} 
-                                    ( {{!isset($select[0]->section_id) ? '' : getSectionnameUser($select[0]->section_id)->section_name }}, 
-                                    {{ !isset($select[0]->subject_id) ? '' : getSubjectNameTeacher($select[0]->subject_id)->subject_name ?? 'Null' }})
+                                    {{!isset($select[0]->class_id) ? '' : getClassnameUser($select[0]->class_id)?->class_name}} 
+                                    ( {{!isset($select[0]->section_id) ? '' : getSectionnameUser($select[0]->section_id)?->section_name }}, 
+                                    {{ !isset($select[0]->subject_id) ? '' : getSubjectNameTeacher($select[0]->subject_id)?->subject_name ?? 'Null' }})
                                     
                                 </option>
                         

@@ -22,6 +22,8 @@ class CreateSubjectsTable extends Migration
             $table->string('subject_name_bn')->nullable();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->string('active')->nullable();
+            $table->softDeletes();
+
             $table->timestamps();
         });
     }
@@ -34,5 +36,7 @@ class CreateSubjectsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('subjects');
+        $table->dropSoftDeletes();
+
     }
 }

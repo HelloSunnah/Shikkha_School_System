@@ -15,6 +15,7 @@ use App\Models\Price;
 use App\Models\Notice;
 use App\Models\Result;
 use App\Models\School;
+use App\Helper\Utility;
 use App\Models\Message;
 use App\Models\Payment;
 use App\Models\Routine;
@@ -45,6 +46,8 @@ use App\Models\EmployeeSalary;
 use App\Models\InstituteClass;
 use App\Models\MessagePackage;
 use App\Models\SchoolCheckout;
+use App\Models\AssignStudentFee;
+use App\Models\SEOModel;
 use App\Exports\AttendanceExport;
 use App\Models\StudentMonthlyFee;
 use Illuminate\Support\Facades\DB;
@@ -54,17 +57,24 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
 // use Excel;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\StudentDocumentUpload;
 use Barryvdh\DomPDF\PDF as DomPDFPDF;
 use App\Http\Requests\ResultCreatePost;
+use App\Models\ClassPeriod;
+use App\Models\ClassSyllabus;
+use App\Models\FeesType;
 use Maatwebsite\Excel\Concerns\ToModel;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Testing\Fluent\Concerns\Has;
+use App\Models\ResultSetting as ModelsResultSetting;
+use App\Models\ResultSubjectCountableMark;
+use DatePeriod;
 use Maatwebsite\Excel\Validators\ValidationException;
+
 
 class SchoolController extends Controller
 {
@@ -84,6 +94,49 @@ class SchoolController extends Controller
         $data = Payment::where('id', $id)->first();
         return view('frontend.school.pdf.paymentpdf', compact('data'));
     }
+
+
+    public function pclassDelete($id)
+    {
+        ResultSubjectCountableMark::where('institute_class_id', $id)->delete();
+
+        User::withTrashed()->where('class_id', $id)->forcedelete();
+        Routine::withTrashed()->where('class_id', $id)->forcedelete();
+        ClassSyllabus::withTrashed()->where('class_id', $id)->forcedelete();
+        Section::withTrashed()->where('class_id', $id)->forcedelete();
+        Subject::withTrashed()->where('class_id', $id)->forcedelete();
+
+        InstituteClass::withTrashed()->where('id', $id)->forcedelete();
+
+        toast("Data delete permanently", "success");
+        return back();
+    }
+    public function restoreclass($id)
+    {
+        Section::withTrashed()->where('class_id', $id)->restore();
+        User::withTrashed()->where('class_id', $id)->restore();
+        Subject::withTrashed()->where('class_id', $id)->restore();
+
+        InstituteClass::withTrashed()->where('id', $id)->restore();
+
+        toast("Restore data", "success");
+        return back();
+    }
+
+
+    public function pSectionDelete($id)
+    {
+        Section::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+    }
+    public function restoreSection($id)
+    {
+        Section::withTrashed()->where('id', $id)->restore();
+        toast("Restore data", "success");
+        return back();
+    }
+
 
     public function UserColor(Request $request)
     {
@@ -108,50 +161,50 @@ class SchoolController extends Controller
             foreach ($months as $index => $month) {
                 $datas[$month] = $users[$index];
             }
-
+            $defaultDate = Carbon::today()->format('d-M-Y');
             $incomeAmount = StudentMonthlyFee::select(DB::raw("sum(amount) as sum"))
-                    ->where('school_id',Auth::user()->id)
-                    ->whereYear('created_at',date('Y'))
-                    ->groupBy('month_name')
-                    // ->orderBy('id','asc')
-                    ->pluck('sum');
+                ->where('school_id', Auth::user()->id)
+                ->whereYear('created_at', date('Y'))
+                ->groupBy('month_name')
+                // ->orderBy('id','asc')
+                ->pluck('sum');
             // dd($incomeAmount);
             // dd("hi");
             $incomeMonths = StudentMonthlyFee::select(DB::raw("month_name as month"))
-                ->where('school_id',Auth::user()->id)
-                ->whereYear('created_at',date('Y'))
+                ->where('school_id', Auth::user()->id)
+                ->whereYear('created_at', date('Y'))
                 // ->orderby('id','asc')
                 ->groupby('month_name')->pluck('month');
 
-            $incomeDatas = array(0,0,0,0,0,0,0,0,0,0,0,0);
+            $incomeDatas = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-            foreach ($incomeMonths as $index => $incomeMonth){
-                $incomeDatas[date("n",strtotime($incomeMonth)) - 1] = $incomeAmount[$index];
+            foreach ($incomeMonths as $index => $incomeMonth) {
+                $incomeDatas[date("n", strtotime($incomeMonth)) - 1] = $incomeAmount[$index];
             }
             $exAmount = EmployeeSalary::select(DB::raw("sum(amount) as sum"))
-                ->where('school_id',Auth::user()->id)
-                ->whereYear('created_at',date('Y'))
+                ->where('school_id', Auth::user()->id)
+                ->whereYear('created_at', date('Y'))
                 // ->orderby('id','desc')
                 ->groupby('month_name')->pluck('sum');
             $staffAmount = TeacherSalary::select(DB::raw("sum(amount) as sum"))
-                ->where('school_id',Auth::user()->id)
-                ->whereYear('created_at',date('Y'))
+                ->where('school_id', Auth::user()->id)
+                ->whereYear('created_at', date('Y'))
                 // ->orderby('id','desc')
                 ->groupby('month_name')->pluck('sum');
 
             $exMonths = EmployeeSalary::select(DB::raw("month_name as month"))
-                ->where('school_id',Auth::user()->id)
-                ->whereYear('created_at',date('Y'))
+                ->where('school_id', Auth::user()->id)
+                ->whereYear('created_at', date('Y'))
                 // ->orderby('id','desc')
                 ->groupby('month_name')->pluck('month');
-            $exDatas = array(0,0,0,0,0,0,0,0,0,0,0,0);
+            $exDatas = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-            foreach ($exMonths as $index => $exMonth){
-                $exDatas[date("n",strtotime($exMonth)) - 1] = $exAmount[$index] + $staffAmount[$index];
+            foreach ($exMonths as $index => $exMonth) {
+                $exDatas[date("n", strtotime($exMonth)) - 1] = $exAmount[$index] + $staffAmount[$index];
             }
             //  dd($exDatas);
 
-            return view('school', compact('datas', 'incomeDatas', 'exDatas'));
+            return view('school', compact('datas', 'incomeDatas', 'exDatas', 'defaultDate'));
         } else {
             return back();
         }
@@ -181,21 +234,6 @@ class SchoolController extends Controller
         $rows = Payment::where('school_id', Auth::user()->id)->latest()->get();
         return view('frontend.school.paymentStatus', compact('rows'));
     }
-
-    // public function schoolPaymentShowCheckout(Request $request)
-    // {
-    //     // dd($request->all());
-    //     $checkout = new SchoolCheckout();
-    //     $checkout->school_id = Auth::user()->id;
-    //     $checkout->pay_amount = $request->pay_amount;
-    //     //$checkout->gateway_number = $request->gateway_number;
-    //     $checkout->gateway_type = $request->select;
-    //     $checkout->transaction_number     = $request->tran_id;
-
-    //     $checkout->save();
-    //     Alert::success('Successfully Payment Submitted,After accept your payment you get a message', 'Success Message');
-    //     return redirect()->route('school.payment.status');
-    // }
 
 
     public function schoolMessage()
@@ -328,7 +366,15 @@ class SchoolController extends Controller
         if (Auth::user()->is_editor != 1) {
             return back();
         } else {
-            return view('frontend.pages.acquisition');
+            $seoTitle = SEOModel::where('page_no','=','18')->first()->title;
+            $seoDescription = SEOModel::where('page_no','=','18')->first()->description;
+            $seoKeyword = SEOModel::where('page_no','=','18')->first()->keyword;
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
+            return view('frontend.pages.acquisition', compact('seo_array'));
         }
     }
 
@@ -380,7 +426,15 @@ class SchoolController extends Controller
             $teachers = substr($workplace->teachers, 2);
             //$price = Price::orwhere('student','>=', (int)$student)->where('id','!=',0)->orderby('student','desc')->get();
             $price = Price::get();
-            return view('frontend.pages.selectPricePage', compact('price', 'id'));
+            $seoTitle = SEOModel::where('page_no','=','8')->first()->title;
+            $seoDescription = SEOModel::where('page_no','=','8')->first()->description;
+            $seoKeyword = SEOModel::where('page_no','=','8')->first()->keyword;
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
+            return view('frontend.pages.selectPricePage', compact('price', 'id','seo_array'));
         } else {
             return redirect()->route('acquisition');
         }
@@ -555,15 +609,15 @@ class SchoolController extends Controller
         $request->validate([
             'class_name' => 'required',
             'class_name_bn' => 'required',
-           
+
         ]);
         $class_name = 'Class ' . $request->class_name;
         $dataClass = InstituteClass::where('class_name', $class_name)->where('school_id', Auth::user()->id)->count();
         if ($dataClass == 0) {
             $class = new InstituteClass();
 
-            $class->class_name = 'Class ' . $request->class_name;
-            $class->class_name_bn = $request->class_name_bn.' শ্রেণী';
+            $class->class_name = $request->class_name;
+            $class->class_name_bn = $request->class_name_bn;
             $class->class_fees = $request->class_fees;
             $class->active = (is_null($request->active) ? 0 : $request->active);
             $class->school_id = Auth::user()->id;
@@ -629,7 +683,7 @@ class SchoolController extends Controller
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-             $classEdit = InstituteClass::find($id);
+            $classEdit = InstituteClass::find($id);
             return view('frontend.school.class.create', compact('classEdit', 'seo_array', 'classText'));
         }
     }
@@ -646,13 +700,12 @@ class SchoolController extends Controller
         $request->validate([
             'class_name' => 'required',
         ]);
-        $class_name = 'Class ' . $request->class_name;
+        $class_name = $request->class_name;
         $dataClass = InstituteClass::where('id', '!=', $id)->where('class_name', $class_name)->where('school_id', Auth::user()->id)->count();
         if ($dataClass == 0) {
             $class = InstituteClass::find($id);
-
-            $class->class_name = 'Class ' . $request->class_name;
-            $class->class_name_bn = $request->class_name_bn.' শ্রেণী';
+            $class->class_name = $request->class_name;
+            $class->class_name_bn = $request->class_name_bn ?? $class->class_name_bn;
             $class->class_fees = $request->class_fees;
             $class->active = (is_null($request->active) ? 0 : $request->active);
             $class->school_id = Auth::user()->id;
@@ -673,9 +726,24 @@ class SchoolController extends Controller
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
+        $resultcount = ResultSubjectCountableMark::where('institute_class_id', $id)->delete();
+
+        $student = User::where('class_id', $id)->delete();
+        $routine = Routine::where('class_id', $id)->delete();
+        $syllabus = ClassSyllabus::where('class_id', $id)->delete();
+        $section = Section::where('class_id', $id)->delete();
         $studentFees = StudentFee::where('class_id', $id)->delete();
+
         $class = InstituteClass::where('id', $id)->delete();
         Alert::error('Successfully Class Deleted', 'Success Message');
+        return back();
+    }
+    public function class_Check_Delete(Request $request)
+    {
+        $ids = $request->ids;
+        StudentFee::whereIn('class_id', $ids)->delete();
+        InstituteClass::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
         return back();
     }
 
@@ -728,7 +796,7 @@ class SchoolController extends Controller
                 'class_id' => 'required',
                 'section_name' => 'required',
             ]);
-            $section_name = 'Section ' . $request->section_name;
+            $section_name = $request->section_name;
             $sectionData = Section::where('class_id', $request->class_id)->where('section_name', 'LIKE', "%{$section_name}%")->first();
             if (isset($sectionData)) {
                 toast('Oops ! Class name and section must be different', 'error');
@@ -748,6 +816,41 @@ class SchoolController extends Controller
                     return redirect()->route('section.show');
                 }
             }
+        }
+    }
+
+    /**
+     * Save Section with ajax
+     * 
+     * @param Request
+     * @param $request
+     * $return response
+     */
+    public function sectionCreatePostAjax(Request $request)
+    {   
+        $validator = Validator::make($request->all(),[
+            'class_id' => 'required',
+            'section_name' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()->all()]);
+        }
+
+        $section_name = 'Section ' . $request->section_name;
+        $sectionData = Section::where('class_id', $request->class_id)->where('section_name', 'LIKE', "%{$section_name}%")->first();
+        if (isset($sectionData)) {
+            return response()->json(['status' => "available"]);
+        } else {
+            $class = new Section();
+
+            $class->class_id = $request->class_id;
+            $class->section_name = 'Section ' . $request->section_name;
+            $class->active = (is_null($request->active) ? 0 : $request->active);
+            $class->school_id = Auth::user()->id;
+            $class->save();
+            
+            return response()->json(['status' => 'success']);
         }
     }
 
@@ -771,7 +874,7 @@ class SchoolController extends Controller
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            $section = Section::orderby('id', 'desc')->where('school_id', Auth::user()->id)->get();
+           $section = Section::orderby('id', 'desc')->where('school_id', Auth::user()->id)->get();
             return view('frontend.school.section.show', compact('section', 'seo_array', 'sectionText'));
         }
     }
@@ -817,7 +920,7 @@ class SchoolController extends Controller
         $class = Section::find($id);
 
         $class->class_id = $request->class_id;
-        $class->section_name = 'section' . $request->section_name;
+        $class->section_name = $request->section_name;
         $class->active = (is_null($request->active) ? 0 : $request->active);
         $class->school_id = Auth::user()->id;
         $class->save();
@@ -867,13 +970,13 @@ class SchoolController extends Controller
 
     /**
      * Create Group (Sajjad Devel)
-     * 
-     * @param Request 
+     *
+     * @param Request
      * @param $request
      * @return \Illuminate\Routing\Redirector
      */
     public function groupCreatePost(Request $request)
-    {   
+    {
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -889,7 +992,7 @@ class SchoolController extends Controller
             $value = $request->session()->put('dataSession', $request->url_check2);
             return redirect()->route('section.create');
         } else {
-            
+
             $request->validate([
                 'class_id' => 'required',
                 'group_name' => 'required',
@@ -965,8 +1068,8 @@ class SchoolController extends Controller
 
     /**
      * Update Group (Sajjad Devel)
-     * 
-     * @param Request 
+     *
+     * @param Request
      * @param $request
      * @param $id
      * @return \Illuminate\Routing\Redirector
@@ -1154,7 +1257,7 @@ class SchoolController extends Controller
         // $section_id = $request->section_id;
         // $group_id = is_null($request->group_id) ? 0 : $request->group_id;
         Alert::success('Success Subject Updated', 'Success Message');
-        return redirect()->route('subject.subjectShow', ['class_id' => $class_id ]);
+        return redirect()->route('subject.subjectShow', ['class_id' => $class_id]);
     }
 
     public function subjectEditPost($id)
@@ -1400,13 +1503,12 @@ class SchoolController extends Controller
             }
             $request->validate([
                 'full_name' => 'required',
-                'email' => 'required|unique:teachers|email',
-                'phone' => 'required|unique:teachers|numeric|digits:11',
+                'email' => 'required|unique:teachers,email,'.Auth::id().'school_id|email',
+                'phone' => 'required|unique:teachers,phone,'.Auth::id().'school_id|numeric|digits:11',
                 'address' => 'required',
                 'salary' => 'numeric',
                 'designation' => 'required',
                 'gender' => 'required',
-                'blood_group' => 'required',
             ]);
 
             $fileName = null;
@@ -1416,12 +1518,16 @@ class SchoolController extends Controller
                 $fileName = "/uploads/teacher/" . $fileName;
             }
 
-            try{
+            try {
 
                 $password = 123456789;
                 $link = 'shikka' . rand(10, 100) . Auth::user()->id . substr($request->phone, 3);
+
+                $uniqueId = Utility::createUniqueId(Auth::id(), 'teacher');
+
                 $teacher = new Teacher();
                 $teacher->full_name = $request->full_name;
+                $teacher->unique_id = $uniqueId;
                 $teacher->email = $request->email;
                 $teacher->phone = $request->phone;
                 $teacher->address = $request->address;
@@ -1429,38 +1535,31 @@ class SchoolController extends Controller
                 $teacher->gender = $request->gender;
                 $teacher->image = $fileName;
                 $teacher->salary = $request->salary;
-                $teacher->blood_group = $request->blood_group;
+                $teacher->blood_group = $request->blood_group ? $request->blood_group : "";
                 $teacher->shift = $request->shift;
                 $teacher->link_id = $link;
                 $teacher->designation = $request->designation;
                 $teacher->active = 1;
-                $teacher->department_name= $request->department_name;
-
+                $teacher->department_name = $request->department_name;
+                $teacher->M_status = $request->M_status ? $request->M_status : "";
                 $teacher->password = Hash::make($password);
                 $teacher->school_id = Auth::user()->id;
                 $teacher->save();
-            }
-
-
-            catch(Exception $e)
-            {
+            } catch (Exception $e) {
                 Alert::error($e->getMessage(), 'Server Error');
                 return back();
             }
 
             $month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-            foreach ($month as $data)
-            {
-                try{
+            foreach ($month as $data) {
+                try {
                     $fees = new TeacherSalary();
                     $fees->month_name = $data;
                     $fees->teacher_id = $teacher->id;
                     $fees->school_id = Auth::user()->id;
                     $fees->save();
-                }
-                catch(Exception $e)
-                {
+                } catch (Exception $e) {
                     break;
                     Alert::error($e->getMessage(), 'Server Error');
                     return back();
@@ -1468,41 +1567,25 @@ class SchoolController extends Controller
             }
 
 
-            // try{
-            //     Mail::to($teacher->email)->send(new InviteTeacher([
-            //         'name'      =>  explode(" ", $teacher->full_name)[0],
-            //         'email'     =>  $teacher->email,
-            //         'password'  =>  $password,
-            //         'school'    =>  $teacher->school->school_name,
-            //         'subject'   =>  $teacher->department_name,
-            //     ]));
-            // }
-            // catch(Exception $e)
-            // {
-            //     Alert::error($e->getMessage(), 'Server Error');
-            //     return back();
-            // }
-
             Alert::success('Success Teacher created', 'Success Message');
             return redirect()->route('teacher.Show');
         }
     }
 
-    public function teacherPassChange(Request $request){
+    public function teacherPassChange(Request $request)
+    {
 
         $request->validate([
 
-            'password'=>['required','min:5','confirmed']
+            'password' => ['required', 'min:5', 'confirmed']
         ]);
 
-        Teacher::where('id',$request->id)->update([
-            'password'=> bcrypt($request->password)
+        Teacher::where('id', $request->id)->update([
+            'password' => bcrypt($request->password)
         ]);
         Alert::success('Successfully Teacher Password Changed', 'Success Message');
 
-        return response()->json([
-            'status'=>'success'
-        ]);
+       return back();
     }
 
     public function singleView($id)
@@ -1529,13 +1612,11 @@ class SchoolController extends Controller
             }
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email',
-                'phone' => 'required|unique:teachers,phone,'.$id.'id|numeric|digits:11',
+                'phone' => 'required|unique:teachers,phone,' . $id . 'id|numeric|digits:11',
                 'full_name' => 'required',
                 'address' => 'required',
-                'blood_group' => 'required',
                 'designation' => 'required',
                 'gender' => 'required',
-                'blood_group' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -1573,12 +1654,10 @@ class SchoolController extends Controller
                 $teacher->gender = $request->gender;
                 $teacher->designation = $request->designation;
                 $teacher->address = $request->address;
-                $teacher->blood_group = $request->blood_group;
-                $teacher->M_status = $request->M_status;
+                $teacher->blood_group = $request->blood_group ? $request->blood_group : "";
+                $teacher->M_status = $request->M_status ? $request->M_status : "";
                 $teacher->salary = $request->salary;
                 $teacher->shift = $request->shift;
-                $teacher->M_status = $request->M_status;
-                //    $teacher->password = Hash::make($password);
                 $teacher->school_id = Auth::user()->id;
                 $teacher->active = (is_null($request->active) ? 1 : $request->active);
                 $teacher->save();
@@ -1611,18 +1690,46 @@ class SchoolController extends Controller
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            $teacher = Teacher::where('school_id', Auth::user()->id)->orderby('active','desc')->get();
+            $teacher = Teacher::where('school_id', Auth::user()->id)->orderby('active', 'desc')->paginate(10);
+            $studentFees = TeacherSalary::where('school_id', Auth::user()->id)->get();
             // $teacher = where('school_id', Auth::user()->id)->orderby('active','asc')->get();
-            return view('frontend.school.teacher.show', compact('teacher', 'seo_array', 'teacherText'));
+            return view('frontend.school.teacher.show', compact('studentFees','teacher', 'seo_array', 'teacherText'));
         }
     }
 
     public function teacherDelete($id)
     {
+
+        $teacherSalary = TeacherSalary::where('teacher_id', $id)->delete();
+
+
+
         $teacher = Teacher::find($id);
         File::delete(public_path($teacher->image));
         $teacher->delete();
         Alert::success('Successfully Teacher Deleted', 'Success Message');
+        return back();
+    }
+    public function teacher_Check_Delete($id)
+    {
+        Teacher::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+    }
+    public function restoreteacher($id)
+    {
+
+        TeacherSalary::withTrashed()->where('teacher_id', $id)->restore();
+        Teacher::withTrashed()->where('id', $id)->restore();
+        toast("Restore data", "success");
+        return back();
+    }
+    public function Pdelete_teacher($id)
+    {
+        TeacherSalary::withTrashed()->where('teacher_id', $id)->forcedelete();
+
+        Teacher::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
         return back();
     }
 
@@ -1672,6 +1779,15 @@ class SchoolController extends Controller
             return back();
         }
     }
+    public function teacher_multiple_ActiveInactive(Request $request)
+    {
+        $ids = $request->ids;
+        $teacher = Teacher::whereIn('id', $ids);
+        $teacher->active = $request->active;
+        $teacher->save();
+        Alert::success(' Selected Teachers are Activation Changed', 'Success Message');
+        return response()->json(['status' => 'success']);
+    }
 
     public function assignCreateShow()
     {
@@ -1688,7 +1804,7 @@ class SchoolController extends Controller
             $class = InstituteClass::where('school_id', Auth::user()->id)->get();
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
-            $teachers = Teacher::where('school_id', Auth::user()->id)->where('active',1)->get();
+            $teachers = Teacher::where('school_id', Auth::user()->id)->where('active', 1)->get();
             $subjects = subject::where('school_id', Auth::user()->id)->get();
 
             //return $subjects;
@@ -1705,7 +1821,8 @@ class SchoolController extends Controller
             ];
 
             return view(
-                'frontend.school.teacher.createShow',compact(
+                'frontend.school.teacher.createShow',
+                compact(
                     'subjectText',
                     'seo_array',
                     'class',
@@ -1764,7 +1881,6 @@ class SchoolController extends Controller
                 toast('Successfully Assigned Teacher', 'success');
                 return back();
             }
-
         }
     }
 
@@ -1962,145 +2078,128 @@ class SchoolController extends Controller
             $class = InstituteClass::where('school_id', Auth::user()->id)->get();
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
-            $subjectText = 'student Input create';
-            $seoTitle = 'student | ' . Auth::user()->school_name;
-            $seoDescription = 'student | ' . Auth::user()->school_name;
-            $seoKeyword = 'student | ' . Auth::user()->school_name;
+            $subjectText = 'Student Input create';
+            $seoTitle = 'Students | ' . Auth::user()->school_name;
+            $seoDescription = 'Student | ' . Auth::user()->school_name;
+            $seoKeyword = 'Student | ' . Auth::user()->school_name;
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            $dataShow = User::where([
-                'school_id'     =>  auth()->id(),
-                ])->latest()->get();
-            return view('frontend.school.student.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group','dataShow'));
+
+
+           $dataShow =  User::where(['school_id'=>auth()->id()])->where('class_id', $class->first()->id)->latest()->get();
+
+            return view('frontend.school.student.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'dataShow'));
         }
     }
+
+    
 
     /**------------------   Find Student
      * =====================================================*/
     public function findStudents(Request $request)
-    {
+    {   
+        if ($request->class_id) {
+            
+            if ($request->section_id) {
 
-        if($request->class_id){
-
-            if($request->section_id){
-
-                if($request->shift_id){
-
-                    if($request -> group_id){
+                if ($request->shift_id) {
+                    
+                    if ($request->group_id) {
                         $shift = $request->shift_id;
                         $class = $request->class_id;
                         $section = $request->section_id;
                         $group = $request->group_id;
-
+                        
                         $dataShow = User::where([
                             'school_id'     =>  auth()->id(),
                             'class_id'      =>  $class,
                             'section_id'    =>  $section,
                             'shift'         =>  $shift,
                             'group_id'    =>  $group,
-                        ])->latest()->get();
-                    }
-                    else{
+                        ])->orderBy('roll_number', 'asc')->get();
+                    } else {
                         $shift = $request->shift_id;
                         $class = $request->class_id;
                         $section = $request->section_id;
-
+                        
                         $dataShow = User::where([
                             'school_id'     =>  auth()->id(),
                             'class_id'      =>  $class,
                             'section_id'    =>  $section,
                             'shift'         =>  $shift,
-                        ])->latest()->get();
+                        ])->orderBy('roll_number', 'asc')->get();
                     }
-
-                }
-                else if($request -> group_id){
+                } else if ($request->group_id) {
 
                     $class = $request->class_id;
                     $section = $request->section_id;
                     $group = $request->group_id;
-
+                    
                     $dataShow = User::where([
                         'school_id'     =>  auth()->id(),
                         'class_id'      =>  $class,
                         'section_id'    =>  $section,
                         'group_id'    =>  $group,
-
-                    ])->latest()->get();
-                }
-                else{
+                    ])->orderBy('roll_number', 'asc')->get();
+                } else {
 
                     $class = $request->class_id;
                     $section = $request->section_id;
-
+                   
                     $dataShow = User::where([
                         'school_id'     =>  auth()->id(),
                         'class_id'      =>  $class,
                         'section_id'    =>  $section,
-                    ])->latest()->get();
-
+                    ])->orderBy('roll_number', 'asc')->get();
                 }
+            } else if ($request->shift_id) {
 
-            }
+                if ($request->group_id) {
+                    
+                    $class = $request->class_id;
+                    $shift = $request->shift_id;
+                    $group = $request->group_id;
 
-            else if($request -> shift_id){
+                    $dataShow = User::where([
+                        'school_id'   =>  auth()->id(),
+                        'class_id'    =>  $class,
+                        'shift'    =>  $shift,
+                        'group_id'    =>  $group,
 
-                    if($request -> group_id){
-
-                        $class = $request->class_id;
-                        $shift = $request->shift_id;
-                        $group = $request->group_id;
-
-                        $dataShow = User::where([
-                            'school_id'   =>  auth()->id(),
-                            'class_id'    =>  $class,
-                            'shift'    =>  $shift,
-                            'group_id'    =>  $group,
-
-                        ])->latest()->get();
-                    }
-
-                    else{
-                        $shift = $request->shift_id;
-                        $class = $request->class_id;
-
-                        $dataShow = User::where([
-                            'school_id'     =>  auth()->id(),
-                            'shift'         =>  $shift,
-                            'class_id'      =>  $class,
-                        ])->latest()->get();
-                    }
-
-            }
-            else if($request -> group_id){
+                    ])->orderBy('roll_number', 'asc')->get();
+                } else {
+                    $shift = $request->shift_id;
+                    $class = $request->class_id;
+                    $dataShow = User::where([
+                        'school_id'     =>  auth()->id(),
+                        'shift'         =>  $shift,
+                        'class_id'      =>  $class,
+                    ])->orderBy('roll_number', 'asc')->get();
+                }
+            } else if ($request->group_id) {
 
                 $class = $request->class_id;
                 $group = $request->group_id;
-
                 $dataShow = User::where([
                     'school_id'     =>  auth()->id(),
                     'class_id'      =>  $class,
                     'group_id'    =>  $group,
 
-                ])->latest()->get();
-            }
-            else{
+                ])->orderBy('roll_number', 'asc')->get();
+            } else {
                 $class = $request->class_id;
-
+                
                 $dataShow = User::where([
                     'school_id'     =>  auth()->id(),
                     'class_id'      =>  $class,
-                ])->latest()->get();
-
+                ])->orderBy('roll_number', 'asc')->get();
             }
-        }
+        } else if ($request->shift_id) {
 
-        else if($request -> shift_id){
-
-            if($request -> group_id){
+            if ($request->group_id) {
 
                 $shift = $request->shift_id;
                 $group = $request->group_id;
@@ -2110,20 +2209,17 @@ class SchoolController extends Controller
                     'shift_id'    =>  $shift,
                     'group_id'    =>  $group,
 
-                ])->latest()->get();
-            }
-            else{
+                ])->orderBy('roll_number', 'asc')->get();
+            } else {
                 $shift = $request->shift_id;
                 $class = $request->class_id;
 
                 $dataShow = User::where([
                     'school_id'     =>  auth()->id(),
                     'shift'         =>  $shift,
-                ])->latest()->get();
+                ])->orderBy('roll_number', 'asc')->get();
             }
-
-        }
-        else if($request -> group_id){
+        } else if ($request->group_id) {
 
             $group = $request->group_id;
 
@@ -2131,10 +2227,8 @@ class SchoolController extends Controller
                 'school_id'     =>  auth()->id(),
                 'group_id'    =>  $group,
 
-            ])->latest()->get();
-        }
-
-        else {
+            ])->orderBy('roll_number', 'asc')->get();
+        } else {
             $shift = $request->shift_id;
             $class = $request->class_id;
             $section = $request->section_id;
@@ -2143,23 +2237,22 @@ class SchoolController extends Controller
             $dataShow = User::where([
                 'school_id'     =>  auth()->id(),
 
-            ])->latest()->get();
-
+            ])->orderBy('roll_number', 'asc')->get();
         }
 
-            $class = InstituteClass::where('school_id', Auth::user()->id)->get();
-            $section = Section::where('school_id', Auth::user()->id)->get();
-            $group = Group::where('school_id', Auth::user()->id)->get();
-            $subjectText = 'Students';
-            $seoTitle = 'student | ' . Auth::user()->school_name;
-            $seoDescription = 'student | ' . Auth::user()->school_name;
-            $seoKeyword = 'student | ' . Auth::user()->school_name;
-            $seo_array = [
-                'seoTitle' => $seoTitle,
-                'seoKeyword' => $seoKeyword,
-                'seoDescription' => $seoDescription,
-            ];
-            return view('frontend.school.student.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'dataShow'));
+        $class = InstituteClass::where('school_id', Auth::user()->id)->get();
+        $section = Section::where('school_id', Auth::user()->id)->get();
+        $group = Group::where('school_id', Auth::user()->id)->get();
+        $subjectText = 'Students';
+        $seoTitle = 'student | ' . Auth::user()->school_name;
+        $seoDescription = 'student | ' . Auth::user()->school_name;
+        $seoKeyword = 'student | ' . Auth::user()->school_name;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.school.student.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'dataShow'));
     }
 
     public function studentCreate()
@@ -2203,9 +2296,10 @@ class SchoolController extends Controller
         }
 
         $request->validate([
+            'discount' => 'nullable',
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
-            'phone' => 'nullable|numeric|unique:users|digits:11',
+            'phone' => 'nullable|numeric',
             'roll_number' => 'required|numeric',
             'gender' => 'nullable',
             'dob' => 'nullable',
@@ -2216,24 +2310,17 @@ class SchoolController extends Controller
         ]);
 
         $userRoll = User::where('class_id', $request->class_id)
-            ->where('section_id',$request->section_id)
+            ->where('section_id', $request->section_id)
             // ->where('group_id',$request->group_id)
             ->where('roll_number', $request->roll_number);
 
-        if ($userRoll->exists())
-        {
+        if ($userRoll->exists()) {
             toast('This roll number already Exits', 'error');
 
             return back()->withInput()
-                    ->withErrors(['roll_number.required' => 'This roll number already Exits']);
-        }
-        else
-        {
-            $schoolId = str_pad(Auth::id(), 3, '0', STR_PAD_LEFT);
-            $year = date("y");
-            $studentExists = User::where('school_id', $schoolId)->whereYear('created_at', date("Y"))->count();
-            $studentSerial = str_pad(++$studentExists, 4, '0', STR_PAD_LEFT);
-            $uniqueId = $year.$schoolId.$studentSerial;
+                ->withErrors(['roll_number.required' => 'This roll number already Exits']);
+        } else {
+            $uniqueId = Utility::createUniqueId(Auth::id(), 'student');
 
             $user = new User();
             $user->unique_id = $uniqueId;
@@ -2241,9 +2328,11 @@ class SchoolController extends Controller
             $user->father_name = $request->father_name ?? null;
             $user->mother_name = $request->mother_name ?? null;
             $user->email = $request->email;
-            $user->roll_number = $request->roll_number;
+            $user->roll_number = (int)$request->roll_number;
             $user->address = $request->address ?? null;
             $user->phone = $request->phone;
+            $user->discount = $request->discount ?? 0;
+
             $user->gender = $request->gender ?? null;
             $user->dob = $request->dob ?? null;
             $user->blood_group = $request->blood_group ?? null;
@@ -2254,8 +2343,6 @@ class SchoolController extends Controller
             $user->school_id = Auth::user()->id;
             $user->password = Hash::make(123456789);
 
-            //return $user->class_id;
-
             $image = $request->file('image');
             if ($request->hasfile('image')) {
                 $new_name = 'profile/img/' . rand() . '.' . $image->getClientOriginalExtension();
@@ -2264,72 +2351,13 @@ class SchoolController extends Controller
             }
             $user->save();
 
-            // set user in zkteco device
-            // if(!is_null(Auth::user()->zk_ip_address) && !is_null(Auth::user()->zk_ip_port))
-            // {
-            //     try{
-            //         $zk = new ZKTeco(Auth::user()->zk_ip_address, Auth::user()->zk_ip_port);
-
-            //         if($zk->connect())
-            //         {
-            //             $zk->setUser($user->id, $user->unique_id, $user->name, '12345678', 0);
-            //         }
-            //     }
-            //     catch(Exception $e)
-            //     {
-            //         Alert::error($e->getMessage(), 'ZKTeco Error');
-            //         return back();
-            //     }
-            // }
-
-            $month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-            foreach ($month as $iteration => $data) {
-                $fees = new StudentMonthlyFee();
-                $fees->month_name = $data;
-                $fees->month_id = $iteration;
-                $fees->student_id = $user->id;
-                $fees->school_id = Auth::user()->id;
-                $fees->save();
-            }
+            \App\Http\Controllers\Finance\Utility::assignFeesToNewStudent($user);
 
             session(['user' => $user]);
             return redirect()->route('student.create');
         }
     }
 
-    public function studentEdit($id)
-    {
-        if (Auth::user()->status == 0) {
-            return redirect()->route('school.payment.info');
-        } elseif (Auth::user()->status == 2) {
-            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
-            return back();
-        }
-        if (Auth::user()->is_editor != 3) {
-            return back();
-        } else {
-
-            $studentEdit = User::find($id);
-
-            $studentText = 'Student Input Edit';
-            $seoTitle = 'Student | ' . Auth::user()->school_name;
-            $seoDescription = 'Student | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student | ' . Auth::user()->school_name;
-
-            $class = InstituteClass::where('school_id', Auth::user()->id)->get();
-            $section = Section::where('school_id', Auth::user()->id)->get();
-            $group = Group::where('school_id', Auth::user()->id)->get();
-
-
-            $seo_array = [
-                'seoTitle' => $seoTitle,
-                'seoKeyword' => $seoKeyword,
-                'seoDescription' => $seoDescription,
-            ];
-            return view('frontend.school.student.create', compact('studentText', 'seo_array', 'class', 'section', 'group', 'studentEdit'));
-        }
-    }
 
     public function studentUpdatePost(Request $request, $id)
     {
@@ -2347,6 +2375,7 @@ class SchoolController extends Controller
             'roll_number' => 'required|numeric',
             'gender' => 'nullable',
             'dob' => 'nullable',
+            'discount' => 'nullable',
             'father_name' => 'nullable|string',
             'mother_name' => 'nullable|string',
             'class_id' => 'nullable|integer',
@@ -2368,6 +2397,8 @@ class SchoolController extends Controller
             $user->father_name = $request->father_name;
             $user->mother_name = $request->mother_name;
             $user->email = $request->email;
+            $user->discount = $request->discount;
+
             $user->roll_number = $request->roll_number;
             $user->address = $request->address;
             $user->phone = $request->phone;
@@ -2386,21 +2417,62 @@ class SchoolController extends Controller
                 $user->image = 'profile/img/' . $new_name;
             }
             $user->save();
+
+
+            if($user->discount > 0)
+            {
+                $updateStudentMonthlyFees = \App\Http\Controllers\Finance\CollectFeesController::updateStudentMonthlyFees($user->id);
+            
+                if($updateStudentMonthlyFees['status'] == false)
+                {
+                    Alert::error('Server Error', $updateStudentMonthlyFees['message']);
+                    return back();
+                }
+            }
+
+
             Alert::success('Success User Updated', 'Success Message');
-            return redirect()->route('student.teacher.create.show');
+            return back();
         }
     }
 
     public function studentDelete($id)
     {
+
+
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
+        $result = Result::where('student_roll_number', $id)->delete();
+        $fee = StudentMonthlyFee::where('student_id', $id)->delete();
         $data = User::where('id', $id)->delete();
-        Alert::error('Success student deleted', 'Success Message');
+        Alert::success('Success student deleted', 'Success Message');
+        return back();
+    }
+    public function student_Check_Delete($id)
+    {
+        User::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+    }
+    public function restorestudent($id)
+    {
+        StudentMonthlyFee::withTrashed()->where('student_id', $id)->restore();
+        Result::withTrashed()->where('student_id', $id)->restore();
+
+        User::withTrashed()->where('id', $id)->restore();
+        toast("Restore data", "success");
+        return back();
+    }
+    public function Pdelete_student($id)
+    {
+        StudentMonthlyFee::withTrashed()->where('student_id', $id)->forcedelete();
+        Result::withTrashed()->where('student_id', $id)->forcedelete();
+        User::withTrashed()->where('user_id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
         return back();
     }
 
@@ -2418,30 +2490,30 @@ class SchoolController extends Controller
             return back();
         } else {
             $class = InstituteClass::where('school_id', Auth::user()->id)->get();
-            return view('frontend.school.student.upload',compact('class'));
+            return view('frontend.school.student.upload', compact('class'));
         }
     }
 
     //upload post student info
 
-    public function studentUploadPost(Request $request){
+    public function studentUploadPost(Request $request)
+    {
         $request->validate([
-            'class_id'=>'required',
-            'section_id'=>'required',
+            'class_id' => 'required',
+            'section_id' => 'required',
             'file' => 'required|mimes:xlsx,xls',
         ]);
 
-    try {
-        Excel::import(new UsersImport($request->class_id, $request->section_id, auth()->user()->id), $request->file);
-        Alert::success('Student uploaded Succesfully', 'Success Message');
+        try {
+            Excel::import(new UsersImport($request->class_id, $request->section_id, auth()->user()->id), $request->file);
+            Alert::success('Student uploaded Succesfully', 'Success Message');
 
-        return redirect()->route('student.teacher.create.show');
-    } catch (ValidationException $e) {
-         $failures = $e->failures();
-         return back()->with('import errors',$failures);
-
+            return redirect()->route('student.teacher.create.show');
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            return back()->with('import errors', $failures);
+        }
     }
-}
 
 
     public function assignStudentDataShow($class_id, $section_id, $group_id)
@@ -2484,31 +2556,40 @@ class SchoolController extends Controller
     }
 
     // Student singleShow
-    public function singleShow($id){
-        $testimonial=Testimonial::where('user_id',$id)->first();
-        $transfer=Transfer::where('user_id',$id)->first();
-        $user=User::with('clasRelation','sectionRelation')->find($id);
+    public function singleShow($id)
+    {
+        $date = Carbon::now();
+        $testimonial = Testimonial::where('user_id', $id)->first();
+        $transfer = Transfer::where('user_id', $id)->first();
+        $user = User::with('clasRelation', 'sectionRelation')->find($id);
         $data['fees'] = StudentMonthlyFee::where('student_id', $id)->get();
-        $studentMonthlyFees = StudentMonthlyFee::where('student_id', $id)->get();
-        $alldocuments=StudentDocumentUpload::where('student_id',$id)->get();
-        return view('frontend.school.student.singleShow',compact('user','testimonial','transfer', 'data','studentMonthlyFees','alldocuments'));
+        $studentMonthlyFees = StudentMonthlyFee::where('student_id', $id)->orderBy('month_id','asc')->get();
+        $total = StudentMonthlyFee::where('student_id', $id)->sum('amount');
+        $totalPaid = StudentMonthlyFee::where('student_id', $id)->sum('paid_amount');
+        $totalDue = $total - $totalPaid;
+        $alldocuments = StudentDocumentUpload::where('school_id', Auth::user()->id)->where('student_id', $id)->get();
+        $AssignTeacher = AssignTeacher::where('class_id',$user->class_id)->where('school_id',Auth::user()->id)->first()?->teacher_id;
+        $classTeacher = Teacher::find($AssignTeacher)?->first()->full_name;
+        $classTeacherPhone = Teacher::find($AssignTeacher)?->first()->phone;
+        $accountant = Teacher::where('designation', '=', "Accountant")->where('school_id', Auth::user()->id)->first()?->phone;
+
+        return view('frontend.school.student.singleShow', compact('user', 'testimonial', 'transfer', 'data', 'studentMonthlyFees', 'alldocuments','date','totalDue','classTeacher','accountant','totalPaid','classTeacherPhone'));
     }
 
-    public function singlePassword(Request $request){
-
+    public function singlePassword(Request $request)
+    {
 
         $request->validate([
-
-            'password'=>['required','min:5','confirmed']
+            'password' => ['required', 'min:5', 'confirmed']
         ]);
-        User::where('id',$request->id)->update([
-            'password'=> bcrypt($request->password)
-          ]);
-          Alert::success('Successfully Student Password Changed ', 'Success Message');
+        User::where('id', $request->id)->update([
+            'password' => bcrypt($request->password)
+        ]);
+        Alert::success('Successfully Student Password Changed ', 'Success Message');
 
-          return response()->json([
-            'status'=>'success'
-            ]);
+        return response()->json([
+            'status' => 'success'
+        ]);
     }
 
 
@@ -2535,7 +2616,7 @@ class SchoolController extends Controller
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            return view('frontend.school.student.attendanceShow', compact('text', 'seo_array', 'class', 'section','defaultDate'));
+            return view('frontend.school.student.attendanceShow', compact('text', 'seo_array', 'class', 'section', 'defaultDate'));
         }
     }
 
@@ -2584,13 +2665,7 @@ class SchoolController extends Controller
             $section_id = $request->section_id;
             $group_id = is_null($request->group_id) ? 0 : $request->group_id;
             $date = $request->date;
-            //        if($request->date >= date("Y-m-d")){
             return redirect()->route('student.attendanceShowDate', ['class_id' => $class_id, 'section_id' => $section_id, 'group_id' => $group_id, 'date' => $date]);
-            //        }else{
-            //            toast('Previous date attendance you can not uploaded','error');
-            //            return back();
-            //        }
-
         }
     }
 
@@ -2602,7 +2677,6 @@ class SchoolController extends Controller
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        //dd($request->all());
         if (Auth::user()->is_editor != 3) {
             return back();
         } else {
@@ -2621,7 +2695,7 @@ class SchoolController extends Controller
     }
 
     public function attendanceShowDate($class_id, $section_id, $group_id, $date)
-    {   
+    {
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -2632,11 +2706,20 @@ class SchoolController extends Controller
             return back();
         } else {
 
-            $dataAttendance = Attendance::where("school_id", Auth::user()->id)->where('class_id', $class_id)->where('section_id', $section_id)->whereDate('created_at', $date)->get();
+            $dataAttendance = Attendance::join('users', 'users.id', 'attendances.student_id')
+            ->where("attendances.school_id", Auth::user()->id)
+            ->where('attendances.class_id', $class_id)
+            ->where('attendances.section_id', $section_id)
+            ->whereDate('attendances.created_at', $date)
+            ->orderBy('users.roll_number', 'ASC')
+            ->get()
+            ->unique('student_id');
+            
             $dataShow = User::where("school_id", Auth::user()->id)->where('class_id', $class_id)
                 ->where('section_id', $section_id)
+                ->orderBy('roll_number')
                 ->get();
-            
+
             $Text = 'Attendance Input create';
             $seoTitle = 'Attendance | ' . Auth::user()->school_name;
             $seoDescription = 'Attendance | ' . Auth::user()->school_name;
@@ -2651,7 +2734,8 @@ class SchoolController extends Controller
         }
     }
 
-    public function attendanceShowDateAll($class_id, $section_id, $group_id, $date){
+    public function attendanceShowDateAll($class_id, $section_id, $group_id, $date)
+    {
 
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
@@ -2663,7 +2747,6 @@ class SchoolController extends Controller
             return back();
         } else {
             $group_id = ($group_id == 0) ? NULL : $group_id;
-            // $mytime = Carbon::now();
             $dataAttendance = Attendance::where('class_id', $class_id)->where('section_id', $section_id)->whereDate('created_at', $date)->get();
             $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->get();
             $Text = 'Attendance Input create';
@@ -2691,7 +2774,6 @@ class SchoolController extends Controller
             return back();
         } else {
             $group_id = ($group_id == 0) ? NULL : $group_id;
-            // $mytime = Carbon::now();
             $dataAttendance = Attendance::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->whereDate('created_at', $date)->get();
             $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->get();
             return view('frontend.school.pdf.attendance', compact('dataAttendance', 'dataShow', 'class_id', 'section_id', 'group_id', 'date'));
@@ -2726,7 +2808,6 @@ class SchoolController extends Controller
             return back();
         } else {
             $group_id = ($group_id == 0) ? NULL : $group_id;
-            // $mytime = Carbon::now();
             $dataAttendance = Attendance::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->whereDate('created_at', Carbon::today())->get();
             $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->get();
             $Text = 'Subject Input create';
@@ -2741,15 +2822,15 @@ class SchoolController extends Controller
             return view('frontend.school.student.attendance', compact('Text', 'seo_array', 'dataShow', 'class_id', 'section_id', 'group_id', 'dataAttendance'));
         }
     }
-     /**
-      * Save Attendance in Database (Sajjad Devel)
-      *
-      * @param Request 
-      * @param $request
-      * @return \Illuminate\Http\RedirectResponse
-      */
+    /**
+     * Save Attendance in Database (Sajjad Devel)
+     *
+     * @param Request
+     * @param $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function attendanceCreatePost(Request $request)
-    {   
+    {
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -2759,27 +2840,27 @@ class SchoolController extends Controller
         if (Auth::user()->is_editor != 3) {
             return back();
         } else {
-            
+
             foreach ($request->student_id as $index => $code) {
-               $attend = Attendance::where("school_id", Auth::user()->id)
-                            ->where('class_id', getUserName($code)->class_id)
-                            ->where('section_id', getUserName($code)->section_id)
-                            ->where('student_id', $code)
-                            ->whereDate('created_at', $request->segment_date)->delete();
-                          
+                $attend = Attendance::where("school_id", Auth::user()->id)
+                    ->where('class_id', getUserName($code)->class_id)
+                    ->where('section_id', getUserName($code)->section_id)
+                    ->where('student_id', $code)
+                    ->whereDate('created_at', $request->segment_date)->delete();
+
                 $attendance = Attendance::create(
-                    [                
+                    [
                         "student_id"    => $code,
                         "class_id"      => getUserName($code)->class_id,
                         "section_id"    => getUserName($code)->section_id,
                         "school_id"     => Auth::user()->id,
-                        "created_at"    => $request->segment_date." "."15:41:51",
+                        "created_at"    => $request->segment_date . " " . "15:41:51",
                         "attendance"    => $request->attendance[$code][0],
                         "comment"       => $request->comment[$index],
                         "group_id"      => getUserName($code)->group_id
                     ]
                 );
-                
+
                 if ($request->attendance[$code][0] == 0) {
 
                     $message = 'Student Name:' . getUserName($code)->name . ' is Absent';
@@ -2825,9 +2906,9 @@ class SchoolController extends Controller
                     'to'      => "$to",
                     'message' => "$message",
                     'token'   => "$token"
-                ]; // Add parameters in key value
+                ];
 
-                $ch = curl_init(); // Initialize cURL
+                $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_ENCODING, '');
                 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
@@ -2893,8 +2974,6 @@ class SchoolController extends Controller
         }
     }
 
-    //fees ....
-
     public function studentFeesCreate()
     {
         if (Auth::user()->status == 0) {
@@ -2920,48 +2999,151 @@ class SchoolController extends Controller
         }
     }
 
-
-    //aditional fees show
-
-    public function studentFeesShow(){
-        if(Auth::user()->status == 0){
+    public function studentFeesShow()
+    {
+        if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
-        }elseif (Auth::user()->status == 2){
-            toast('Sorry Admin can Inactive Your Account Please Contact','error');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        if(Auth::user()->is_editor != 3) {
+        if (Auth::user()->is_editor != 3) {
             return back();
-        }else {
-        $studentText = 'Fees Input create';
-        $seoTitle = 'Fees | '.Auth::user()->school_name;
-        $seoDescription = 'Fees | '.Auth::user()->school_name;
-        $seoKeyword = 'Fees | '.Auth::user()->school_name;
-        $fees = StudentFee::where('school_id',Auth::user()->id)->get();
-        $feesclass = InstituteClass::where('school_id',Auth::user()->id)->get();
-        //  return $fees;
-        $seo_array = [
-            'seoTitle' => $seoTitle,
-            'seoKeyword' => $seoKeyword,
-            'seoDescription' => $seoDescription,
-        ];
-        return view('frontend.school.student.fees.show',compact('studentText','fees','feesclass','seo_array'));
-    }
+        } else {
+            $studentText = 'Fees Input create';
+            $seoTitle = 'Fees | ' . Auth::user()->school_name;
+            $seoDescription = 'Fees | ' . Auth::user()->school_name;
+            $seoKeyword = 'Fees | ' . Auth::user()->school_name;
+            $fees = StudentFee::where('school_id', Auth::user()->id)->get();
+            $feesclass = InstituteClass::where('school_id', Auth::user()->id)->get();
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
+            return view('frontend.school.student.fees.show', compact('studentText', 'fees', 'feesclass', 'seo_array'));
+        }
     }
 
-    //aditional fees store
 
-    public function studentFeesCreatePost(Request $request){
-        if(Auth::user()->status == 0){
+    public function  studentPaymentPost(Request $request)
+    {
+        // dd($request->all());
+
+        $student = User::where('school_id', Auth::id())->where('id', $request->student_id);
+        $data['student'] = $student->first();
+
+        $discount = $data['student']->discount;
+        $data['monthlyFee'] = InstituteClass::where('school_id', Auth::id())->where('id', $data['student']->class_id)->first()->class_fees;
+        $discountCount = $data['monthlyFee'] - ($discount * $data['monthlyFee']) / 100;
+
+        $data['studentFees'] = StudentMonthlyFee::where('school_id', Auth::id())->where('student_id', $data['student']->id)->where('month_name', $request->month_name)->sum('amount');
+
+        $TotalAmount = $discountCount + $data['studentFees'];
+        $datastudent = StudentMonthlyFee::where('school_id', Auth::id())->where('student_id', $data['student']->id)->get();
+
+
+        $update = StudentMonthlyFee::where('month_name', $request->month_name)->where('student_id', $request->student_id)->get();
+        // return $update;
+        $payment = StudentMonthlyFee::find($update[0]->id);
+        $newAmount = $request->paid_amount + $payment->paid_amount;
+
+        if ($newAmount == $TotalAmount) {
+            $payment->update([
+                'status' => '2',
+                'paid_amount' => $payment->paid_amount + $request->paid_amount,
+            ]);
+        } elseif ($newAmount == 0) {
+            $payment->update([
+                'status' => '0',
+                'paid_amount' => $payment->paid_amount + $request->paid_amount,
+            ]);
+        } else {
+
+            $payment->update([
+                'status' => '1',
+                'paid_amount' => $payment->paid_amount + $request->paid_amount,
+            ]);
+        }
+
+        Alert::success('Payment succesful', 'Success Message');
+        
+        session(['printKey' => $request->student_id]);
+        return back()->with('printDiv', "YES");
+        
+        // return redirect()->route('student.monthly.payment.domPDF',["student_id"=>$request->student_id, 'paid_amount' => $request->paid_amount, 'month_name'=> $request->month_name]);
+    }
+
+    
+    
+    public function studentMonthlyPaymentDomPdf($student_id, $paid_amount, $month_name)
+    {
+        $student = User::where('school_id', Auth::id())->where('id', $student_id);
+        $data['student'] = $student->first();
+
+        $discount = User::where('school_id', Auth::id())->where('id', $student_id)->first()->discount;
+        $data['monthlyFee'] = InstituteClass::where('school_id', Auth::id())->where('id', $data['student']->class_id)->first()->class_fees;
+        $discountCount = $data['monthlyFee'] - ($discount * $data['monthlyFee']) / 100;
+
+        $data['studentFees'] = StudentMonthlyFee::where('school_id', Auth::id())->where('student_id', $data['student']->id)->where('month_name', $month_name)->sum('amount');
+        $data['studentFeesType'] = StudentMonthlyFee::where('school_id', Auth::id())->where('student_id', $data['student']->id)->where('month_name', $month_name)->get();
+        $TotalAmount = $discountCount + $data['studentFees'];
+        $datastudent = StudentMonthlyFee::where('school_id', Auth::id())->where('student_id', $data['student']->id)->get();
+
+        $update = StudentMonthlyFee::where('month_name', $month_name)->where('student_id', $student_id)->get();
+        $payment = StudentMonthlyFee::find($update[0]->id);
+
+        $newAmount = $paid_amount + $payment->paid_amount;
+
+        if ($newAmount == $TotalAmount) {
+                $status = '2';
+                $paid_amount = $payment->paid_amount + $paid_amount;           
+        } 
+        elseif ($newAmount == 0) {
+                $status = '0';
+                $paid_amount = $payment->paid_amount + $paid_amount;
+
+        } else {
+                $status = '1';
+                $paid_amount = $payment->paid_amount + $paid_amount;
+        }
+        
+        if ($month_name == 'January') {$monthKey = 0; }           
+        elseif ($month_name == 'February') {$monthKey = 1;}
+        elseif ($month_name == 'March') {$monthKey = 2;}
+        elseif ($month_name == 'April') {$monthKey = 3;}
+        elseif ($month_name == 'MAy') {$monthKey = 4;}
+        elseif ($month_name == 'June') {$monthKey = 5;}
+        elseif ($month_name == 'July') {$monthKey = 6;}
+        elseif ($month_name == 'August') {$monthKey = 7;}
+        elseif ($month_name == 'September') {$monthKey = 8;}
+        elseif ($month_name == 'October') {$monthKey = 9;}
+        elseif ($month_name == 'November') {$monthKey = 10;}
+        else {$monthKey = 11;}            
+        
+        $data['monthKey']= $monthKey;
+        $data['status']= $status;
+        $data['discountCount'] = $discountCount;
+        $data['paid_amount'] = $paid_amount;
+        $data['month_name'] = $month_name;
+        // dd($data);
+        
+        // return view('frontend.school.pdf.studentPayment', $data);
+        $pdf = PDF::loadView('frontend.school.pdf.studentPayment', $data);
+        return $pdf->download($data['student']->unique_id.'.'.'pdf');
+    }
+
+    public function studentFeesCreatePost(Request $request)
+    {
+        if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
-        }elseif (Auth::user()->status == 2){
-            toast('Sorry Admin can Inactive Your Account Please Contact','error');
+        } elseif (Auth::user()->status == 2) {
+            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        if(Auth::user()->is_editor != 3) {
+        if (Auth::user()->is_editor != 3) {
             return back();
-        }
-        else {
+        } else {
             $request->validate([
                 'class_id' => 'required',
             ]);
@@ -2990,19 +3172,16 @@ class SchoolController extends Controller
             $fees->extra_fees = $request->extra_fees ?? 0;
             $fees->extra_fees_title = $request->extra_fees_title ?? 'null';
             $fees->class_id = $request->class_id;
-            //$fees->active = $request->active;
             $fees->school_id = Auth::user()->id;
-
             $fees->save();
-                toast('Successfully Uploaded','success');
+            toast('Successfully Uploaded', 'success');
             return redirect()->route('student.fees.show');
         }
     }
 
-    //aditional fees edit
-
-    public function studentFeesEdit($id){
-        if(Auth::user()->status == 0){
+    public function studentFeesEdit($id)
+    {
+        if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
@@ -3025,8 +3204,6 @@ class SchoolController extends Controller
         }
     }
 
-    //aditional fees update
-
     public function studentFeesUpdate(Request $request, $id)
     {
         if (Auth::user()->status == 0) {
@@ -3037,43 +3214,42 @@ class SchoolController extends Controller
         }
         if (Auth::user()->is_editor != 3) {
             return back();
-        }else {
-         $fees = StudentFee::find($id);
+        } else {
+            $fees = StudentFee::find($id);
 
-        $fees->monthly_fee = $request->monthly_fee ?? 0;
-        $fees->absent = $request->absent ?? 0;
-        $fees->absent_after_break = $request->absent_after_break ?? 0;
-        $fees->term_fees = $request->term_fees ?? 0;
-        $fees->exam_center = $request->exam_center ?? 0;
-        $fees->library = $request->library ?? 0;
-        $fees->sport = $request->sport ?? 0;
-        $fees->penalty = $request->penalty ?? 0;
-        $fees->admission_form = $request->admission_form ?? 0;
-        $fees->registration = $request->registration ?? 0;
-        $fees->development = $request->development ?? 0;
-        $fees->session = $request->session ?? 0;
-        $fees->coaching = $request->coaching ?? 0;
-        $fees->dairy = $request->dairy ?? 0;
-        $fees->transport = $request->transport ?? 0;
-        $fees->syllabus = $request->syllabus ?? 0;
-        $fees->testimonial = $request->testimonial ?? 0;
-        $fees->scout = $request->scout ?? 0;
-        $fees->tour = $request->tour ?? 0;
+            $fees->monthly_fee = $request->monthly_fee ?? 0;
+            $fees->absent = $request->absent ?? 0;
+            $fees->absent_after_break = $request->absent_after_break ?? 0;
+            $fees->term_fees = $request->term_fees ?? 0;
+            $fees->exam_center = $request->exam_center ?? 0;
+            $fees->library = $request->library ?? 0;
+            $fees->sport = $request->sport ?? 0;
+            $fees->penalty = $request->penalty ?? 0;
+            $fees->admission_form = $request->admission_form ?? 0;
+            $fees->registration = $request->registration ?? 0;
+            $fees->development = $request->development ?? 0;
+            $fees->session = $request->session ?? 0;
+            $fees->coaching = $request->coaching ?? 0;
+            $fees->dairy = $request->dairy ?? 0;
+            $fees->transport = $request->transport ?? 0;
+            $fees->syllabus = $request->syllabus ?? 0;
+            $fees->testimonial = $request->testimonial ?? 0;
+            $fees->scout = $request->scout ?? 0;
+            $fees->tour = $request->tour ?? 0;
 
-        $fees->extra_fees = $request->extra_fees ?? 0;
-        $fees->extra_fees_title = $request->extra_fees_title ?? 'null';
-        $fees->class_id = $request->class_id;
-        $fees->school_id = Auth::user()->id;
-        $fees->save();
-            toast('Successfully Uploaded','success');
-         return redirect()->route('student.fees.show');
+            $fees->extra_fees = $request->extra_fees ?? 0;
+            $fees->extra_fees_title = $request->extra_fees_title ?? 'null';
+            $fees->class_id = $request->class_id;
+            $fees->school_id = Auth::user()->id;
+            $fees->save();
+            toast('Successfully Uploaded', 'success');
+            return redirect()->route('student.fees.show');
+        }
     }
-    }
 
-    //aditional fees delete
-
-    public function studentFeesDelete($id){
-        if(Auth::user()->status == 0){
+    public function studentFeesDelete($id)
+    {
+        if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
@@ -3744,7 +3920,7 @@ class SchoolController extends Controller
         $startOfWeek = Carbon::now()->startOfWeek(Carbon::SUNDAY)->format("Y-m-d");
         $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY)->format("Y-m-d");
 
-        if(Message::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where(['school_id' => Auth::id(), 'status' => 2])->count() >= 2):
+        if (Message::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where(['school_id' => Auth::id(), 'status' => 2])->count() >= 2) :
             Alert::info('Sorry!', 'SMS can\'t be sent more than two times to all students per week. But single SMS can be sent unlimited times');
             return back();
         endif;
@@ -3762,7 +3938,6 @@ class SchoolController extends Controller
 
             $numbers[] = $to;
             $messages[] = [$to => $message];
-
         }
 
         $sms = new Message();
@@ -3783,22 +3958,16 @@ class SchoolController extends Controller
      */
     public function sendSmsToEmployee()
     {
-
-        if (Auth::user()->status == 0)
-        {
+        if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
-        }
-        elseif(Auth::user()->status == 2)
-        {
+        } elseif (Auth::user()->status == 2) {
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
 
         if (Auth::user()->is_editor != 3) {
             return back();
-        }
-        else
-        {
+        } else {
             $url = url()->previous();
             $urlEmployeeData = url('/') . '/school/' . session('dataSession');
             if ($url == $urlEmployeeData) {
@@ -3831,31 +4000,26 @@ class SchoolController extends Controller
 
         if (Auth::user()->is_editor != 3) {
             return back();
-        }
-        else
-        {
+        } else {
             // $messageAccount = getMessageAccount();
-            if ($request->id == 'all_employee')
-            {
+            if ($request->id == 'all_employee') {
                 $smsCount = 0; // init count
                 $numbers = []; // init array
                 $messages = []; // init array
 
                 $employee = Employee::where('school_id', Auth::user()->id);
 
-                if($employee->count() > 0)
-                {
+                if ($employee->count() > 0) {
                     foreach ($employee->get() as $data) {
 
                         $to = $data['phone_number'];
-                        $message = $request['message'] . ". Thanks from ".Auth::user()->school_name;
+                        $message = $request['message'] . ". Thanks from " . Auth::user()->school_name;
 
                         Controller::GreenWebSMS($to, $message);
 
                         ++$smsCount; // increment sms count
                         $numbers[] = $to;
                         $messages[] = [$to => $message];
-
                     }
 
                     $sms = new Message();
@@ -3865,17 +4029,13 @@ class SchoolController extends Controller
                     $sms->data = json_encode($messages);
                     $sms->status = 2; // for sending sms to all user
                     $sms->save();
-                }else
-                {
+                } else {
                     Alert::error("Oops!", 'Record does not exists');
                     return back();
                 }
-
-            }
-            else
-            {
+            } else {
                 $to = $request['id'];
-                $message = $request['message'] .". Thanks from ".Auth::user()->school_name;
+                $message = $request['message'] . ". Thanks from " . Auth::user()->school_name;
 
                 Controller::GreenWebSMS($to, $message);
 
@@ -3890,7 +4050,6 @@ class SchoolController extends Controller
             return redirect()->route('send.sms.employee');
         }
     }
-
 
     public function sendSmsToTeacher()
     {
@@ -3945,24 +4104,22 @@ class SchoolController extends Controller
                 $startOfWeek = Carbon::now()->startOfWeek(Carbon::SUNDAY)->format("Y-m-d");
                 $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY)->format("Y-m-d");
 
-                if(Message::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where(['school_id' => Auth::id(), 'status' => 2])->count() >= 2):
+                if (Message::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where(['school_id' => Auth::id(), 'status' => 2])->count() >= 2) :
                     Alert::info('Sorry!', 'SMS can\'t be sent more than two times to all students per week. But single SMS can be sent unlimited times');
                     return back();
                 endif;
 
                 $teacher = Teacher::where('school_id', Auth::user()->id);
 
-                if($teacher->count() > 0)
-                {
-                    foreach ($teacher->get() as $data)
-                    {
+                if ($teacher->count() > 0) {
+                    foreach ($teacher->get() as $data) {
                         $to = $data['phone'];
-                        $message = $request['message'] . " Thanks from ". Auth::user()->school_name;
+                        $message = $request['message'] . " Thanks from " . Auth::user()->school_name;
                         Controller::GreenWebSMS($to, $message); // send sms
 
                         ++$smsCount;
                         $numbers[] = $to;
-                        $messages[] = [$to => $messae];
+                        $messages[] = [$to => $message];
                     }
 
                     // save records
@@ -3973,19 +4130,14 @@ class SchoolController extends Controller
                     $sms->data = json_encode($messages);
                     $sms->status = 2; // for sending sms to all user
                     $sms->save();
-                }
-                else
-                {
+                } else {
                     Alert::error('Sorry!', 'Record does not exists');
                     return back();
                 }
-
-            }
-            else
-            {
+            } else {
                 $to = $request['id'];
-                return ($to);
-                $message = $request['message'] . " Thanks from ". Auth::user()->school_name;
+                // return ($to);
+                $message = $request['message'] . " Thanks from " . Auth::user()->school_name;
                 Controller::GreenWebSMS($to, $message); // send sms
 
                 // save records
@@ -3996,7 +4148,6 @@ class SchoolController extends Controller
                 $dataMessage->save();
             }
             Alert::success('Successfully Sms Send', 'Success Message');
-
             return redirect()->route('send.sms.teacher');
         }
     }
@@ -4055,7 +4206,7 @@ class SchoolController extends Controller
                 $startOfWeek = Carbon::now()->startOfWeek(Carbon::SUNDAY)->format("Y-m-d");
                 $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY)->format("Y-m-d");
 
-                if(Message::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where(['school_id' => Auth::id(), 'status' => 2])->count() >= 2):
+                if (Message::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where(['school_id' => Auth::id(), 'status' => 2])->count() >= 2) :
                     Alert::info('Sorry!', 'SMS can\'t be sent more than two times to all students per week. But single SMS can be sent unlimited times');
                     return back();
                 endif;
@@ -4080,10 +4231,9 @@ class SchoolController extends Controller
                 $sms->data = json_encode($messages);
                 $sms->status = 2; // for sending sms to all user
                 $sms->save();
-            }
-            elseif($request->has('student_id') && $request->student_id == 0) // send sms to selected class student
+            } elseif ($request->has('student_id') && $request->student_id == 0) // send sms to selected class student
             {
-                $users = User::where(['school_id'=> Auth::id(), 'shift' => $request->shift, 'class_id' => $request->class])->get();
+                $users = User::where(['school_id' => Auth::id(), 'shift' => $request->shift, 'class_id' => $request->class])->get();
 
                 $smsCount = 0; // init count
                 $numbers = [];
@@ -4091,7 +4241,7 @@ class SchoolController extends Controller
                 $startOfWeek = Carbon::now()->startOfWeek(Carbon::SUNDAY)->format("Y-m-d");
                 $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY)->format("Y-m-d");
 
-                if(Message::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where(['school_id' => Auth::id(), 'status' => 2])->count() >= 2):
+                if (Message::whereBetween('created_at', [$startOfWeek, $endOfWeek])->where(['school_id' => Auth::id(), 'status' => 2])->count() >= 2) :
                     Alert::info('Sorry!', 'SMS can\'t be sent more than two times to all students per week. But single SMS can be sent unlimited times');
                     return back();
                 endif;
@@ -4116,11 +4266,10 @@ class SchoolController extends Controller
                 $sms->data = json_encode($messages);
                 $sms->status = 2; // for sending sms to all user
                 $sms->save();
-            }
-            else // send sms to single student
+            } else // send sms to single student
             {
                 $to = $request['student_id'];
-                $message = $request['message'] .'('.Auth::user()->school_name.')';
+                $message = $request['message'] . '(' . Auth::user()->school_name . ')';
 
                 Controller::GreenWebSMS($to, $message);
 
@@ -4240,8 +4389,7 @@ class SchoolController extends Controller
     {
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
-        }
-        elseif (Auth::user()->status == 2) {
+        } elseif (Auth::user()->status == 2) {
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
@@ -4256,7 +4404,7 @@ class SchoolController extends Controller
         return redirect()->route('school.staff.show');
     }
 
-   public function schoolStaffTypeDelete($id)
+    public function schoolStaffTypeDelete($id)
     {
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
@@ -4264,15 +4412,21 @@ class SchoolController extends Controller
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        if($row = StaffType::find($id)):
+        if ($row = StaffType::find($id)) :
             $row->delete();
             Alert::success('Great!', "Staff type deleted successfully");
-        else:
+        else :
             Alert::success('Sorry', "Staff type not found");
         endif;
         return back();
     }
-
+    public function stafftype_Check_delete(Request $request)
+    {
+        $ids = $request->ids;
+        StaffType::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+    }
 
     public function schoolStaffList()
     {
@@ -4289,13 +4443,16 @@ class SchoolController extends Controller
             $seoTitle = 'Staff | ' . Auth::user()->school_name;
             $seoDescription = 'Staff | ' . Auth::user()->school_name;
             $seoKeyword = 'Staff | ' . Auth::user()->school_name;
-            $employee = Employee::where('school_id', Auth::user()->id)->get();
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            return view('frontend.school.staff.details.show', compact('studentText', 'employee', 'seo_array'));
+            $position_name = StaffType::where('school_id', Auth::user()->id)->get();
+            $employee = Employee::where('school_id', Auth::user()->id)->get();
+            $staffSalary = EmployeeSalary::where('school_id', Auth::user()->id)->get();
+            // $staffMonthlySalary = Employee::where('id', $employee->id)->first();
+            return view('frontend.school.staff.details.show', compact('studentText', 'position_name', 'employee','staffSalary', 'seo_array'));
         }
     }
 
@@ -4364,14 +4521,11 @@ class SchoolController extends Controller
                 'position_name' => 'required',
                 'shift' => 'required',
                 'gender' => 'required',
-                'employee_id' => 'required',
                 'phone_number' => 'required|unique:employees|min:11',
                 'salary' => 'numeric',
             ]);
 
-
             $employee = new Employee();
-
             $employee->phone_number = $request->phone_number;
             $employee->employee_id = $request->employee_id;
             $employee->employee_name = $request->employee_name;
@@ -4392,12 +4546,8 @@ class SchoolController extends Controller
             }
 
             return redirect()->route('school.staff.List');
-        }
-
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             toast($e->getMessage(), 'error');
-
         }
         return back();
     }
@@ -4416,7 +4566,6 @@ class SchoolController extends Controller
             'phone_number' => 'required|min:11',
             'shift' => 'required',
             'gender' => 'required',
-            'employee_id' => 'required',
             'salary' => 'numeric',
         ]);
 
@@ -4424,8 +4573,7 @@ class SchoolController extends Controller
 
             $employee = Employee::find($id);
 
-            if ($request->hasFile('image'))
-            {
+            if ($request->hasFile('image')) {
                 File::delete(public_path($employee->image));
 
                 $fileName = date('Ymdhmsis') . '.' . $request->file('image')->extension();
@@ -4435,7 +4583,6 @@ class SchoolController extends Controller
             }
 
             $employee->phone_number = $request->phone_number;
-            $employee->employee_id = $request->employee_id;
             $employee->employee_name = $request->employee_name;
             $employee->shift = $request->shift;
             $employee->gender = $request->gender;
@@ -4447,59 +4594,10 @@ class SchoolController extends Controller
             $employee->save();
             Alert::success('Staff Updated Success', 'Success Message');
             return redirect()->route('school.staff.List');
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             toast($e->getMessage(), 'error');
         }
         return back();
-    }
-
-    public function schoolStaffAdd($id)
-    {
-        if (Auth::user()->status == 0) {
-            return redirect()->route('school.payment.info');
-        } elseif (Auth::user()->status == 2) {
-            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
-            return back();
-        }
-        $subjectText = 'Staff Fees';
-        $seoTitle = 'Staff | ' . Auth::user()->school_name;
-        $seoDescription = 'Staff | ' . Auth::user()->school_name;
-        $seoKeyword = 'Staff | ' . Auth::user()->school_name;
-        $seo_array = [
-            'seoTitle' => $seoTitle,
-            'seoKeyword' => $seoKeyword,
-            'seoDescription' => $seoDescription,
-        ];
-        $studentFees = EmployeeSalary::where('employee_id', $id)->get();
-        return view('frontend.school.salary.staffSalary', compact('studentFees', 'seo_array', 'subjectText'));
-    }
-
-    public function schoolStaffSalaryEdit($id)
-    {
-        if (Auth::user()->status == 0) {
-            return redirect()->route('school.payment.info');
-        } elseif (Auth::user()->status == 2) {
-            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
-            return back();
-        }
-        if (Auth::user()->is_editor != 3) {
-            return back();
-        } else {
-            $subjectText = 'Staff Fees Input Edit';
-            $seoTitle = 'student | ' . Auth::user()->school_name;
-            $seoDescription = 'student | ' . Auth::user()->school_name;
-            $seoKeyword = 'student | ' . Auth::user()->school_name;
-            $seo_array = [
-                'seoTitle' => $seoTitle,
-                'seoKeyword' => $seoKeyword,
-                'seoDescription' => $seoDescription,
-            ];
-            $studentFeesEdit = EmployeeSalary::where('id', $id)->first();
-            $StaffSalary = Employee::where('id', $studentFeesEdit->employee_id)->first();
-            return view('frontend.school.salary.staffSalaryEdit', compact('studentFeesEdit', 'seo_array', 'subjectText','StaffSalary'));
-        }
     }
 
     public function schoolStaffSalaryUpdate(Request $request, $id)
@@ -4510,23 +4608,22 @@ class SchoolController extends Controller
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        //return $id;
-        $studentFeesEdit = EmployeeSalary::where('id', $id)->first();
-        $studentFeesEdit->employee_phone = $request->employee_phone;
-        $studentFeesEdit->amount = $request->amount;
-        $studentFeesEdit->save();
-        $staff = Employee::where('school_id', Auth::user()->id ,);
+        $payStaffSalary = EmployeeSalary::where('id', $id)->first();
+        // $payStaffSalary->employee_phone = $request->employee_phone;
+        if($payStaffSalary->amount > 0) $addAmount = $payStaffSalary->amount + $request->amount;
+        else $addAmount = $request->amount;
+        $payStaffSalary->amount = $addAmount;
+        $payStaffSalary->save();
+        $staff = Employee::where('school_id', Auth::user()->id,);
         $to = $request['employee_phone'];
-       // return $to;
-               $message = $request['message'] ." You received $request->amount taka form ".'('.Auth::user()->school_name.')';
-               Controller::GreenWebSMS($to, $message); // send sms
+        $message = $request['message'] . " You received $request->amount taka form " . '(' . Auth::user()->school_name . ')';
+        Controller::GreenWebSMS($to, $message); // send sms
 
-               // save records
-               $dataMessage = new Message();
-               $dataMessage->school_id = Auth::user()->id;
-               $dataMessage->message = 1;
-               $dataMessage->send_number = $to;
-               $dataMessage->save();
+        $dataMessage = new Message();
+        $dataMessage->school_id = Auth::user()->id;
+        $dataMessage->message = 1;
+        $dataMessage->send_number = $to;
+        $dataMessage->save();
         toast('Staff Salary Updated', 'success');
         return redirect()->route('school.staff.salary.List');
     }
@@ -4539,102 +4636,78 @@ class SchoolController extends Controller
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        if($row = Employee::find($id)):
+        $Employee = EmployeeSalary::where('employee_id', $id)->delete();
+
+        if ($row = Employee::find($id)) :
             $row->delete();
             Alert::success('Great!', "Staff Record deleted successfully");
-        else:
+        else :
             Alert::success('Sorry', "Staff Record not found");
         endif;
         return back();
     }
-
-
-    public function schoolTeacherAdd($id)
+    public function staff_Check_Delete(Request $request)
     {
-        if (Auth::user()->status == 0) {
-            return redirect()->route('school.payment.info');
-        } elseif (Auth::user()->status == 2) {
-            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
-            return back();
-        }
-        if (Auth::user()->is_editor != 3) {
-            return back();
-        } else {
-            $subjectText = 'student Fees Input create';
-            $seoTitle = 'student | ' . Auth::user()->school_name;
-            $seoDescription = 'student | ' . Auth::user()->school_name;
-            $seoKeyword = 'student | ' . Auth::user()->school_name;
-            $seo_array = [
-                'seoTitle' => $seoTitle,
-                'seoKeyword' => $seoKeyword,
-                'seoDescription' => $seoDescription,
-            ];
-            $studentFees = TeacherSalary::where('teacher_id', $id)->get();
-            return view('frontend.school.salary.teacherSalary', compact('studentFees', 'seo_array', 'subjectText'));
-        }
-    }
-
-    public function schoolTeacherSalaryEdit($id)
-    {
-        if (Auth::user()->status == 0) {
-            return redirect()->route('school.payment.info');
-        } elseif (Auth::user()->status == 2) {
-            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
-            return back();
-        }
-        if (Auth::user()->is_editor != 3) {
-            return back();
-        } else {
-            $subjectText = 'Salary Update';
-            $seoTitle = 'Salary | ' . Auth::user()->school_name;
-            $seoDescription = 'Salary | ' . Auth::user()->school_name;
-            $seoKeyword = 'Salary | ' . Auth::user()->school_name;
-            $seo_array = [
-                'seoTitle' => $seoTitle,
-                'seoKeyword' => $seoKeyword,
-                'seoDescription' => $seoDescription,
-            ];
-            $studentFeesEdit = TeacherSalary::where('id', $id)->first();
-            $teacherSalary = Teacher::where('id', $studentFeesEdit->teacher_id)->first();
-
-            return view('frontend.school.salary.teacherSalaryEdit', compact('studentFeesEdit', 'seo_array', 'subjectText','teacherSalary'));
-        }
+        $ids = $request->ids;
+        Employee::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
     }
 
     public function schoolTeacherSalaryUpdate(Request $request, $id)
-    {   
-       $request->validate([
-        'amount'=>'required'
-       ]);
+    {
+        $request->validate([
+            'amount' => 'required'
+        ]);
+
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        $studentFeesEdit = TeacherSalary::where('id', $id)->first();
-        
-        $studentFeesEdit->teacher_phone = $request->teacher_phone;
-        $studentFeesEdit->amount = $request->amount;
-        $studentFeesEdit->save();
-         $teacher = Teacher::where('school_id', Auth::user()->id ,);
-         $to = $request['teacher_phone'];
-        // return $to;
-                $message = $request['message'] ." You received $request->amount taka form ".'('.Auth::user()->school_name.')';
-                Controller::GreenWebSMS($to, $message); // send sms
-              
-                // save records
-                $dataMessage = new Message();
-                $dataMessage->school_id = Auth::user()->id;
-                $dataMessage->message = 1;
-                $dataMessage->send_number = $to;
-                $dataMessage->save();
+        $payTeacherSalary = TeacherSalary::where('id', $id)->first();
+        // $payTeacherSalary->teacher_phone = $request->teacher_phone;
+
+        if($payTeacherSalary->amount > 0) $addAmount = $payTeacherSalary->amount + $request->amount;
+        else $addAmount = $request->amount;
+        $payTeacherSalary->amount = $addAmount;
+
+        $payTeacherSalary->save();
+        $teacher = Teacher::where('school_id', Auth::user()->id,);
+        $to = $request['teacher_phone'];
+        $message = $request['message'] . " You received $request->amount taka form " . '(' . Auth::user()->school_name . ')';
+        Controller::GreenWebSMS($to, $message); // send sms
+
+        $dataMessage = new Message();
+        $dataMessage->school_id = Auth::user()->id;
+        $dataMessage->message = 1;
+        $dataMessage->send_number = $to;
+        $dataMessage->save();
         toast('Teacher Salary Update SuccessFully', 'success');
         return redirect()->route('teacher.salary.Show');
     }
 
+    /**
+     * Result Setting View Page
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
     public function resultCreateShow()
-    {
+    {   
+        $resultSettings = ModelsResultSetting::where('school_id', Auth::user()->id)->orderBy('id', 'asc')->get();
+
+        return view('frontend.school.student.result.createShow', compact('resultSettings'));
+    }
+
+    /**
+     * Result Upload First Step (Select Class, Section, Term)
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function resultUpFirstStep($id)
+    {   
+        $resultSettingId = $id;
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -4647,7 +4720,7 @@ class SchoolController extends Controller
             $class = InstituteClass::where('school_id', Auth::user()->id)->get();
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
-            $term = Term::where('school_id', Auth::user()->id)->orderBy('id','desc')->get();
+            $term = Term::where('school_id', Auth::user()->id)->orderBy('id', 'desc')->get();
             $subjectText = 'Subject Input create';
             $seoTitle = 'Subject | ' . Auth::user()->school_name;
             $seoDescription = 'Subject | ' . Auth::user()->school_name;
@@ -4657,13 +4730,14 @@ class SchoolController extends Controller
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            return view('frontend.school.student.result.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'term'));
+
+            return view('frontend.school.student.result.resultUpload', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'resultSettingId', 'term'));
         }
     }
 
-    public function resultCreateShowPost(Request $request)
-    {
 
+    public function resultCreateShowPost(Request $request)
+    {   
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -4679,31 +4753,32 @@ class SchoolController extends Controller
                     [
                         'class_id' => 'required',
                         'section_id' => 'required',
-                        'term_id' => 'required',
+                        // 'term_id' => 'required',
                     ],
                     [
                         'class_id.required' => 'Class Required',
                         'section_id.required' => 'Section Required',
-                        'term_id.required' => 'Term Required',
+                        // 'term_id.required' => 'Term Required',
                     ]
                 );
                 $class_id = $request->class_id;
                 $section_id = $request->section_id;
-               //$group_id = is_null($request->group_id) ? 0 : $request->group_id;
-                $term_id = $request->term_id;
+                
+                $term_id = $request->resultSettingId ?? '';
+
                 return redirect()->route('school.result.dataShowAll', ['class_id' => $class_id, 'section_id' => $section_id, 'term_id' => $term_id]);
             } else {
                 $request->validate([
                     'class_id' => 'required',
                     'section_id' => 'required',
                     'subject_id' => 'required',
-                    'term_id' => 'required',
+                    // 'term_id' => 'required',
                 ]);
                 $class_id = $request->class_id;
                 $section_id = $request->section_id;
                 //$group_id = is_null($request->group_id) ? 0 : $request->group_id;
                 $subject_id = $request->subject_id;
-                $term_id = $request->term_id;
+                $term_id = $request->resultSettingId ?? '';
                 return redirect()->route('school.result.dataShow', ['class_id' => $class_id, 'section_id' => $section_id, 'subject_id' => $subject_id, 'term_id' => $term_id]);
             }
         }
@@ -4712,12 +4787,11 @@ class SchoolController extends Controller
 
     public function resultStudentDataShowAll($class_id, $section_id, $term_id)
     {
-
-        $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->get();
-        $termName = Term::where('id', $term_id)->first();
+        $dataShow = User::where('school_id', Auth::user()->id)->where('class_id', $class_id)->where('section_id', $section_id)->orderBy('roll_number', 'asc')->get();
+        $termName = ModelsResultSetting::where('id', $term_id)->first();
         $subjectName = Subject::where('class_id', $class_id)->get();
         $markTypes = MarkType::where('institute_classes_id', $class_id)->where('school_id', Auth::user()->id)->orderBy('id', 'asc')->get();
-        return view('frontend.school.student.result.dataShowAll', compact('dataShow', 'subjectName', 'termName', 'markTypes', 'section_id'));
+        return view('frontend.school.student.result.dataShowAll', compact('dataShow', 'termName', 'subjectName', 'markTypes', 'section_id'));
     }
 
     public function resultStudentDataShow($class_id, $section_id, $group_id, $subject_id, $term_id)
@@ -4758,48 +4832,53 @@ class SchoolController extends Controller
      * @param $request
      * @return Response
      */
+    public function resultmarkSet(Request $request, $id)
+    {   $resultSettingId = $id;
+        $class = InstituteClass::where('school_id', Auth::user()->id)->get();
+
+        return view('frontend.school.student.result.resultSet', compact('class','resultSettingId'));
+    }
+
     public function resultCreatePost(ResultCreatePost $request)
     {   
         $request->validated();
-        if(is_array($request->student_id) && count($request->student_id) > 0):
-        try {
-            foreach ($request->student_id as $key => $data) {
-                $dataHave = Result::where('student_id', $data)->where('subject_id', $request->subject_id)->where('term_id', $request->term_id)->first();
-                if (isset($dataHave)) {
-                    $result = Result::where('id', $dataHave->id)->first();
-                } else {
-                    $result = new Result();
+        if (is_array($request->student_id) && count($request->student_id) > 0) :
+            try {
+                foreach ($request->student_id as $key => $data) {
+                    $dataHave = Result::where('student_id', $data)->where('subject_id', $request->subject_id)->where('term_id', $request->term_id)->first();
+                    if (isset($dataHave)) {
+                        $result = Result::where('id', $dataHave->id)->first();
+                    } else {
+                        $result = new Result();
+                    }
+                    $result->school_id = Auth::user()->id;
+                    $result->student_id = $data;
+                    $result->student_roll_number = $request->student_roll_number[$key];
+                    $result->institute_class_id  = $request->class_id;
+                    $result->section_id          = $request->section_id;
+                    $result->subject_id = $request->subject_id;
+                    $result->term_id = $request->term_id;
+                    $result->attendance =  is_null($request->Attendance) ? 0 : $request->Attendance[$key] ?? 0;
+                    $result->assignment =  is_null($request->Assignment) ? 0 : $request->Assignment[$key] ?? 0;
+                    $result->class_test =  is_null($request->Class_Test) ? 0 : $request->Class_Test[$key] ?? 0;
+                    $result->presentation =  is_null($request->Presentation) ? 0 : $request->Presentation[$key] ?? 0;
+                    $result->quiz =  is_null($request->Quiz) ? 0 : $request->Quiz[$key] ?? 0;
+                    $result->practical =  is_null($request->Practical) ? 0 : $request->Practical[$key] ?? 0;
+                    $result->written = is_null($request->Written) ? 0 : $request->Written[$key] ?? 0;
+                    $result->mcq =  is_null($request->MCQ) ? 0 : $request->MCQ[$key] ?? 0;
+                    $result->others =  is_null($request->Others) ? 0 : $request->Others[$key] ?? 0;
+                    $result->total  = totalMark($result);
+                    $result->grade  = grade($result->total, $request->term_id, $request->class_id, $request->subject_id);
+                    $result->gpa  = gpa($result->total, $request->term_id, $request->class_id, $request->subject_id);
+                    $result->save();
                 }
-                $result->school_id = Auth::user()->id;
-                $result->student_id = $data;
-                $result->student_roll_number = $request->student_roll_number[$key];
-                $result->institute_class_id  = $request->class_id;
-                $result->section_id          = $request->section_id;
-                $result->subject_id = $request->subject_id;
-                $result->term_id = $request->term_id;
-                $result->attendance =  is_null($request->Attendance) ? 0 : $request->Attendance[$key] ?? 0;
-                $result->assignment =  is_null($request->Assignment) ? 0 : $request->Assignment[$key] ?? 0;
-                $result->class_test =  is_null($request->Class_Test) ? 0 : $request->Class_Test[$key] ?? 0;
-                $result->presentation =  is_null($request->Presentation) ? 0 : $request->Presentation[$key] ?? 0;
-                $result->quiz =  is_null($request->Quiz) ? 0 : $request->Quiz[$key] ?? 0;
-                $result->practical =  is_null($request->Practical) ? 0 : $request->Practical[$key] ?? 0;
-                $result->written = is_null($request->Written) ? 0 : $request->Written[$key] ?? 0;
-                $result->mcq =  is_null($request->MCQ) ? 0 : $request->MCQ[$key] ?? 0;
-                $result->others =  is_null($request->Others) ? 0 : $request->Others[$key] ?? 0;
-                $result->total  = totalMark($result);
-                $result->grade  = grade($result->total, $request->term_id);
-                $result->gpa  = gpa($result->total, $request->term_id);
-                $result->save();
+
+                toast('Mark Save Sucessfully', 'success');
+            } catch (Exception $e) {
+                toast($e->getMessage(), 'error');
             }
 
-            toast('Mark Save Sucessfully', 'success');
-        }
-        catch(Exception $e)
-        {
-            toast($e->getMessage(), 'error');
-        }
-
-        else:
+        else :
             toast('Please select at least one item', 'error');
         endif;
         return back();
@@ -4807,8 +4886,6 @@ class SchoolController extends Controller
 
     public function resultUpdatePost(Request $request, $id)
     {
-        
-
         $result = Result::find($id);
         $result->student_id = $request->student_id;
         $result->student_roll_number = $request->student_roll_number;
@@ -4890,6 +4967,13 @@ class SchoolController extends Controller
         return back();
     }
 
+    public function notice_Check_Delete(Request $request)
+    {
+        $ids = $request->ids;
+        Notice::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+    }
     public function onlineClass($id)
     {
         $teacher = Teacher::where('id', $id)->first();
@@ -4901,17 +4985,16 @@ class SchoolController extends Controller
         $request->validate([
             'employee_name' => 'required',
             'phone_number' => 'required|unique:employees|digits:11|numeric',
-            'employee_id' => 'required',
             'position_name' => 'required',
             'address' => 'required',
             'salary' => 'required|integer',
         ]);
 
+        $uniqueId = Utility::createUniqueId(Auth::id(), 'employee');
 
         $data = new Employee();
 
-        if ($request->hasFile('image'))
-        {
+        if ($request->hasFile('image')) {
             $fileName = date('Ymdhmsis') . '.' . $request->file('image')->extension();
             $request->file('image')->move(public_path('uploads/staff'), $fileName);
             $filePath = "uploads/staff/" . $fileName;
@@ -4919,7 +5002,7 @@ class SchoolController extends Controller
         }
         $data->employee_name = $request->employee_name;
         $data->phone_number = $request->phone_number;
-        $data->employee_id = $request->employee_id;
+        $data->employee_id = $uniqueId;
         $data->position = $request->position_name;
         $data->shift = $request->shift;
         $data->gender = $request->gender;
@@ -4944,29 +5027,40 @@ class SchoolController extends Controller
         toast('Employee Add Successfully Uploaded', 'success');
         return redirect()->route('school.staff.List');
     }
-    public function staffview($id){
-        $data=Employee::find($id);
-        return view('frontend.school.staff.details.singleview',compact('data'));
-
+    public function staffview($id)
+    {
+        $data = Employee::find($id);
+        return view('frontend.school.staff.details.singleview', compact('data'));
     }
 
 
+
+    public function pDeleteStaff($id)
+    {
+        EmployeeSalary::withTrashed()->where('employee_id', $id)->forcedelete();
+        Employee::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+    }
+    public function restoreStaff($id)
+    {
+        EmployeeSalary::withTrashed()->where('employee_id', $id)->restore();
+        Employee::withTrashed()->where('id', $id)->restore();
+        toast("Restore data", "success");
+        return back();
+    }
 
     // ajax operation  .....
     public function showAjaxSection(Request $request)
     {
         $classes = InstituteClass::find($request->class_id)->class_name;
-        // $class = (int)trim(str_replace("class ", "", strtolower($class)));
         $section = Section::orderby('id', 'asc')->where('class_id', $request->class_id)->where('school_id', Auth::user()->id)->get();
         $class = InstituteClass::where('id', $request->class_id)->first();
 
         $group = 0;
-        if($classes == "Class Nine" || $classes == "Class Ten" || $classes == "Class Eleven" || $classes == "Class Twelve")
-        {
+        if ($classes == "Class Nine" || $classes == "Class Ten" || $classes == "Class Eleven" || $classes == "Class Twelve") {
             $group = 1;
         }
-
-        //dd($class->class_name);
         $html = "<option value=''>Select One";
         $html .= "</option>";
         foreach ($section as $data) {
@@ -5057,4 +5151,17 @@ class SchoolController extends Controller
         echo  $html;
     }
 
+    public function pdeletesubject($id)
+    {
+
+        Subject::withTrashed()->where('id', $id)->forcedelete();
+        toast("Data delete permanently", "success");
+        return back();
+    }
+    public function restoreSubject($id)
+    {
+        Subject::withTrashed()->where('id', $id)->restore();
+        toast("Restore data", "success");
+        return back();
+    }
 }

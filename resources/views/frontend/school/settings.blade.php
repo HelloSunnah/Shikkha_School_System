@@ -1,7 +1,6 @@
 @extends('layouts.school.master')
 
 @section('content')
-    <!--start content-->
     <main class="page-content">
 
         <div class="row">
@@ -19,7 +18,8 @@
                                 <div class="col mb-3" id="customerServices">
                                     <div class="form-check">
                                         <input 
-                                            type="checkbox" 
+                                            type="checkbox"
+                                            class="text-white" 
                                             name="class[]" 
                                             value="{{$class['id']}}"
                                             onchange="selectSubjects('{{$key}}')"

@@ -41,20 +41,20 @@
                                         <td>{{ $borrowrer->return_date}}</td>
 
                                         @if(is_null($borrowrer->return_date))
-                                            <td><a href="{{route('borrower.Edit',$borrowrer->id)}}" class="btn btn-success"><i class="bi bi-pencil-square"></i></a></td>
+                                            <td><a href="{{route('borrower.Edit',$borrowrer->id)}}" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i></a></td>
                                             <td>
-                                                <button type="button" class="btn btn-danger" onclick="if(confirm('Are You sure?')){ location.replace('{{route('borrower.delete',$borrowrer->id)}}') }">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="if(confirm('Are You sure?')){ location.replace('{{route('borrower.delete',$borrowrer->id)}}') }">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </td>
                                         @else
                                             <td>
-                                                <button disabled type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#delete">
+                                                <button disabled type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#delete">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </button>
                                             </td>
                                             <td>
-                                                <button disabled type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete">
+                                                <button disabled type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </td>
@@ -77,3 +77,12 @@
 </main>
 
 @endsection
+
+@push('js')
+<script>
+    $(document).ready( function () {
+        $("#example").dataTable().fnDestroy();
+    } );
+    </script>
+    
+@endpush

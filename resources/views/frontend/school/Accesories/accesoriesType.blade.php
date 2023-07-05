@@ -8,7 +8,7 @@
     <h1>{{__('app.Accesories')}} {{__('app.List')}}</h1>
 
   </center>
-  <a class="btn btn-success" href="{{route('reciept.create')}}">Back</a>
+  <a class="btn btn-secondary" href="{{route('reciept.create')}}">Back</a>
 
   <div class="row mt-3">
     <div class="col-12">

@@ -9,6 +9,41 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
     <link href="{{ asset('schools/assets/css/payment.css') }}" rel="stylesheet" />
+    <style>
+        .bg-primary{
+            background: #7a00a7 !important;
+            color: white !important;
+        }
+        .btn-primary{
+            background: #7a00a7 !important;
+            color: white !important;
+            border-color: #7a00a7;
+        }
+        input[type=radio] {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                border: 2px solid #8a2be2; 
+                background: #ffff;
+                padding: 6px;
+                border-radius:8px ;
+                cursor: pointer;
+                margin-top: 4px !important;
+                position: absolute;
+
+            }
+        input[type="radio"]:checked {
+                background: #8a2be2 !important;
+                cursor: pointer;
+                color:rgb(255, 255, 255) !important;
+            }
+            .form-control-radio{
+                margin-left: -22px;
+            }
+            .form-control-radio{
+
+               }
+    </style>
 </head>
 
 <body>
@@ -82,28 +117,28 @@
                                         <img class="amarPay__right__payImg"
                                             src="{{ asset('schools/assets/images/payment/bkash.png') }}"
                                             alt="" />
-                                        <input class="amarPay__right_radio" type="radio" id="control_01"
+                                        <input class="form-control-radio" type="radio" id="control_01"
                                             name="select" value="bkash" checked />
                                     </div>
                                     <div class="amarPay__right_img-radio">
                                         <img class="amarPay__right__payImg"
                                             src="{{ asset('schools/assets/images/payment/rsz_rocket.png') }}"
                                             alt="" />
-                                        <input class="amarPay__right_radio" type="radio" id="control_01"
+                                        <input class="form-control-radio" type="radio" id="control_01"
                                             name="select" value="rocket" />
                                     </div>
                                     <div class="amarPay__right_img-radio">
                                         <img class="amarPay__right__payImg"
                                             src="{{ asset('schools/assets/images/payment/nagad.png') }}"
                                             alt="" />
-                                        <input class="amarPay__right_radio" type="radio" id="control_01"
+                                        <input class="form-control-radio" type="radio" id="control_01"
                                             name="select" value="nagad" />
                                     </div>
                                     <div class="amarPay__right_img-radio">
                                         <img class="amarPay__right__payImg"
                                             src="{{ asset('schools/assets/images/payment/upay.jpeg') }}"
                                             alt="" />
-                                        <input class="amarPay__right_radio" type="radio" id="control_01"
+                                        <input class="form-control-radio" type="radio" id="control_01"
                                             name="select" value="upay" />
                                     </div>
                                 </div>
@@ -130,7 +165,7 @@
 
                                 <br />
                                 <div class="mt-4">
-                                    <button class="amarPay__right__button btn btn-success mx-3">
+                                    <button class="amarPay__right__button btn btn-primary mx-3">
                                         Checkout
                                     </button>
                                 </div>

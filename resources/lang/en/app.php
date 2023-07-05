@@ -12,6 +12,11 @@ return [
     'StaffInputList' => 'Staff Input List',
     'STAFF DETAILS CREATE FORM' => 'STAFF DETAILS CREATE FORM',
     'STAFF INPUT CREATE FORM' => 'STAFF INPUT CREATE FORM',
+    'collect_fees'  =>  'Collect Fees',
+    'assign'  =>  'Assign',
+    'collected_fees'    =>  "Collected Fees",
+    'due'    =>  "Due",
+    'entry_time'=> 'Entry Time',
 
     'Attendance Show'=>'Attendance Show',
     'Get Your All Content At a Glance'=>'Get Your All Content At a Glance',
@@ -55,10 +60,11 @@ return [
 
 
     'services' => 'serv',
-    'header_title' => 'Shikkha is the best software for your School management system',
+     'Shikkha'=>'Shikkha',
+    'header_title' => ' is the best software for manage  your School system',
     'header_paragraph'=>'We will Stay connected to your school at any time.',
     'email1'=>'Enter your email..',
-    'btn1'=>'Start With Shikka',
+    'btn1'=>'Start now',
     'header2'=>'Get the Perfect Solution from Sikkha',
     'feater1a'=>'Online',
     'feater1b'=>'Class',
@@ -201,7 +207,7 @@ return [
     'Home' => "Home  ",
     'talk' => "Let's talk  ",
     'Location' => "Our Location ",
-    'Location1' => "Euro Tower, H-155, R-18, S-10, Uttara, Dhaka-1230 ",
+    'Location1' => "Best House, Level-6, House-25, Road-13, S-10, Uttara, Dhaka-1230 ",
     'Email' => "Email Adress ",
     'Number' => "Hotline Number ",
     'Number1' => "+(880) 1568 405146 ",
@@ -327,7 +333,7 @@ return [
     'rack' => 'Rack N0',
     'quantity' => 'Quantity',
     'available' => 'Available',
-    'save' => 'save',
+    'save' => 'Save',
     'action' => 'Action',
     'add' => 'Add',
     'member' => 'Member Name',
@@ -542,7 +548,7 @@ return [
     'taka'=>'taka',
     'checkout'=>'checkout',
     'package'=>'package',
-    'Total Teacher Salary'=>'Total Teacher Salary',
+    'Total Teacher Salary'=>'Total  Teacher Salary',
     'Total Teacher Salary Paid'=>'Teacher Salary Paid (This Month)',
     'Total Teacher Salary Due'=>'Teacher Salary Due (This Month)',
     'Staff Salary'=>'Staff Salary',
@@ -552,12 +558,14 @@ return [
     'Total Student Fee'=>'Total Student Fee',
     'Collected Fee'=>'Collected Fee',
     'Due Fee'=>'Due Fee',
+    'Paid' => 'Paid',
     'Fund Receive'=>'Fund Receive',
     'Due Fee'=>'Due Fee',
     'Fund Receive'=>'Fund Receive',
     'Accesories'=>'Accesories',
-
+    'Document' => 'Document',
     'Total Profit'=>'Total Profit',
+    'Total Loss'=>'Total Loss',
     'Search End Date'=>'Search End Date',
     'Search On month'=>'Search On month',
     'Expense Purpose'=>'Expense Purpose',
@@ -584,6 +592,7 @@ return [
     'Account Number'=>'Account Number',
     'Balance'=>'Balance',
     'Bank Account'=>'Bank Account',
+    'No Account Added Yet'  => 'No Account Added Yet',
 
 
 
@@ -598,6 +607,8 @@ return [
     'select_all'  => 'Select All',
     //Result
     'Result_Show' => 'See Result',
+
+    'Discount'  =>  'Discount',
 
 
     'tt1'=>' The software is licensed to the school for a specified period of time. The school is granted the right to use the software for its own internal purposes and to allow its authorized users to access the software in accordance with the terms of the license agreement.
@@ -718,7 +729,7 @@ return [
 ',
 'as23'=>'Activity check
 ',
-'as24'=>'Classroom activity records
+'as24'=>'Class activity records
 ',
 'as25'=>'Quick communication
 ',
@@ -810,7 +821,7 @@ return [
 ',
 'sp8'=>'Monitor progress and goals
 ',
-'sp9'=>'can keep track of a students attendance and activity in general
+'sp9'=>'Track students attendance & activity
 ',
 'sp01'=>'Sikkha allows you to manage student information, check attendance and behavior, create custom reports, and manage grades
 
@@ -866,9 +877,7 @@ return [
 ',
 'op8'=>'Save your time and keep in touch with all
 ',
-'op9'=>'Sikkha is a cloud based school management system which is designed to meet everyone purposes at any time
-
-',
+'op9'=>'Sikkha is a cloud based school management system which can save all the  data and it designed to meet everyone purposes at any time    ',
 'op10'=>'Flexible interface for digital transactions
 ',
 'op11'=>'Sikkha supports digital payment systems through online banking or transactions which configure payment based on the head & type.
@@ -948,7 +957,7 @@ return [
 ',
 'ep24'=>'Interaction through SMS
 ',
-'ep25'=>'Online salary management
+'ep25'=>'Online salary 
 ',
 'ep26'=>'Subsidy management
 ',
@@ -1002,7 +1011,40 @@ return [
 'Select Subject' => 'Select Subject',
 'Select Teacher' => 'Select Teacher',
 'Update' => 'Update',
-'Roll' => 'Roll No.'
+'Disocunt'=>'Disocunt',
+'Roll' => 'Roll No',
+'Attendance' => 'Attendance',
+'Comment' => 'Comment',
+'Any' => 'Any',
+'This Month' => '(This Month)',
+'ViewAttendance' => 'View Attendance',
+'TakeAttendance' => 'Take Attendance',
+'GetFingerprint' => 'Get Fingerprint',
+'checkdelete' => 'Are you sure to Delete all selected Data?',
+'Record' => 'Record',
+'deleteall' => 'Delete All',
+'Fund' => 'Fund',
+'Result_Set' => 'Result Setting',
+'Receipt' => 'Receipt',
+'Total' => 'Total',
+'Get Attendance' => 'Get Attendance',
+'Date' => 'Date',
+'Statistics' => 'Statistics',
+'sincelastweek' => 'since last week',
+'Usages' => 'Usages',
+'EntryTime' =>'Entry Time',
+'Details' => 'Details',
+
+'History' => 'History',
+'Details' => 'Details',
+'Total Fund' => 'Total Fund',
+'Total Revenue' => 'Total Revenue',
+'Fund List' => 'Fund List',
+'Admit Card' => 'Admit Card',
+'billing' => 'Billing',
+'Sit Plan' => 'Sit Plan',
+'Due' => 'Due',
+'Description' => 'Description',
 
 
 ];

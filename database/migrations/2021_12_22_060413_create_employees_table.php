@@ -26,6 +26,8 @@ class CreateEmployeesTable extends Migration
             $table->string('salary')->nullable();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -37,5 +39,7 @@ class CreateEmployeesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('employees');
+        $table->dropSoftDeletes();
+
     }
 }

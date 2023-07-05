@@ -18,7 +18,7 @@
                         </ol>
                     </div>
                     <div class="col-md-2">
-                        <a href="{{ route('Addon.form') }}" class="btn btn-success">Create</a>
+                        <a href="{{ route('Addon.form') }}" class="btn btn-primary">Create</a>
                     </div>
                 </div>
 

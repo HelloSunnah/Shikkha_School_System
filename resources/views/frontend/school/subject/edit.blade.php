@@ -4,11 +4,11 @@
     <!--start content-->
     <main class="page-content">
         <div class="row">
-            <div class="col-xl-6 mx-auto">
-                <div class="card">
+            <div class="col-xl-6 mx-auto mt-5">
+                <div class="card" style="box-shadow:4px 3px 13px  .7px #deaaf7">
                     <div class="card-body">
                         <div class="border p-3 rounded">
-                            <h6 class="mb-0 text-uppercase">{{$subjectText}} Form</h6>
+                            <h6 class="mb-0 text-uppercase text-primary">{{__('app.Subject')}} {{__('app.Update')}}</h6>
                             <hr/>
                             <form class="row g-3" method="post" action="{{route('subject.create.update',$subject->id)}}" enctype="multipart/form-data">
                                 @csrf
@@ -16,14 +16,15 @@
                                     @include('frontend.layouts.message')
                                 </div>
                                 <input type="hidden" name="active" value="1">
-                                <div class="col-12">
-                                    <label class="form-label">Subject Name</label>
-                                    <div class="input-group mb-3">
+                                <div class="col-12 mt-4">
+                                    <label class="form-label-edit">{{__('app.Subject')}} {{__('app.Name')}} <span style="color:red;">*</span></label>
+                                    
                                         <input type="text" class="form-control" placeholder="Subject Name" name="subject_name" value="{{$subject->subject_name}}">
-                                    </div>
+                                    
                                 </div>
-                                <div class="col-12">
-                                    <select class="form-select mb-3 js-select" aria-label="Default select example" name="class_id" id="class_id" onchange="game_chf()">
+                                <div class="col-12 mt-4">
+                                    <label class="select-form">{{__('app.class')}} {{__('app.select')}}</label>
+                                    <select class="form-select mb-3 js-select" aria-label="Default select example" name="class_id" id="class_id" onchange="game_chf()">                                        
                                         <option value="">Class Name</option>
                                         <option value="{{$subject->class_id}}" selected>{{getClassName($subject->class_id)->class_name}}</option>
                                         @foreach($class as $data)
@@ -31,15 +32,6 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                
-                                {{-- <div class="col-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="gridCheck1" name="active" value="1" {{($subject->active == 1) ? 'checked' : ''}}>
-                                        <label class="form-check-label" for="gridCheck1" >
-                                            Check me out
-                                        </label>
-                                    </div>
-                                </div> --}}
                                 <div class="col-12">
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-primary">Submit</button>

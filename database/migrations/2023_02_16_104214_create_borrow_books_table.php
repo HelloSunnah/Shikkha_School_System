@@ -21,6 +21,8 @@ class CreateBorrowBooksTable extends Migration
             $table->string('return_date')->nullable();
             $table->string('possible_borrow_date');
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -32,5 +34,7 @@ class CreateBorrowBooksTable extends Migration
     public function down()
     {
         Schema::dropIfExists('borrow_books');
+        $table->dropSoftDeletes();
+
     }
 }

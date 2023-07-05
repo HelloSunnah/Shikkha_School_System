@@ -2,60 +2,68 @@
 
 @section('main')
 <br><br><br><br><br><br>
+<style>
+    .btn1:hover {
+        background-color: blueviolet;
+        color: white !important;
+    }
+</style>
 
-   <div class="site-wrapper-reveal ">
+<div class="site-wrapper-reveal ">
 
-            <!--====================  Blog Area Start ====================-->
-            <div class="blog-pages-wrapper section-space--ptb_100">
-                <div class="container">
-                    <div class="row">
-                        
-                        <div class="col-lg-6 col-md-6  mb-30 wow move-up">
-                            <div class="single-blog-item blog-grid">
-                                <div class="post-feature blog-thumbnail">
-                                    <a href="#">
-                                        <img class="img-fluid" src="{{ asset('frontend/assets/img/features/home-2/online_class_2.svg') }}" alt="Blog Images" width="500px" height="500px">
-                                    </a>
+    <!--====================  Blog Area Start ====================-->
+
+
+
+    <center>
+        <h1 style="color: purple;padding-bottom:40px">Shikkha Blog</h1>
+        <p style="margin-left: 200px;margin-right:200px;margin-bottom:50px;">
+            Our blog includes informative guides, tutorials, the latest news, and articles related to the web app and mobile
+            app developments. Use these guidelines to get
+            started on your software outsourcing projects.</p>
+    </center>
+    <div class="blog-pages-wrapper section-space--ptb_100">
+        <div class="container">
+
+            <div class="row">
+                @foreach($blog as $data)
+
+                <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                    <a href="{{route('blog.view',$data->slug)}}">
+
+                        <div class="services__inner hover__active mb-30 wow fadeInUp" data-wow-delay=".3s">
+
+                            <div class="text-center services__item white-bg transition-3 p-3">
+                                <div class="services__icon mb-25 d-flex align-items-end justify-content-center">
+                                    <img width="200px" src="{{ asset($data->image ?? 'frontend/assets/img/icon/services/home-1/services-1.png') }}" alt="">
                                 </div>
-                                
-                                <div class="post-info lg-blog-post-info">
-                                    <h5 class="post-title font-weight--bold">
-                                        <a href="#">Best School Management System</a>
-                                    </h5>
+                                <div class="services__content">
+                                    <div style="overflow: hidden;height:50px">
+                                        <p class="services__title"><a href="#"> <br>{!! substr(strip_tags($data->title), 0, 100) !!}</a></p>
 
-                                    <div class="post-excerpt mt-15">
-                                        <p>(Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.) </p>
                                     </div>
+                                    <p>{{$data->created_at->format('M d, Y')}}</p>
+                                    <br>
+                                    <a href="{{route('blog.view',$data->slug)}}" class="btn btn-outline-primary btn1" style="border-color:blueviolet !important;background-color: #7127ea;color:white">View Blog</a>
+
                                 </div>
-                                
                             </div>
                         </div>
+                    </a>
 
-                        <div class="col-lg-6 col-md-6  mb-30 wow move-up">
-                            <div class="single-blog-item blog-grid">
-                                <div class="post-feature blog-thumbnail">
-                                    <a href="#">
-                                        <img class="img-fluid" src="{{ asset('frontend/assets/img/features/home-2/user_management_2.svg') }}" alt="Blog Images" >
-                                    </a>
-                                </div>
-                                
-                                <div class="post-info lg-blog-post-info">
-                                    <h5 class="post-title font-weight--bold">
-                                        <a href="#">Best School Management System</a>
-                                    </h5>
-
-                                    <div class="post-excerpt mt-15">
-                                        <p>(Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.) </p>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        </div>
-                        
-                    </div>
                 </div>
+
+                @endforeach
+
+
+
+
+
+
             </div>
-            <!--====================  Blog Area End  ====================-->
+        </div>
+    </div>
+    <!--====================  Blog Area End  ====================-->
 
 
 
@@ -67,8 +75,8 @@
 
 
 
-            <!--========== Call to Action Area Start ============-->
-            {{-- <div class="cta-image-area_one section-space--ptb_80 cta-bg-image_one">
+    <!--========== Call to Action Area Start ============-->
+    {{-- <div class="cta-image-area_one section-space--ptb_80 cta-bg-image_one">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-xl-8 col-lg-7">
@@ -85,11 +93,11 @@
                     </div>
                 </div>
             </div> --}}
-            <!--========== Call to Action Area End ============-->
+    <!--========== Call to Action Area End ============-->
 
 
-        </div>
+</div>
 
 <!--===========  feature-large-images-wrapper  End =============-->
 
-@endsection 
+@endsection

@@ -19,17 +19,19 @@ class Language
     public function handle(Request $request, Closure $next)
     {
 
-        if(is_null(session()->has('locale')))
+        if(session()->has('locale'))
         {
             App::setLocale(session('locale'));
         }
         else
-        {
+           {
             //App::setLocale('bn');
             if(Auth::guard('schools')->check())
             {
                 App::setLocale(Auth::guard('schools')->user()->language);
-            }else{
+            }
+            else
+            {
                 App::setLocale('bn');
                 
             }

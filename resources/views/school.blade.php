@@ -1,5 +1,11 @@
 @extends('layouts.school.master')
 @section('content')
+<style>
+    .btn1:hover{
+        background-color: blueviolet;
+        color: white !important;
+    }
+</style>
     <!--start content-->
     <main class="page-content">
         <!--breadcrumb-->
@@ -17,198 +23,178 @@
         </div>
         <!--end breadcrumb-->
 
-
-        <div class="row">
-            <div class="col-12 col-lg-12 col-xl-6 d-flex">
-                <div class="card radius-10 w-100">
-                    <div class="card-body">
-                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-xl-3 row-cols-xxl-3 g-3">
-                            <div class="col">
-                               <a href="{{route('student.teacher.create.show')}}">
-                                    <div class="card radius-10 bg-tiffany mb-0">
-                                        <div class="card-body text-center">
-                                            <div class="widget-icon mx-auto mb-3 bg-white-1 text-white">
-                                                <i class="bi bi-file-earmark-break-fill"></i>
-                                            </div>
-                                            <h3 class="text-white">{{CountUser()}}</h3>
-                                            <p class="mb-0 text-white">{{__('app.student')}}</p>
-                                        </div>
-                                    </div>
-                               </a>
+        <div>
+            <div class="row mb-5">
+                <div class="col-md-4 mb-2 ">
+                    <a href="{{route('student.teacher.create.show')}}">
+                        <div class="card  bg-white mb-0" style="border-radius:18px;">
+                            <h4 class="mb-0 text-center" style="color: blueviolet;margin-top:20px">{{__('app.Student')}}</h4>
+                            <div class="card-body text-center p-4">
+                                <h3 style="color:rgb(2, 2, 2);">{{CountUser()}}</h3>
+                                <div class="d-flex justify-content-center gap-3 pt-4">
+                                    <h6 style="color:#30d915"><i class="bi bi-graph-up-arrow"></i> 17% </h6>
+                                    <p style="color:rgb(36, 36, 36)">{{__('app.sincelastweek')}}</p>
+                                 </div>
                             </div>
-                            <div class="col">
-                                <a href="{{route('teacher.Show')}}">
-                                    <div class="card radius-10 bg-success mb-0">
-                                        <div class="card-body text-center">
-                                            <div class="widget-icon mx-auto mb-3 bg-white-1 text-white">
-                                                <i class="bi bi-hdd-fill"></i>
-                                            </div>
-                                            <h3 class="text-white">{{CountTeacher()}}</h3>
-                                            <p class="mb-0 text-white">{{__('app.teacher')}}</p>
-                                        </div>
-                                    </div>
-                                </a>
+                        </div>
+                   </a>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <a href="{{route('teacher.Show')}}">
+                        <div class="card  bg-white mb-0" style="border-radius:18px;">
+                            <h4 class="mb-0 text-center" style="color: blueviolet;margin-top:20px">{{__('app.teacher')}}</h4>
+                            <div class="card-body text-center p-4">
+                                <h3 style="color: rgb(0, 0, 0)" >{{CountTeacher()}}</h3>
+                                <div class="d-flex justify-content-center gap-3 pt-4" >
+                                    <h6 style="color:#30d915;"><i class="bi bi-graph-up-arrow"></i> 17% </h6>
+                                    <p style="color:rgb(36, 36, 36);">{{__('app.sincelastweek')}}</p>
+                                 </div>
                             </div>
-                            <div class="col">
-                                <div class="card radius-10 bg-danger mb-0">
-                                    <div class="card-body text-center">
-                                        <div class="widget-icon mx-auto mb-3 bg-white-1 text-white">
-                                            <i class="bi bi-people-fill"></i>
-                                        </div>
-                                        <h3 class="text-white">{{totalDuefeature()}}</h3>
-                                        <p class="mb-0 text-white">{{__('app.t3')}} </p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-2">
+                        <div class="card  bg-white mb-0" style="border-radius:18px;">
+                            <h4 class="mb-0 text-center" style="color: blueviolet;margin-top:20px">{{__('app.t3')}}</h4>
+                            <div class="card-body text-center p-4">
+                                <h3 style="color: rgb(0, 0, 0)" >{{totalDuefeature()}}</h3>
+                                <div class="d-flex justify-content-center gap-3 pt-4">
+                                    <h6 style="color:#30d915;"><i class="bi bi-graph-up-arrow"></i> 17% </h6>
+                                    <p style="color:rgb(36, 36, 36);">{{__('app.sincelastweek')}}</p>
+                                 </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col-md-4 mb-2">
+                        <div class="card  bg-white mb-0" style="border-radius:18px;">
+                            <h4 class="mb-0 text-center" style="color: blueviolet;margin-top:20px">{{__('app.t4')}}</h4>
+                            <div class="card-body text-center p-4">
+                                <h3 style="color: rgb(0, 0, 0)" >{{MonthlyIncome()}}</h3>
+                                <div class="d-flex justify-content-center gap-3 pt-4" >
+                                    <h6 style="color:#30d915;"><i class="bi bi-graph-up-arrow"></i> 17% </h6>
+                                    <p style="color:rgb(36, 36, 36);">{{__('app.sincelastweek')}}</p>
+                                    
+                                 </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-2">
+                        <div class="card  bg-white mb-0" style="border-radius:18px;">
+                            <h4 class="mb-0 text-center" style="color: blueviolet;margin-top:20px">{{__('app.t5')}}</h4>
+                            <br>
+                            <div class="card-body text-center p-4">
+                                <h3 style="color: rgb(0, 0, 0)" >0</h3>
+                                <div class="d-flex justify-content-center gap-3 pt-4" >
+                                    <h6 style="color:#30d915;"><i class="bi bi-graph-up-arrow"></i> 17% </h6>
+                                    <p style="color:rgb(36, 36, 36);">{{__('app.sincelastweek')}}</p>
+                                    
+                                 </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-2">
+                        <div class="card  bg-white mb-0" style="border-radius:18px;">
+                            <h4 class="mb-0 p-2 text-center" style="color: blueviolet;margin-top:15px;padding-bottom:0px !important">{{__('app.t6')}}</h4>
+                            
+                            <div class="card-body text-center p-4">
+                                <h3 style="color: rgb(0, 0, 0)" >{{DailyAttendence()}}</h3>
+                                <div class="d-flex justify-content-center gap-3 pt-4" >
+                                    <h6 style="color:#30d915;padding-left:14px"><i class="bi bi-graph-up-arrow"></i> 17% </h6>
+                                    <p style="color:rgb(36, 36, 36);">{{__('app.sincelastweek')}}</p>
+                                    
+                                 </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card radius-10 w-100">
+                        {{-- <div class="card-header bg-transparent p-3">
+                            
+                        </div> --}}
+                        <div class="card-body">
+                            <div class="row row-cols-1 row-cols-lg-2 g-3 align-items-center">
+                                <div class="col">
+                                    <h5 class="mb-0" style="color:blueviolet">{{__('app.Status2')}}</h5>
+                                </div>
+                                <div class="col">
+                                    <div class="d-flex align-items-center justify-content-sm-end gap-3 cursor-pointer">
+                                        <div class="font-13" style="color: blueviolet"><i class="bi bi-circle-fill text-info" style="color:blueviolet !important"></i><span class="ms-2">{{__('app.Status3')}}</span></div>
+                                        <div class="font-13"><i class="bi bi-circle-fill" style="color:rgb(250, 154, 65)"></i><span class="ms-2">{{__('app.Status4')}}</span></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col">
-                                <div class="card radius-10 bg-dark mb-0">
-                                    <div class="card-body text-center">
-                                        <div class="widget-icon mx-auto mb-3 bg-white-1 text-white">
-                                            <i class="bi bi-file-earmark-check-fill"></i>
-                                        </div>
-                                        <h3 class="text-white">{{MonthlyIncome()}}</h3>
-                                        <p class="mb-0 text-white">{{__('app.t4')}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card radius-10 bg-purple mb-0">
-                                    <div class="card-body text-center">
-                                        <div class="widget-icon mx-auto mb-3 bg-white-1 text-white">
-                                            <i class="bi bi-tags-fill"></i>
-                                        </div>
-                                        <h3 class="text-white">0</h3>
-                                        <p class="mb-0 text-white">{{__('app.t5')}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <a href="{{route('student.attendance.show.date')}}">
-                                    <div class="card radius-10 bg-orange mb-0">
-                                        <div class="card-body text-center">
-                                            <div class="widget-icon mx-auto mb-3 bg-white-1 text-white">
-                                                <i class="bi bi-chat-left-quote-fill"></i>
-                                            </div>
-                                            <h3 class="text-white">{{DailyAttendence()}}</h3>
-                                            <p class="mb-0 text-white">{{__('app.t6')}}</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
+                            <div id="chart5"></div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-12 col-lg-12 col-xl-6 d-flex">
-                <div class="card radius-10 w-100">
-                    <div class="card-header bg-transparent">
-                        <div class="row g-3 align-items-center">
-                            <div class="col">
-                                <h5 class="mb-0">{{__('app.Status1')}}</h5>
+                <div class="col-md-6">
+                    <div class="card radius-10 w-100">
+                        <div class="card-body">
+                            <h5 class="mb-0" style="color:blueviolet">{{__('app.Status1')}}</h5>
+                            <div id="chart1">
                             </div>
-                            <div class="col">
-                                <div class="d-flex align-items-center justify-content-end gap-3 cursor-pointer">
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="chart1"></div>
-                    </div>
-                </div>
-            </div>
-        </div><!--end row-->
-
-        <div class="row">
-            <div class="col-12 col-lg-12 d-flex">
-                <div class="card radius-10 w-100">
-                    <div class="card-header bg-transparent p-3">
-                        <div class="row row-cols-1 row-cols-lg-2 g-3 align-items-center">
-                            <div class="col">
-                                <h5 class="mb-0">{{__('app.Status2')}}</h5>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex align-items-center justify-content-sm-end gap-3 cursor-pointer">
-                                    <div class="font-13"><i class="bi bi-circle-fill text-info"></i><span class="ms-2">{{__('app.Status3')}}</span></div>
-                                    <div class="font-13"><i class="bi bi-circle-fill text-orange"></i><span class="ms-2">{{__('app.Status4')}}</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="chart5"></div>
-                    </div>
-                </div>
-            </div>
-{{--            <div class="col-12 col-lg-12 col-xl-6 d-flex">--}}
-{{--                <div class="card radius-10 w-100">--}}
-{{--                    <div class="card-header bg-transparent">--}}
-{{--                        <div class="row g-3 align-items-center">--}}
-{{--                            <div class="col">--}}
-{{--                                <h5 class="mb-0">Statistics</h5>--}}
-{{--                            </div>--}}
-{{--                            <div class="col">--}}
-{{--                                <div class="d-flex align-items-center justify-content-end gap-3 cursor-pointer">--}}
-{{--                                    <div class="dropdown">--}}
-{{--                                        <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bx bx-dots-horizontal-rounded font-22 text-option"></i>--}}
-{{--                                        </a>--}}
-{{--                                        <ul class="dropdown-menu">--}}
-{{--                                            <li><a class="dropdown-item" href="javascript:;">Action</a>--}}
-{{--                                            </li>--}}
-{{--                                            <li><a class="dropdown-item" href="javascript:;">Another action</a>--}}
-{{--                                            </li>--}}
-{{--                                            <li>--}}
-{{--                                                <hr class="dropdown-divider">--}}
-{{--                                            </li>--}}
-{{--                                            <li><a class="dropdown-item" href="javascript:;">Something else here</a>--}}
-{{--                                            </li>--}}
-{{--                                        </ul>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="card-body">--}}
-{{--                        <div id="chart2"></div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-        </div><!--end row-->
-
-        <div class="row">
-            <div class="col-12 col-lg-12 col-xl-6 d-flex">
-                <div class="card radius-10 w-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="project-date">
-                                <p class="mb-0 font-13">July 2, 2020</p>
-                            </div>
-
-                        </div>
-                        <div class="text-center my-3">
-                            <h6 class="mb-0">{{__('app.Status5')}} </h6>
-                        </div>
-                        <?php
-                        $messageAccount =  getMessageAccount();
-                        ?>
-                        <div class="my-2">
-                            <p class="mb-1 font-13">Usages {{$messageAccount['dataProcessBar']}} / {{$messageAccount['total']}} </p>
-                            <div class="progress radius-10" style="height:5px;">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{$messageAccount['cssProcessBar']}}%"></div>
-                            </div>
-                            <p class="mb-0 mt-1 font-13 text-end"></p>
-                        </div>
-                        <div class="d-flex align-items-center mt-5">
-                            <div class="project-user-groups">
-                                <a href="{{route('school.message.post.checkout.show')}}" class="py-1 px-3 radius-30 bg-light-primary text-primary ms-auto">{{__('app.Status7')}} </a>
-                            </div>
-                            <a href="{{route('school.message')}}" class="py-1 px-3 radius-30 bg-light-primary  ms-auto">{{__('app.Status8')}}</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="project-date">
+                                <strong class="mb-0 font-13">{{$defaultDate}}</strong>
+                            </div>
+
+                        </div>
+                        <div class="text-center my-3">
+                            <h6 style="color:blueviolet" class="mb-0">{{__('app.Status5')}} </h6>
+                        </div>
+                        <?php
+                        $messageAccount =  getMessageAccount();
+                        ?>
+                        <div class="my-2">
+                            <p class="mb-1 font-13">{{__('app.Usages')}}<strong style="color: red">({{$messageAccount['dataProcessBar']}} / {{$messageAccount['total']}})</strong> </p>
+                            <div class="progress radius-10" style="height:25px;">
+                                <div class="progress-bar radius-10" role="progressbar" style="width:{{$messageAccount['cssProcessBar']}}%;background-color:blueviolet !important;"></div>
+                            </div>
+                            {{-- <div class="progress radius-10" style="height:5px;">
+                                <div class="progress-bar" role="progressbar" style="width: {{$messageAccount['cssProcessBar']}}%"></div>
+                            </div> --}}
+                            <p class="mb-0 mt-1 font-13 text-end"></p>
+                        </div>
+                        <div class="d-flex align-items-center mt-5">
+                            <div class="project-user-groups">
+                                <a href="{{route('school.message.post.checkout.show')}}" class="btn btn-outline-primary btn1" style="border-color:blueviolet !important;color:blueviolet">{{__('app.Status7')}} </a>
+                            </div>
+                            <a href="{{route('school.message')}}" class="btn btn-primary radius-30 btn2 ms-auto" style="background-color:blueviolet !important;color:white;border-color:blueviolet;">{{__('app.Status8')}}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <h5 class="mb-0" style="color: blueviolet;">{{__('app.Statistics')}}</h5>
+                        <div id="chart2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end row-->
+
+        
 
 
     </main>
@@ -280,7 +266,7 @@
                 },
                 markers: {
                     size: 0,
-                    colors: ["#3461ff", "#12bf24"],
+                    colors: ["#7a00a7", "#7a00a7"],
                     strokeColors: "#fff",
                     strokeWidth: 2,
                     hover: {
@@ -313,7 +299,7 @@
                     // width: 3,
                     curve: "smooth"
                 },
-                colors: ["#12bf24"],
+                colors: ["#7a00a7"],
                 xaxis: {
                     categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
                 },
@@ -335,13 +321,13 @@
             var options = {
                 series: [{
                     name: "Users",
-                    data: [450, 650, 440, 160]
+                    data: [450, 420, 660, 160]
                 }],
                 chart: {
                     foreColor: '#9a9797',
                     type: "bar",
                     //width: 130,
-                    height: 270,
+                    height: 170,
                     toolbar: {
                         show: !1
                     },
@@ -354,7 +340,7 @@
                         left: 14,
                         blur: 4,
                         opacity: .12,
-                        color: "#12bf24"
+                        color: "#8a2be2"
                     },
                     sparkline: {
                         enabled: !1
@@ -362,8 +348,8 @@
                 },
                 markers: {
                     size: 0,
-                    colors: ["#12bf24"],
-                    strokeColors: "#fff",
+                    colors: ["#8a2be2"],
+                    strokeColors: "#8a2be2",
                     strokeWidth: 2,
                     hover: {
                         size: 7
@@ -396,9 +382,9 @@
                     // width: 3,
                     curve: "smooth"
                 },
-                //colors: ["#12bf24"],
+                colors: ["#8a2be2"],
                 xaxis: {
-                    categories: ["Visitors", "Subscribers", "Contributor", "Author"]
+                    categories: ["Student", "Teacher", "Finance", "Author"]
                 },
                 tooltip: {
                     theme: 'dark',
@@ -565,7 +551,7 @@
                     curve: 'smooth',
                     width: 3
                 },
-                colors: ["#32bfff", '#ff6632'],
+                colors: ["#8a2be2", '#ff6632'],
                 series: [{
                     name: "Income",
                     data: incomeDatas

@@ -6,7 +6,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-1"></div>
                 <div class="col-lg-5">
-                    <h1 class="fs-1 fw-bold">{{__('app.sp')}}
+                    <h1 style="padding-top:0px;font-size:35px !important" class="fs-1 fw-bold">{{__('app.sp')}}
                         <br> {{__('app.sp1')}}</h1>
                     <p class="text-muted mt-4">{{__('app.sp2')}} <br>{{__('app.sp3')}}</p>
                     <ul class="mt-4">
@@ -19,7 +19,7 @@
                     <div class="hero__search wow fadeInUp" data-wow-delay=".7s">
                         <form method="post" action="{{route('getStarted.post')}}" enctype="multipart/form-data">
                             @csrf
-                            <input type="email" placeholder="Enter your email Address.." name="email" required>
+                            <input type="email" placeholder="{{__('app.email1')}}" name="email" required>
                             <br> <button type="submit" class="w-btn w-btn mt-4">{{__('app.spp')}}</button>
                         </form>
                     </div>
@@ -46,7 +46,7 @@
                     <div class="trackProgress__left">
                         <div class="text-center"> <img class="w-50" src="" alt=""></div>
 
-                        <h1>{{__('app.sp9')}}</h1>
+                        <h3>{{__('app.sp9')}}</h3>
                         <p>{{__('app.sp10')}}</p>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                         <div class="text-center">
                             <img class="w-50" src="" alt="">
                         </div>
-                        <h1>{{__('app.sp11')}}</h1>
+                        <h3>{{__('app.sp11')}}</h3>
                         <p>{{__('app.sp12')}}</p>
                     </div>
                 </div>

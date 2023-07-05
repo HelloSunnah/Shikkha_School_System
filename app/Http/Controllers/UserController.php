@@ -302,4 +302,8 @@ class UserController extends Controller
         return back();
 
     }
+
+    public function student_profile(){
+        return view ('');
+    }
 }

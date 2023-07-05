@@ -6,26 +6,26 @@
     <main class="page-content">
         <div class="row">
             @foreach(\App\Models\MessagePackage::all() as $messagePackage)
-            <div class="col-xl-3">
+            <div class="col-xl-4">
                 <!-- <form role="form" action="{{ route('school.message.post') }}" method="POST"> -->
                     <!-- @csrf -->
                     <input type="hidden" value="{{$messagePackage->id}}" name="message_package_id">
-                    <div class="card radius-10 {{( ($loop->iteration % 2) == 0) ? 'bg-purple': 'bg-orange'}}">
+                    <div class="card radius-10" style="box-shadow:4px 3px 13px  .13px #d480fb;border-radius:5px;">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="">
-                                    <p class="mb-1 text-white">{{__('app.Message')}} {{__('app.package')}} {{$loop->iteration}}</p>
-                                    <h4 class="mb-0 text-white">{{$messagePackage->price}} {{__('app.taka')}}</h4>
+                                    <p class="mb-1 ">{{__('app.Message')}} {{__('app.package')}} {{$loop->iteration}}</p>
+                                    <h4 class="mb-0 ">{{$messagePackage->price}} {{__('app.taka')}}</h4>
                                 </div>
-                                <div class="ms-auto fs-2 text-white">
+                                <div class="ms-auto fs-2 ">
                                     <i class="fadeIn animated bx bx-money"></i>
                                 </div>
                             </div>
                             <hr class="my-2 border-top border-light">
                             <div class="d-flex justify-content-between text-center">
-                                <small class="mb-0 text-white"><span><p class="mb-1 text-white">{{__('app.package')}} {{__('app.name')}}</p> {{$messagePackage->package_name}}</span></small>
+                                <small class="mb-0 "><span><p class="mb-1 ">{{__('app.package')}} {{__('app.name')}}</p> {{$messagePackage->package_name}}</span></small>
                                 <hr class="my-2 border-top border-light">
-                                <small class="mb-0 text-white"><span><p class="mb-1 text-white">{{__('app.Message')}} {{__('app.Quantity')}}</p>  {{$messagePackage->quantity}}</span></small>
+                                <small class="mb-0 "><span><p class="mb-1 ">{{__('app.Message')}} {{__('app.Quantity')}}</p>  {{$messagePackage->quantity}}</span></small>
                             </div>
 
                             <br>

@@ -29,6 +29,8 @@ class CreateQuestionsTable extends Migration
             $table->string('question_mark')->nullable();
             $table->longText('question')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -40,5 +42,7 @@ class CreateQuestionsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('questions');
+        $table->dropSoftDeletes();
+
     }
 }

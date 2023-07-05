@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SupportAlertMail;
+use App\Models\Blog;
 use App\Models\FeatureDetailsPage;
 use App\Models\Otp;
 use App\Models\Price;
@@ -10,6 +11,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use App\Models\School;
 use App\Models\Support;
+use App\Models\SEOModel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -52,19 +54,38 @@ class PageController extends Controller
     }
     public function home()
     {
-        return view('frontend.pages.index');
+        $seoTitle = SEOModel::where('page_no','=','1')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','1')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','1')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        $blog=Blog::orderBy('created_at', 'desc')->take(4)->get();
+        return view('frontend.pages.index', compact('seo_array','blog'));
     }
 
     public function contactPage()
     {
-        return view('frontend.pages.contact');
+        $seoTitle = SEOModel::where('page_no','=','14')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','14')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','14')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.pages.contact', compact('seo_array'));
+        // return view('frontend.pages.contact');
     }
+    public function  blogView($slug){
+        $blog = Blog::where('slug', 'LIKE', "%{$slug}%")->first();
+        $blog1=Blog::orderBy('created_at', 'desc')->take(4)->get();
 
-    public function contactPage2()
-    {
-        return Redirect::to('https://sportclubff.com/');
+        return view('frontend.pages.blogView',compact('blog','blog1'));
+
     }
-
     public function featurePage()
     {
         return view('frontend.pages.feature');
@@ -72,54 +93,166 @@ class PageController extends Controller
 
     public function featureU()
     {
-        return view('frontend.pages.service.featureU');
+        $seoTitle = SEOModel::where('page_no','=','2')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','2')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','2')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.pages.service.featureU', compact('seo_array'));
+        
     }
     public function featureS()
     {
-        return view('frontend.pages.service.featureS');
+        $seoTitle = SEOModel::where('page_no','=','4')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','4')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','4')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.pages.service.featureS', compact('seo_array'));
+        
     }
     public function featureA()
     {
-        return view('frontend.pages.service.featureA');
+        $seoTitle = SEOModel::where('page_no','=','3')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','3')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','3')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.pages.service.featureU', compact('seo_array'));
+        // return view('frontend.pages.service.featureA');
     }
     public function featureP()
     {
-        return view('frontend.pages.service.featureP');
+        $seoTitle = SEOModel::where('page_no','=','5')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','5')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','5')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.pages.service.featureP', compact('seo_array'));
+        // return view('frontend.pages.service.featureP');
     }
     public function featureO()
     {
-        return view('frontend.pages.service.featureO');
+        $seoTitle = SEOModel::where('page_no','=','7')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','7')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','7')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.pages.service.featureO', compact('seo_array'));
+        // return view('frontend.pages.service.featureO');
     }
     public function featureE()
     {
-        return view('frontend.pages.service.featureE');
+        $seoTitle = SEOModel::where('page_no','=','6')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','6')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','6')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.pages.service.featureE', compact('seo_array'));
     }
 
 
     public function pricing()
     {
         $prices = Price::get();
+        $seoTitle = SEOModel::where('page_no','=','8')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','8')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','8')->first()->keyword;
         $seo_array = [
-            'seoTitle' => 'Price',
-            'seoDescription' => 'Price',
-            'seoKeyword' => 'Price',
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
         ];
-
         return view('frontend.pages.pricing', compact('prices', 'seo_array'));
     }
+    public function pricing_Checkout(Request $request)
+    {
+        
+        $id = $request->prices_package_id;
+       $price = Price::where('id', $id)->first();
+        return view('frontend.pages.pricingmodal',compact('price'));
+    }
+
+
 
     public function getStarted(Request $request)
     {
         $email=$request-> email;
         $data = School::where('email', $email)->first();
+        $seoTitle = SEOModel::where('page_no','=','17')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','17')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','17')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         if($data)
         {
             return view('auth.login', ['url' => 'schools', 'email'=>$email]);
         }
         else
         {
-            return view('frontend.pages.signup',compact('email'));
+            return view('frontend.pages.signup',compact('email', 'seo_array'));
         }
+    }
+
+    public function termsCondition()
+    {
+        $seoTitle = SEOModel::where('page_no','=','13')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','13')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','13')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('term_condition', compact('seo_array'));
+    }
+
+    public function video()
+    {
+        $seoTitle = SEOModel::where('page_no','=','12')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','12')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','12')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('videos', compact('seo_array'));
+    }
+
+    public function blog()
+    {
+        $seoTitle = SEOModel::where('page_no','=','11')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','11')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','11')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        $blog=Blog::all();
+        return view('blog', compact('seo_array','blog'));
     }
 
     public function getSignup(Request $request){
@@ -139,11 +272,20 @@ class PageController extends Controller
             $school = School::where('phone_number',$request->phone_number)->where('email',$request->email)->first();
             if(!is_null($school)){
               //  dd($school);
+              
+            $seoTitle = SEOModel::where('page_no','=','9')->first()->title;
+            $seoDescription = SEOModel::where('page_no','=','9')->first()->description;
+            $seoKeyword = SEOModel::where('page_no','=','9')->first()->keyword;
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
                 if($school->is_editor == 0){
                     $to = $request->phone_number;
                     $to_email = $request->email;
                     $to_password = $request->password;
-                    return view('frontend.pages.otp',compact('to','to_email','to_password'));
+                    return view('frontend.pages.otp',compact('to','to_email','to_password','seo_array'));
                 }elseif ($school->is_editor == 1){
                     toast('We need More Infomation','success');
                     return redirect()->route('school.login');
@@ -152,12 +294,29 @@ class PageController extends Controller
                     return redirect()->route('school.login');
                 }
             }else{
+                $seoTitle = SEOModel::where('page_no','=','9')->first()->title;
+                $seoDescription = SEOModel::where('page_no','=','9')->first()->description;
+                $seoKeyword = SEOModel::where('page_no','=','9')->first()->keyword;
+                $seo_array = [
+                    'seoTitle' => $seoTitle,
+                    'seoKeyword' => $seoKeyword,
+                    'seoDescription' => $seoDescription,
+                ];
                 $errors =$validator->errors();
-                return view('frontend.pages.signup',compact('errors'));
+                return view('frontend.pages.signup',compact('errors' ,'seo_array'));
             }
 
 
         }
+        
+        $seoTitle = SEOModel::where('page_no','=','9')->first()->title;
+        $seoDescription = SEOModel::where('page_no','=','9')->first()->description;
+        $seoKeyword = SEOModel::where('page_no','=','9')->first()->keyword;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
 
         $school = new School();
 
@@ -167,8 +326,10 @@ class PageController extends Controller
         $school->password = Hash::make($request->password);
         $school->school_name = $request->school_name;
         $school->school_name_bn = $request->school_name_bn;
-
         $school->unique_id = uniqid();
+        $trialEndDate = Carbon::now()->addDays(10);
+        $school->trial_end_date = $trialEndDate;
+        $school->subscription_status = $request->subscription_status;
         $school->save();
 
         $token   = env("GREENWEB_TOKEN");
@@ -189,7 +350,7 @@ class PageController extends Controller
         
         $to_password = $request->password;
         toast('Otp will be send , Please Wait','question');
-        return view('frontend.pages.otp',compact('to','to_email','to_password'));
+        return view('frontend.pages.otp',compact('to','to_email','to_password' ,'seo_array'));
 
     }
 

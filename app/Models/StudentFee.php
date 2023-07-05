@@ -19,4 +19,9 @@ class StudentFee extends Model
 
     }
 
+    public function feesType()
+    {
+        return $this->belongsTo(FeesType::class);   
+    }
+
 }

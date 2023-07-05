@@ -39,12 +39,12 @@
                         
                 @else
                     <div class="col">
-                        <div class="card radius-10 {{cardColorChange($key)}}">
+                        <div class="card radius-10 {{cardColorChange($s)}}">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="">
                                         <p class="mb-1 text-white">{{ \App\Models\InstituteClass::find($s2[0]->class_id)?->class_name }}</p>
-                                        <h4 class="mb-0 text-white">{{getSubjectNameAll($s2[0]->subject_id)->subject_name ?? 'null'}}</h4>
+                                        <h4 class="mb-0 text-white">{{getSubjectNameAll($s2[0]->subject_id)?->subject_name ?? 'null'}}</h4>
                                     </div>
                                     <div class="ms-auto fs-2 text-white">
                                         <i class="fadeIn animated bx bx-book-reader"></i>

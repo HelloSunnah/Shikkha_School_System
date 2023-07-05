@@ -4,7 +4,7 @@
     <main class="page-content">
         <div class="row">
             <div class="col-lg-9 mx-auto">
-                <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#5c84f6">
+                <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#7c00a7">
 
                 <div class="card">
 
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class=" col-xl-3 mx-auto">
-                <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#5c84f6">
+                <hr style="width:100%;text-align:left;margin-left:0;margin-bottom:0;height:5px;background-color:#7c00a7">
                 <div class="card">
                     <div class="mt-10">
                         <div style="margin-left:15px; margin-top:10px;">

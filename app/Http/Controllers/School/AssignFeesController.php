@@ -35,6 +35,7 @@ class AssignFeesController extends Controller
      */
     public function store(Request $request)
     {   
+        // return $request;
         $request->validate(
             [
                 'class' =>  ['required', 'array'],
@@ -46,49 +47,64 @@ class AssignFeesController extends Controller
             ]
         );
 
-        foreach($request['class'] as $classId)
-        {   
-            try{
-                foreach($request['month'] as $month)
-                {   
-                    AssignStudentFee::where(['class_id'=> $classId, 'month_id' => $month])->delete();
+        try{
 
-                    $data = [];
-                    $inTotalFee = 0;
-                    
-                    foreach($request['feesTypeId'] as $feesType)
-                    {
-                        $fees = StudentFee::where(['school_id' => Auth::id(), 'class_id' => $classId, 'fees_type_id' => $feesType])->first();
-                        $feesTitle = \Str::camel(FeesType::find($feesType)->title);
-
-                        $data[$feesTitle] = $fees->fees ?? 0;
-
-                        $inTotalFee += $fees->fees ?? 0;
-                    }
-
-                    // store record in assign student fees
-                    AssignStudentFee::create([
-                        'school_id' =>  Auth::id(),
-                        'class_id'  =>  $classId,
-                        'month_id'  =>  $month,
-                        'fees_details'  => json_encode($data)
-                    ]);
-
-                    // selected class students
-                    $students = User::where(['school_id'=>Auth::id(), 'class_id'=>$classId])->get();
-
-                    foreach($students as $student)
-                    {
-                        StudentMonthlyFee::where(['school_id'=>Auth::id(), 'student_id'=>$student->id, 'month_id'=>$month])
-                        ->update(['amount'=>$inTotalFee]);
-                    }
-                }                
-            }
-            catch(Exception $e)
+            foreach($request['class'] as $classId)
             {
-                Alert::error("Great!", $e->getMessage());
-                return back();
+
+                $users = User::where(['school_id' => Auth::id(), 'class_id' => $classId])->get();
+
+                foreach($users as $user)
+                {
+                    foreach($request['month'] as $month)
+                    { 
+                        $monthNum = $month + 1;
+                        $loop = 0;
+                        foreach($request['feesTypeId'] as $feesType)
+                        {
+                            $feesType = FeesType::find($feesType);
+                            $studentFee = StudentFee::where('school_id', Auth::id())->where('class_id', $classId)->where('fees_type_id', $feesType->id)->first();
+
+                            if(empty($studentFee) || is_null($studentFee))
+                            {
+                                Alert("Data Missing", "Please enter valid amount for ".$feesType->title);
+                                return back();
+                            }
+
+                            $monthlyFee = (double)$studentFee->fees;
+
+                            if($loop == 0 && ($feesType->title == "Monthly Fees" || $feesType->title == "Monthly Fee"))
+                            {
+                                if($user->discount > 0)
+                                {
+                                    $monthlyFee = (double)($monthlyFee - (($monthlyFee * $user->discount) / 100));
+                                }
+                            }
+
+                            StudentMonthlyFee::updateOrCreate(
+                                [
+                                    'student_id'  =>  $user->id,
+                                    'month_id'  =>  $month,
+                                    'month_name'    => date('F', mktime(0, 0, 0, $monthNum, 10)),
+                                    'student_fees_id'  =>  $studentFee->id,
+                                    'school_id' =>  Auth::id(),
+                                ],
+                                [
+                                    'amount'    =>  $monthlyFee ?? 0
+                                ]
+                            );
+
+                            ++$loop;
+                        }
+                    }
+                }
             }
+                
+        }
+        catch(Exception $e)
+        {
+            Alert::error("Server Error!", $e->getMessage());
+            return back();
         }
 
         Alert::success("Great!", "Fees assign successfully");

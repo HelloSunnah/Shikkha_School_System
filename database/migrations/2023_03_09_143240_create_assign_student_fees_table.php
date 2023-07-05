@@ -20,6 +20,8 @@ class CreateAssignStudentFeesTable extends Migration
             $table->text('fees_details')->nullable();
             $table->integer('month_id');
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -31,5 +33,7 @@ class CreateAssignStudentFeesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('assign_student_fees');
+        $table->dropSoftDeletes();
+
     }
 }

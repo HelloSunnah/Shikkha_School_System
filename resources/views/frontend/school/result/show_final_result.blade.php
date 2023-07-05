@@ -137,10 +137,11 @@
                                         <th>Grade Point</th>
                                     </tr>
                                     </thead>
-                                    
+
                                     <tbody>
                                         @php
                                             $totalAvg = 0;
+                                            $totalGpa = 0;
                                         @endphp
                                         @foreach ($subjects as $key => $subject )
                                             @foreach ($subject as $k => $v)
@@ -155,20 +156,24 @@
                                             <td>100</td>
                                             <td>33</td>
                                             @php
-                                                $sum = 0;                                                
+                                                $sum = 0;
+
                                             @endphp
-                                            
+
                                             @foreach ($subject as $k => $v)
-                                            @php
-                                                $total[$k] += $v['total'];
-                                                $sum += $v['total'];
-                                                $totalTermMark = \App\Models\Term::where('school_id', Auth::id())->selectRaw("SUM(total_mark) as term_total_mark")->first();
-                                                $count = $totalTermMark->term_total_mark / 100;
-                                            @endphp
+                                                @php
+                                                    $total[$k] += $v['total'];
+                                                    $sum += $v['total'];
+                                                    // $totalTermMark = \App\Models\Term::where('school_id', Auth::id())->selectRaw("SUM(total_mark) as term_total_mark")->first(); (Old System Result)
+                                                    // $totalTermMark = \App\Models\ResultSetting::where('school_id', Auth::id())->selectRaw("SUM(all_subject_mark) as term_total_mark")->first();
+                                                    $subject_id = $v['subject_id'];
+                                                    $class_id = $studentResults->first()->user?->class_id;
+                                                    $totalTermMark = \App\Models\ResultSubjectCountableMark::where('school_id', Auth::id())->where('institute_class_id', $class_id)->whereIn('result_setting_id', $term_id)->where('subject_id', $subject_id)->selectRaw("SUM(mark) as term_total_mark")->first();
+                                                    $count = $totalTermMark->term_total_mark;
+                                                @endphp
                                                 @if ($v['total'] != 0)
                                                     <td class="p-0">
                                                         <table class="table table-bordered m-0">
-                                                            
                                                             <tr>
                                                                 <td width="25%">{{ $v['written'] }}</td>
                                                                 <td width="25%">{{ $v['mcq'] }}</td>
@@ -191,87 +196,36 @@
                                                 @endif
                                             @endforeach
                                         <td>
-                                            {{ number_format($sum / $count, 2) }}
+                                            {{ number_format(($sum * 100) / $count, 2) }}
                                         </td>
-                                        <td>{{ annualGrade(number_format($sum / $count, 2)) }}</td>
-                                        <td>{{ annualGpa(number_format($sum / $count, 2)) }}</td>
+                                        <td>{{ annualGrade(number_format(($sum * 100) / $count, 2)) }}</td>
+                                        <td>{{ annualGpa(number_format(($sum * 100) / $count, 2)) }}</td>
                                         @php
-                                            $totalAvg += number_format($sum / $count, 2);
+                                            $totalGpa += annualGpa(number_format(($sum * 100) / $count, 2));
+                                            $finalGpa = number_format($totalGpa / count($subjects), 2);
+                                            $totalAvg += number_format(($sum * 100) / $count, 2);
                                         @endphp
                                         </tr>
                                         @endforeach
+                                        @php
+                                        @endphp
                                         <tr>
                                             <th colspan="3">Total Mark And GPA</th>
                                             @foreach ($total as $value)
                                                 <th>{{ $value }}</th>
                                             @endforeach
-                                            <th>{{ $totalAvg }}</th>
-                                            <th>{{ finalGrade($totalAvg, Auth::id()) }}</th>
-                                            <th>{{ finalGpa($totalAvg) }}</th>
+                                            <th>{{ number_format(($totalAvg / count($subjects)), 2) }}</th>
+                                            <th>{{ classWiseGpa($finalGpa) }}</th>
+                                            <th> {{$finalGpa }}</th>
+                                            {{-- <th>{{ finalGrade($totalAvg, Auth::id()) }}</th> --}}
+                                            {{-- <th>{{ finalGpa($totalAvg) }} {{$finalGpa }}</th> --}}
                                         </tr>
                                     </tbody>
                                 </table>
                                 <div class="row justify-content-between">
 
-                                    <div class="col-6" style="font-size: 12px;">
-                                        <table class=" table table-bordered text-center" >
-                                            <thead>
-                                                <tr>
-                                                    <th colspan="3">Signatures</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr style="height: 90%">
-                                                    <td style="height: 70px; width:150px;"></td>
-                                                    <td style="height: 70px; width:150px;"></td>
-                                                    <td style="height: 70px; width:150px;"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Class Teacher</td>
-                                                    <td>Principal</td>
-                                                    <td>Guardian</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-        
-                                    <div class="col-3">
-                                        <div>
-                                            <table class=" table table-bordered text-center" style="font-size: 12px;">
-        
-                                                <tbody>
-                                                    <tr class="row">
-                                                        <td class="col-8">Total Days</td>
-                                                        <td class="col-4"></td>
-                                                    </tr>
-                                                    <tr class="row">
-                                                        <td class="col-8">Total Attendance</td>
-                                                        <td class="col-4"></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-        
-                                        <div>
-                                            <table class=" table table-bordered text-center" style="font-size: 12px;">
-        
-                                                <tbody>
-                                                    <tr class="row">
-                                                        <td class="col-8">Position in Class</td>
-                                                        <td class="col-4">{{$studentRank}}</td>
-                                                    </tr>
-                                                    <tr class="row">
-                                                        <td class="col-8">Position in Section</td>
-                                                        <td class="col-4">{{$section_studentRank}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-        
-                                    </div>
-        
                                     <div class="ml-auto col-2">
-                                        <table class="table table-bordered" style="font-size: 9px;">
+                                        <table class="table table-bordered" style="font-size: 12px; border-color:black;">
                                             <thead>
                                                 <tr align="center">
                                                     <th colspan="2">Mark Grade</th>
@@ -308,11 +262,72 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>                            
+    
+                                    <div class="col-3">
+                                        <div>
+                                            <table class=" table table-bordered text-center" style="font-size: 12px; border-color:black;">
+    
+                                                <tbody>
+                                                    <tr class="row">
+                                                        <td class="col-8 border-end-0" style="border-bottom-color: white;" style="padding:2px;">Total Working Days</td>
+                                                        <td class="col-4" style="padding:2px;"></td>
+                                                    </tr>
+                                                    <tr class="row">
+                                                        <td class="col-8 border-end-0 border-top-0" style="padding:2px;">Present</td>
+                                                        <td class="col-4" style="padding:2px;"></td>
+                                                    </tr>
+                                                    <tr class="row">
+                                                        <td class="col-8 border-end-0 border-top-0" style="padding:2px;">Absent</td>
+                                                        <td class="col-4" style="padding:2px;"></td>                                                
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+    
+                                        <div>
+                                            <table class=" table table-bordered text-center" style="font-size: 12px; border-color:black;">
+    
+                                                <tbody>
+                                                    <tr class="row">
+                                                        <td class="col-8 border-end-0" style="padding:2px;">Position in class</td>
+                                                        <td class="col-4" style="padding:2px;">{{(isset($resultStatus)) ? ' ' : $studentRank}}</td>
+                                                    </tr>
+                                                    <tr class="row">
+                                                        <td class="col-8 border-end-0 border-top-0" style="padding:2px;">Position in section</td>
+                                                        <td class="col-4" style="padding:2px;">{{(isset($resultStatus)) ? ' ' : $section_studentRank}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
                                     </div>
-        
+    
+                                    <div class="col-6" style="font-size: 12px;">
+                                        <table class=" table table-bordered text-center" style="border-color: black;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="3">Signatures</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr style="height: 90%">
+                                                    <td style="height: 80px; width:150px;"></td>
+                                                    <td style="height: 80px; width:150px;"></td>
+                                                    <td style="height: 80px; width:150px;"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Class Teacher</td>
+                                                    <td>Principal</td>
+                                                    <td>Guardian</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>                            
+    
                                 </div>
                             </div>
-                        </div> 
+                        </div>
                     </div>
                 </div>
                 <div class="col-12 d-flex justify-content-center">
@@ -329,7 +344,7 @@
         </div>
         <!--end row-->
     </main>
-   
+
 @endsection
 
 @push('js')

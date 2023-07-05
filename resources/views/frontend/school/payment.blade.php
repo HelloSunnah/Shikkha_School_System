@@ -12,6 +12,41 @@
         crossorigin="anonymous"
     />
     <link href="{{asset('schools/assets/css/payment.css')}}" rel="stylesheet" />
+    <style>
+        .bg-primary{
+            background: #7a00a7 !important;
+            color:white;
+        }
+        .btn-primary{
+            background: #7a00a7 !important;
+            color:white;
+            border-color:#7a00a7;
+        }
+        input[type=radio] {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                border: 2px solid #8a2be2; 
+                background: #ffff;
+                padding: 6px;
+                border-radius:8px ;
+                cursor: pointer;
+                margin-top: 4px !important;
+                position: absolute;
+
+            }
+            input[type="radio"]:checked {
+                background: #8a2be2 !important;
+                cursor: pointer;
+                color:rgb(255, 255, 255) !important;
+            }
+            .form-control-radio{
+                margin-left: -22px;
+            }
+            .amarPay__left{
+                min-height:100% !important;
+            }
+    </style>
 </head>
 <body>
 <?php
@@ -20,7 +55,7 @@
 <section class="amrPay">
     <div
         class="container"
-        style="background: #f1f1f1; box-shadow: 1px 0px 4px 0px"
+        style="background: #f1f1f1; box-shadow: 1px 0px 4px 0px;"
     >
         <form method="post" action="{{route('school.payment.info.school.checkout')}}" enctype="multipart/form-data">
             @csrf
@@ -74,7 +109,7 @@
                                         alt=""
                                     />
                                     <input
-                                        class="amarPay__right_radio"
+                                        class="form-control-radio"
                                         type="radio"
                                         id="control_01"
                                         name="select"
@@ -89,7 +124,7 @@
                                         alt=""
                                     />
                                     <input
-                                        class="amarPay__right_radio"
+                                        class="form-control-radio"
                                         type="radio"
                                         id="control_01"
                                         name="select"
@@ -103,7 +138,7 @@
                                         alt=""
                                     />
                                     <input
-                                        class="amarPay__right_radio"
+                                        class="form-control-radio"
                                         type="radio"
                                         id="control_01"
                                         name="select"
@@ -117,7 +152,7 @@
                                         alt=""
                                     />
                                     <input
-                                        class="amarPay__right_radio"
+                                        class="form-control-radio"
                                         type="radio"
                                         id="control_01"
                                         name="select"
@@ -154,7 +189,7 @@
 
                             <br />
                             <div class="mt-4">
-                                <button class="amarPay__right__button btn btn-success mx-3">
+                                <button class="amarPay__right__button btn btn-primary mx-3">
                                     Checkout
                                 </button>
                             </div>

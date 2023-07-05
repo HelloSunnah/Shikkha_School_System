@@ -12,8 +12,8 @@
                         <div class="d-sm-flex align-items-center">
                             <h5 class="mb-2 mb-sm-0">Payments</h5>
                             <div class="ms-auto">
-                                <button type="button" class="btn btn-danger" onclick="history.back()">Back</button>
-                                <a href="{{route('class.create')}}" class="btn btn-primary">Show Message</a>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="history.back()"><i class="bi bi-arrow-left-square"></i></button>
+                                <a href="{{route('class.create')}}" class="btn btn-primary btn-sm">Show Message</a>
 
                             </div>
                         </div>
@@ -37,7 +37,7 @@
                                         <td>{{$data->payment_amount}}</td>
                                         <td>{{$data->payment_type}}</td>
                                         <td>{{($data->Status == 1) ? 'Paid' : 'Under Review'}}</td>
-                                        <td><a href="{{route('pdf.show.statement.schoolCheckout',$data->id)}}" class="btn btn-sm btn-danger"><i class="bi bi-printer-fill"></i>Export as PDF</a>
+                                        <td><a href="{{route('pdf.show.statement.schoolCheckout',$data->id)}}" class="btn btn-sm btn-primary"><i class="bi bi-printer-fill"></i>Export as PDF</a>
                                         </td>
                                     </tr>
                                 @endforeach

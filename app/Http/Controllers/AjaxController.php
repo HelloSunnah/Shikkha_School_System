@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccesoriesTransaction;
+use App\Models\ResultSetting;
+use App\Models\ResultSubjectCountableMark;
 use Str;
 use Exception;
 use App\Models\User;
@@ -31,26 +33,41 @@ class AjaxController extends Controller
 
         return $html;
     }
-    public function ajaxLoaderaccesories(Request $request){
+  
+    
+    public function loadBill(Request $request)
+    {
+        
+        $id = $request->input('id');
+         return $data = School::where('id', $id)->get();
+        return response()->json($data);
+    }
+
+
+
+
+
+    public function ajaxLoaderaccesories(Request $request)
+    {
         Transection::create([
-            'purpose'=>'Receipt Accesories Payment',
-            'payment_method'=>1,
-            'type'=>'3',
-            'amount'=>$request->amount,
-            'name'=>'admin',
+            'purpose' => 'Receipt Accesories Payment',
+            'payment_method' => 1,
+            'type' => '3',
+            'amount' => $request->amount,
+            'name' => 'admin',
             'school_id' =>  Auth::id()
         ]);
     }
 
     /**
      * Save Accesories (Sunnah)
-     * 
-     * @param Request 
+     *
+     * @param Request
      * @param $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function ajaxAccesorisTransaction(Request $request)
-    {   
+    {
         $access = AccesoriesTransaction::create([
             "name" => $request->name,
             "roll" => $request->roll,
@@ -63,7 +80,6 @@ class AjaxController extends Controller
         ]);
 
         return response()->json(['success' => true, 'access' => $access]);
-
     }
 
     public function ajaxLoadStudents(Request $request)
@@ -74,12 +90,12 @@ class AjaxController extends Controller
         ]);
 
         $rows = User::where(['school_id' => Auth::id(), 'shift' => $request->shift, 'class_id' => $request->classId])->get();
-    
+
         $html = '<label>Student</label>  <select class="form-select mb-3" name="student_id" required>
         <option value="0" selected>All Students</option>';
 
-        foreach($rows as $row){
-            $html .= '<option value="'.$row->phone.'">'.$row->name.'</option>';
+        foreach ($rows as $row) {
+            $html .= '<option value="' . $row->phone . '">' . $row->name . '</option>';
         }
 
         $html .= '</select>';
@@ -89,7 +105,7 @@ class AjaxController extends Controller
 
 
     /**
-     * 
+     *
      */
     public function zkTeck()
     {
@@ -111,9 +127,7 @@ class AjaxController extends Controller
             }
 
             return "Not connect";
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             return $e->getMessage();
         }
     }
@@ -131,6 +145,28 @@ class AjaxController extends Controller
         }
 
         $html .= '</select>';
+
+        return $html;
+    }
+    public function ajaxLoaderSubjectResult(Request $request)
+    {   
+        $subjects = Subject::where('class_id', $request->class_id)->where('school_id', Auth::user()->id)->get();
+
+        $html = ' ';
+        
+        $resultSetting = ResultSetting::findOrFail($request->resultSettingId);
+        foreach ($subjects as $subject) {
+            $subjectMark = ResultSubjectCountableMark::where(["school_id" => Auth::user()->id, "result_setting_id"  => $resultSetting->id, "institute_class_id" => $request->class_id, "subject_id" => $subject->id])->first();
+            $mark = ($subjectMark != null) ? $subjectMark->mark : $resultSetting->all_subject_mark;
+            $html .=
+            '<div class="mb-1 d-flex row">
+            <label class="col-sm-9 col-form-label">'.$subject->subject_name.' </label>
+                <input type="hidden" name="resultSettingId" value="'.$resultSetting->id.'">
+                <div class="col-md-3">
+                    <input type="number" min="1" name="subjectMark['.$subject->class_id.']['.$subject->id. ']" class="form-control input-field" value="'. $mark.'" required>
+                </div>
+            </div>';
+        }
 
         return $html;
     }

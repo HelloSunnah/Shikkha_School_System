@@ -36,7 +36,7 @@
                                     <td>{{($data->active == 1) ? 'ON' : 'OFF'}}</td>
                                     <td>
                                         <div class="btn-group mr-2" role="group" aria-label="First group">
-                                            <a  href="{{route('department.edit',$data->id)}}" class="btn btn-success">Edit</a>
+                                            <a  href="{{route('department.edit',$data->id)}}" class="btn btn-primary">Edit</a>
 {{--                                            <a href="{{route('department.delete',$data->id)}}" class="btn btn-danger">Delete</a>--}}
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{$key}}">Delete</button>
 

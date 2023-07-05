@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <div style="background-color:#05a5f5; color:white;" class="card-header">
+                    <div style="background-color:#ae12e2; color:white;" class="card-header">
                         <div class="row">
                             <div class="col-lg-2">
                                 <img src="{{ asset($school->school_logo) }}" width="120" height="120" name="school_logo"
@@ -107,6 +107,12 @@
                                                         style="border:none;background:none;" class="form-control w-75 "
                                                         type="text" placeholder="Please Input Address"></td>
                                             </tr>
+                                            <tr>
+                                                <th>Address</th>
+                                                <td> <input name="address_bn" value="{{ $school->address_bn }}"
+                                                        style="border:none;background:none;" class="form-control w-75 "
+                                                        type="text" placeholder="Please Input Address In Bangla"></td>
+                                            </tr>
 
                                             <tr>
                                                 <th>School Logo</th>
@@ -133,7 +139,7 @@
 
                                             <tr>
                                                 <th>Action</th>
-                                                <td><button type="submit" class="btn btn-success btn-sm">Update</button>
+                                                <td><button type="submit" class="btn btn-primary btn-sm">Update</button>
                                                 </td>
                                             </tr>
 

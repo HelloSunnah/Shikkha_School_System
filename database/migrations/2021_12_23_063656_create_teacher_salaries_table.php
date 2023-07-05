@@ -21,6 +21,8 @@ class CreateTeacherSalariesTable extends Migration
             $table->foreignId('teacher_id')->constrained('teachers')->cascadeOnDelete();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -32,5 +34,7 @@ class CreateTeacherSalariesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('teacher_salaries');
+        $table->dropSoftDeletes();
+
     }
 }
