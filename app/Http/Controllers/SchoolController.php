@@ -740,11 +740,11 @@ class SchoolController extends Controller
     }
     public function class_Check_Delete(Request $request)
     {
-        $ids = $request->ids;
-        StudentFee::whereIn('class_id', $ids)->delete();
-        InstituteClass::withTrashed()->where('id', $id)->forcedelete();
-        toast("Data delete permanently", "success");
-        return back();
+        $ids=$request->ids;
+        StudentFee::whereIn('class_id',$ids)->delete();
+        InstituteClass::whereIn('id', $ids)->delete();
+        Alert::success(' Selected Class are deleted', 'Success Message');
+        return response()->json(['status'=>'success']);
     }
 
     public function sectionCreate()
@@ -1690,7 +1690,7 @@ class SchoolController extends Controller
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            $teacher = Teacher::where('school_id', Auth::user()->id)->orderby('active', 'desc')->paginate(10);
+            $teacher = Teacher::where('school_id', Auth::user()->id)->orderby('active', 'desc')->get();
             $studentFees = TeacherSalary::where('school_id', Auth::user()->id)->get();
             // $teacher = where('school_id', Auth::user()->id)->orderby('active','asc')->get();
             return view('frontend.school.teacher.show', compact('studentFees','teacher', 'seo_array', 'teacherText'));
@@ -1710,12 +1710,13 @@ class SchoolController extends Controller
         Alert::success('Successfully Teacher Deleted', 'Success Message');
         return back();
     }
-    public function teacher_Check_Delete($id)
-    {
-        Teacher::withTrashed()->where('id', $id)->forcedelete();
-        toast("Data delete permanently", "success");
-        return back();
+    public function teacher_Check_Delete(Request $request){
+        $ids = $request->ids;
+        Teacher::whereIn('id',$ids)->delete();
+        Alert::success(' Selected Teachers are deleted', 'Success Message');
+        return response()->json(['status'=>'success']);
     }
+
     public function restoreteacher($id)
     {
 
@@ -2452,11 +2453,12 @@ class SchoolController extends Controller
         Alert::success('Success student deleted', 'Success Message');
         return back();
     }
-    public function student_Check_Delete($id)
-    {
-        User::withTrashed()->where('id', $id)->forcedelete();
-        toast("Data delete permanently", "success");
-        return back();
+    public function student_Check_Delete(Request $request)
+    {   
+       $ids = $request->ids;
+        User::whereIn('id',$ids)->delete();
+        Alert::success(' Selected students are deleted', 'Success Message');
+        return response()->json(['status'=>'success']);
     }
     public function restorestudent($id)
     {
@@ -2471,7 +2473,7 @@ class SchoolController extends Controller
     {
         StudentMonthlyFee::withTrashed()->where('student_id', $id)->forcedelete();
         Result::withTrashed()->where('student_id', $id)->forcedelete();
-        User::withTrashed()->where('user_id', $id)->forcedelete();
+        User::withTrashed()->where('id', $id)->forcedelete();
         toast("Data delete permanently", "success");
         return back();
     }
@@ -4423,9 +4425,9 @@ class SchoolController extends Controller
     public function stafftype_Check_delete(Request $request)
     {
         $ids = $request->ids;
-        StaffType::withTrashed()->where('id', $id)->forcedelete();
-        toast("Data delete permanently", "success");
-        return back();
+        StaffType::whereIn('id',$ids)->delete();
+        Alert::success(' Selected Staff-Type are deleted', 'Success Message');
+        return response()->json(['status'=>'success']);
     }
 
     public function schoolStaffList()
@@ -4649,9 +4651,9 @@ class SchoolController extends Controller
     public function staff_Check_Delete(Request $request)
     {
         $ids = $request->ids;
-        Employee::withTrashed()->where('id', $id)->forcedelete();
-        toast("Data delete permanently", "success");
-        return back();
+        Employee::whereIn('id',$ids)->delete();
+        Alert::success(' Selected staffs are deleted', 'Success Message');
+        return response()->json(['status'=>'success']);
     }
 
     public function schoolTeacherSalaryUpdate(Request $request, $id)

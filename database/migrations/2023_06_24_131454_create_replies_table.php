@@ -17,9 +17,10 @@ class CreateRepliesTable extends Migration
             $table->id();
             $table->foreignId('ticket_id');
             $table->string('message_type')->nullable();
-            $table->string('message')->nullable();
+            $table->longText('message')->nullable();
             $table->string('attachment')->nullable();
-            $table->string('assign_id')->nullable();
+            $table->string('assign_id_user')->nullable();
+            $table->string('assign_id_admin')->nullable();
             $table->timestamps();
         });
     }

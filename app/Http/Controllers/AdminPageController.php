@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use App\Models\MessagePackage;
 use App\Models\SchoolCheckout;
 use App\Models\Shikkhabilling;
+use App\Models\Billingtransaction;
 use App\Models\FeatureDetailsPage;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\Auth;
@@ -674,8 +675,9 @@ class AdminPageController extends Controller
     {
         $currentMonth = Carbon::now()->format('m');
         $school = School::find($id);
-        $billing = Shikkhabilling::where('school_id', $school->id)->orderBy('created_at', 'desc')->get();
-        return view('backend.admin.school.billingPage', compact('school', 'billing', 'currentMonth'));
+        $billing = Shikkhabilling::where('school_id', $school->id)->orderBy('created_at', 'asc')->get();
+        $billingtransaction = Billingtransaction::where('school_id', $school->id)->orderBy('created_at', 'asc')->get();
+        return view('backend.admin.school.billingPage', compact('school', 'billing', 'currentMonth','billingtransaction'));
     }
     public function getData($id)
     {
@@ -863,35 +865,24 @@ class AdminPageController extends Controller
         
         return view('backend.admin.Setting.maintainance.show');;
     }
-    
-    // public function school_subscriptionstore(Request $request){
-        
-    //             Subscription::create([
-    //                 'school_id'=>$request->school_id,
-    //                 'status'=>$request->status,
-    //             ]);
-    //             Toastr::success('Subscription Added successfully');
-    //             return redirect()->back(); 
-            
-    // }
 
     public function subscription_status(Request $request ,$id){
-            $getstatus=School::select('subscription_status')->where('id',$id)->first();
+        $getstatus=School::select('subscription_status')->where('id',$id)->first();
 
-            if($getstatus->subscription_status == 0){
-                $status=1;
-            }
-            elseif($getstatus->subscription_status == 2){
-                $status=1;
-            }            
-            else{
-                $status=2;
-            }
-            School::where('id',$id)->update(['subscription_status'=>$status]);
-    
-            Toastr::success('Subscription Status Changed successfully');
-              return back(); 
+        if($getstatus->subscription_status == 0){
+            $status=1;
         }
+        elseif($getstatus->subscription_status == 2){
+            $status=1;
+        }            
+        else{
+            $status=2;
+        }
+        School::where('id',$id)->update(['subscription_status'=>$status]);
+
+        Toastr::success('Subscription Status Changed successfully');
+            return back(); 
+    }
       
 
     public function blogList()

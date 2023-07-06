@@ -24,9 +24,9 @@
                 initDataTable();
             },
             error: (error) => {
-                console.log(error.responseJSON.message);
-                initDataTable();
                 $("#loader").modal('hide');
+                initDataTable();
+                console.log(error.responseJSON.message);
             }
         });
     }

@@ -327,7 +327,7 @@ class PageController extends Controller
         $school->school_name = $request->school_name;
         $school->school_name_bn = $request->school_name_bn;
         $school->unique_id = uniqid();
-        $trialEndDate = Carbon::now()->addDays(10);
+        $trialEndDate = Carbon::now()->addDays(14);
         $school->trial_end_date = $trialEndDate;
         $school->subscription_status = $request->subscription_status;
         $school->save();

@@ -33,17 +33,7 @@
                             <td>{{$data->created_at->format('Y-m-d') }}</td>
                             <td>
                             <a href="{{route('ticket.reply',$data->id)}}" class="btn btn-primary btn-sm"><i class="bi bi-reply"></i></a>
-                            <a href="" class="btn btn-secondary btn-sm"><i class="bi bi-pencil-fill"></i></a>
-                            @if(Auth::user()->school)
-                            <a href="{{route('ticket.reply',$data->id)}}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
-
-                            @endif
-
-
-                        </td>
-
-                     
-                         
+                        </td>                     
                         </tr>
                         @endforeach
                     </tbody>

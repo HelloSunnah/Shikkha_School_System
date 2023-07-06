@@ -144,10 +144,11 @@ class LibraryController extends Controller
     }
     public function books_Check_delete(Request $request)
     {
-        $ids = $request->ids;
-        LibraryBookInfo::withTrashed()->where('id', $id)->forcedelete();
-        toast("Data delete permanently", "success");
-        return back();}
+        $ids=$request->ids;
+        LibraryBookInfo::whereIn('id',$ids)->delete();
+        Alert::success('Selected books are deleted','success message');
+        return response()->json(['status'=>'success']);
+    }
 
     public function bookstypeDelete($id)
     {

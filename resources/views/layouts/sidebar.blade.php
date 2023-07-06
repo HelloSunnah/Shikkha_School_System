@@ -22,56 +22,71 @@
             </li>
             {{-- class="active"   <span class="fa arrow"></span> --}}
             <li>
-                <a href="{{route('admin')}}"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span> </a>
+                <a href="{{ route('admin') }}"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span>
+                </a>
             </li>
             <li>
-                <a href="{{ route('Schools.list') }}"><i class="fa fa-graduation-cap" aria-hidden="true"></i><span class="nav-label">Schools</span></a>
+                <a href="{{ route('Schools.list') }}"><i class="fa fa-graduation-cap" aria-hidden="true"></i><span
+                        class="nav-label">Schools</span></a>
             </li>
             <li>
-                <a href="{{ route('featurePage.create') }}"><i class="fa fa-columns" aria-hidden="true"></i><span class="nav-label">Feature Create</span></a>
+                <a href="{{ route('featurePage.create') }}"><i class="fa fa-columns" aria-hidden="true"></i><span
+                        class="nav-label">Feature Create</span></a>
             </li>
             {{-- <li>
                 <a href="{{ route('show.all.School.ForPayment') }}"><i class="fa fa-phone-square" aria-hidden="true"></i><span class="nav-label">school package</span></a>
             </li> --}}
             <li>
-                <a href="{{ route('contactus.index') }}"><i class="fa fa-phone-square" aria-hidden="true"></i><span class="nav-label">Contact us</span></a>
+                <a href="{{ route('contactus.index') }}"><i class="fa fa-phone-square" aria-hidden="true"></i><span
+                        class="nav-label">Contact us</span></a>
             </li>
             <li>
-                <a href="{{ route('pricing.index') }}"><i class="fa fa-money" aria-hidden="true"></i><span class="nav-label">Pricing</span></a>
+                <a href="{{ route('pricing.index') }}"><i class="fa fa-money" aria-hidden="true"></i><span
+                        class="nav-label">Pricing</span></a>
             </li>
             <li>
-                <a href="{{ route('tutorial.index') }}"><i class="fa fa-youtube-play" aria-hidden="true"></i><span class="nav-label">Tutorial</span></a>
+                <a href="{{ route('tutorial.index') }}"><i class="fa fa-youtube-play" aria-hidden="true"></i><span
+                        class="nav-label">Tutorial</span></a>
             </li>
             <li>
-                <a href="{{ route('messagePackage.index') }}"><i class="fa fa-envelope" aria-hidden="true"></i><span class="nav-label">Message Package</span></a>
+                <a href="{{ route('messagePackage.index') }}"><i class="fa fa-envelope" aria-hidden="true"></i><span
+                        class="nav-label">Message Package</span></a>
             </li>
             <li>
-                <a href="{{ route('confirm.message.payment.index') }}"><i class="fa fa-cart-plus" aria-hidden="true"></i><span class="nav-label">Sell Message</span></a>
+                <a href="{{ route('confirm.message.payment.index') }}"><i class="fa fa-cart-plus"
+                        aria-hidden="true"></i><span class="nav-label">Sell Message</span></a>
             </li>
             <li>
-                <a href="{{ route('confirm.message.payment.index') }}"><i class="fa fa-paypal" aria-hidden="true"></i><span class="nav-label">Payment Info
+                <a href="{{ route('confirm.message.payment.index') }}"><i class="fa fa-paypal"
+                        aria-hidden="true"></i><span class="nav-label">Payment Info
                     </span></a>
             </li>
             <li>
-                <a href="{{ route('AppReleased.List') }}"><i class="fa fa-bell" aria-hidden="true"></i><span class="nav-label">App Released
+                <a href="{{ route('AppReleased.List') }}"><i class="fa fa-bell" aria-hidden="true"></i><span
+                        class="nav-label">App Released
                     </span></a>
             </li>
             <li>
-                <a href="{{ route('AddonList') }}"><i class="fa fa-sitemap" aria-hidden="true"></i> <span class="nav-label">Addon
+                <a href="{{ route('AddonList') }}"><i class="fa fa-sitemap" aria-hidden="true"></i> <span
+                        class="nav-label">Addon
                     </span></a>
             </li>
             <li>
-                <a href="{{ route('seo.tool') }}"><i class="fa fa-sitemap" aria-hidden="true"></i> <span class="nav-label">SEO Tools
+                <a href="{{ route('seo.tool') }}"><i class="fa fa-sitemap" aria-hidden="true"></i> <span
+                        class="nav-label">SEO Tools
                     </span></a>
             </li>
             <li>
-                <a href="{{route('under.maintenance.show')}}"><i class="fa fa-cog" aria-hidden="true"></i> <span class="nav-label">Setting
-                </span></a>
+                <a href="{{ route('under.maintenance.show') }}"><i class="fa fa-cog" aria-hidden="true"></i> <span
+                        class="nav-label">Setting
+                    </span></a>
             </li>
             <li>
-                <a href="{{ route('ticketmessage.list.admin') }}"><i class="fa fa-paypal" aria-hidden="true"></i><span class="nav-label">Support
-                <a href="{{ route('bloglist') }}"><i class="fa fa-sitemap" aria-hidden="true"></i> <span class="nav-label">Blog
-                </span></a>
+                {{-- <a href="{{ route('ticketmessage.list.admin') }}"><i class="fa fa-paypal" aria-hidden="true"></i><span
+                        class="nav-label">Support</span></a> --}}
+                <a href="{{ route('bloglist') }}"><i class="fa fa-sitemap" aria-hidden="true"></i> <span
+                        class="nav-label">Blog
+                    </span></a>
             </li>
             {{-- <li>
                 <a href="{{ route('support') }}"><i class="fa fa-paypal" aria-hidden="true"></i><span class="nav-label">Support

@@ -128,9 +128,9 @@
                                             <td>{{ $studentMonthlyFee->paid_amount }} ৳ </td>
                                             <td>{{ $studentMonthlyFee->amount - $studentMonthlyFee->paid_amount}} ৳ </td>
                                             @if ($studentMonthlyFee->status == 2)
-                                                <td><span class="badge bg-success"> {{__('app.Paid')}} </span></td>
+                                                <td><button class="btn btn-primary"> {{__('app.Paid')}} </button></td>
                                             @else
-                                                <td><span class="badge bg-danger">{{__('app.Due Fee')}}</span></td>
+                                                <td><button class="btn btn-danger">{{__('app.Due Fee')}}</button></td>
                                             @endif
                                         </tr>
                                     @endforeach
@@ -147,7 +147,7 @@
                             <div class="hide" style="display:none">
                                 <div class="container" id="printDiv">
                                     <div class="row">
-                                        <div class="col-md-3" style="margin-right: 50px; margin-left: 50px; color:black;">                                           
+                                        <div class="col-md-3" style="margin-right: 150px; margin-left: 50px; color:black;">                                           
 
                                             {{-- School Info --}}
                                             <div class="d-flex justify-content-center">
@@ -156,8 +156,8 @@
                                                 @endif
                                                 <div class="text-center">
                                                     <h4 style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> {{ strtoupper(Auth::user()->school_name) }} </h4>
-                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> <b>{{ Auth::user()->slogan != null ? '('.Auth::user()->slogan.')': ""}}</b> </p>
-                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> {{ Auth::user()->address }} </p>
+                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;font-size: 19px;"> <b>{{ Auth::user()->slogan != null ? '('.Auth::user()->slogan.')': ""}}</b> </p>
+                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;font-size: 19px;"> {{ Auth::user()->address }} </p>
                                                     
                                                 </div>
                                             </div>
@@ -168,33 +168,36 @@
                                             <div class="d-flex justify-content-between" >            
                                                 <div class="col-md-12">
                                                     <div class="row">                                                            
-                                                        <div class="col-12" style="font-size: 16px;">
+                                                        <div class="col-12" style="font-size: 19px;">
                                                             <table style="border-color: black; white-space: nowrap;">
                                                                 <tbody>
                                                                     <tr> 
-                                                                        <td>Student Name: {{$user->name}}</td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td><b> Student Name: </b>{{$user->name}}</td>                                                                        
+                                                                    </tr>
+                                                                                                                                       
+                                                                </tbody>
+                                                            </table>
+                                                            <table style="border-color: black; white-space: nowrap;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td><b>Class: </b>{{$user->clasRelation->class_name}}</td>                                                                            
+                                                                        <td><b><span style="padding-left: 40px;">Section: </span></b>{{$user->sectionRelation->section_name}}</td>
                                                                         
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Class: {{$user->clasRelation->class_name}}</td>                                                                            
-                                                                        <td>Section: {{$user->sectionRelation->section_name}}</td>
-                                                                        <td></td>
-                                                                    </tr>
-                                                                    <tr>
+                                                                    </tr>                                                                   
+                                                                </tbody>
+                                                            </table>
+                                                            <table style="border-color: black; white-space: nowrap; font-size: 20px;">
+                                                                <tbody>
+                                                                    <tr >
                                                                         <td>Roll: {{$user->roll_number}}</td> 
-                                                                        <td>ID No: {{$user->unique_id}}</td>
-                                                                        <td>Date : {{$date->format('d-m-Y')}}</td>
+                                                                        <td style="padding-left: 15px;"><b>ID No: </b>{{$user->unique_id}}</td>
+                                                                        <td style="padding-left: 15px;"><b>Date: </b>{{$date->format('d-m-Y')}}</td>
                                                                     </tr>
                                                                                                                                             
                                                                 </tbody>
                                                             </table>
-
-                                                        </div>
-                                                        
+                                                        </div>                                                        
                                                     </div>
-
                                                 </div>                                                        
                                             </div>
 
@@ -202,7 +205,7 @@
 
                                             {{-- Start fees table --}}
                                             <div class="table">
-                                                <table class="table table-hover table-bordered">
+                                                <table class="table table-hover table-bordered" style="font-size: 19px;">
                                                     <thead>
                                                         <tr>
                                                             <th style="padding: 2px;">{{__('app.No')}}</th>
@@ -220,16 +223,16 @@
                                                                 <td style="padding: 2px;">{{++$key}}</td>
                                                                 <td style="padding: 2px;">{{ $studentMonthlyFee->month_name }}</td>
                                                                 <td style="padding: 2px;">{{ App\Models\FeesType::find(App\Models\StudentFee::find($studentMonthlyFee->student_fees_id)?->fees_type_id)?->title }}</td>
-                                                                <td style="padding: 2px;">{{ $studentMonthlyFee->paid_amount }} ৳ </td>
-                                                                <td style="padding: 2px;">{{ $studentMonthlyFee->amount - $studentMonthlyFee->paid_amount}} ৳ </td>                                                                    
+                                                                <td style="padding: 2px;white-space: nowrap;">{{ $studentMonthlyFee->paid_amount }}৳ </td>
+                                                                <td style="padding: 2px;white-space: nowrap;">{{ $studentMonthlyFee->amount - $studentMonthlyFee->paid_amount}}৳ </td>                                                                    
                                                             </tr>
                                                         @endforeach
                                                         <tr>
                                                             <td style="padding: 2px;"></td>
                                                             <td style="padding: 2px;">Total :</td>
                                                             <td style="padding: 2px;"></td>
-                                                            <td style="padding: 2px;">{{$totalPaid}} ৳</td>
-                                                            <td style="padding: 2px;">{{$totalDue}} ৳</td>
+                                                            <td style="padding: 2px;white-space: nowrap;">{{$totalPaid}}৳</td>
+                                                            <td style="padding: 2px;white-space: nowrap;">{{$totalDue}}৳</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -238,7 +241,7 @@
                                             {{-- End fees table --}}
 
                                             {{-- Start Class Teacher --}}
-                                            <div class="classTeacher">
+                                            <div class="classTeacher" style="font-size: 19px; white-space: nowrap;">
                                                 <table>
                                                     <tbody>
                                                         <tr>
@@ -252,42 +255,47 @@
                                                     </tbody>
                                                 </table>
                                                 <br>
-                                                <p><span style="color: red"> ১০ তারিখের মধ্যে বেতন পরিশোধের অনুরোধ রইল এবং <br> বেতন প্রদানের সময় সীটটি সঙ্গে আনতে হবে।</span></p>
+                                                <p><span style="color: red; font-size: 20px;"> ১০ তারিখে মধ্যে বেতন পরিশোধের অনরোধ রইল এবং <br>বেতন প্রদাের সময় সীটট সঙ্গে আনতে হবে।</span></p>
                                             </div>
 
                                             {{-- End Class Teacher --}}
 
                                             {{-- signature start --}}
-                                            <div class="row">
-                                                <div class="d-flex justify-content-center">
-                                                    <div class="col-6" style="font-size: 12px;">
-                                                        <table class="table text-center" style="border-color: black;">
-                                                            
-                                                            <tbody>
-                                                                <tr style="height: 90%">
-                                                                    <td style="height: 50px; width:150px;"></td>
-                                                                    <td style="border: none;"></td>
-                                                                    <td style="height: 50px; width:150px;"></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="table-bordered" style="border-bottom: none;">Accountant Sign</td>&nbsp;
-                                                                    <td style="border: none;"></td>
-                                                                    <td class="table-bordered" style="border-bottom: none;">Guardian Sign</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                        <div class="text-center">
-                                                            <span>Office Copy</span>
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="d-flex justify-content-center">
+                                                        <div class="col" style="font-size: 22px;">
+                                                            <table class="table text-center" style="border-color: black;">
+                                                                
+                                                                <tbody>
+                                                                    <tr style="height: 90%">
+                                                                        <td style="height: 50px; width:150px;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="height: 50px; width:150px;"></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="table-bordered" style="border-bottom: none;white-space: nowrap;">Accountant Sign</td>&nbsp;
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td class="table-bordered" style="border-bottom: none;white-space: nowrap;">Guardian Sign</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="text-center">
+                                                                <span>Office Copy</span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    
-                                                </div>    
+                                                        
+                                                    </div>    
+                                                </div>
                                             </div>
+                                            
                                             {{-- signature End --}}
                                                                                                 
                                         </div>
 
-                                        <div class="col-md-3" style="margin-right: 50px; margin-left: 50px;  color:black;">
+                                        <div class="col-md-3" style="margin-right: 150px; margin-left: 50px;  color:black;">
                                                         
                                             {{-- School Info --}}
                                             <div class="d-flex justify-content-center">
@@ -296,8 +304,8 @@
                                                 @endif
                                                 <div class="text-center">
                                                     <h4 style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> {{ strtoupper(Auth::user()->school_name) }} </h4>
-                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> <b>{{ Auth::user()->slogan != null ? '('.Auth::user()->slogan.')': ""}}</b> </p>
-                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> {{ Auth::user()->address }} </p>
+                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;font-size: 19px;"> <b>{{ Auth::user()->slogan != null ? '('.Auth::user()->slogan.')': ""}}</b> </p>
+                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;font-size: 19px;"> {{ Auth::user()->address }} </p>
                                                     
                                                 </div>
                                             </div>
@@ -310,40 +318,43 @@
                                             <div class="d-flex justify-content-between" >            
                                                 <div class="col-md-12">
                                                     <div class="row">                                                            
-                                                        <div class="col-12" style="font-size: 16px;">
+                                                        <div class="col-12" style="font-size: 19px;">
                                                             <table style="border-color: black; white-space: nowrap;">
                                                                 <tbody>
                                                                     <tr> 
-                                                                        <td>Student Name: {{$user->name}}</td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td><b> Student Name: </b>{{$user->name}}</td>                                                                        
+                                                                    </tr>
+                                                                                                                                       
+                                                                </tbody>
+                                                            </table>
+                                                            <table style="border-color: black; white-space: nowrap;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td><b>Class: </b>{{$user->clasRelation->class_name}}</td>                                                                            
+                                                                        <td><b><span style="padding-left: 40px;">Section: </span></b>{{$user->sectionRelation->section_name}}</td>
                                                                         
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Class: {{$user->clasRelation->class_name}}</td>                                                                            
-                                                                        <td>Section: {{$user->sectionRelation->section_name}}</td>
-                                                                        <td></td>
-                                                                    </tr>
-                                                                    <tr>
+                                                                    </tr>                                                                   
+                                                                </tbody>
+                                                            </table>
+                                                            <table style="border-color: black; white-space: nowrap; font-size: 20px;">
+                                                                <tbody>
+                                                                    <tr >
                                                                         <td>Roll: {{$user->roll_number}}</td> 
-                                                                        <td>ID No: {{$user->unique_id}}</td>
-                                                                        <td>Date : {{$date->format('d-m-Y')}}</td>
+                                                                        <td style="padding-left: 15px;"><b>ID No: </b>{{$user->unique_id}}</td>
+                                                                        <td style="padding-left: 15px;"><b>Date: </b>{{$date->format('d-m-Y')}}</td>
                                                                     </tr>
                                                                                                                                             
                                                                 </tbody>
                                                             </table>
-            
-                                                        </div>
-                                                        
+                                                        </div>                                                        
                                                     </div>
-            
                                                 </div>                                                        
                                             </div>
 
                                             {{-- end student Info --}}
                                             {{-- Start fees table --}}
                                             <div class="table">
-                                                <table class="table table-hover table-bordered">
+                                                <table class="table table-hover table-bordered" style="font-size: 19px;">
                                                     <thead>
                                                         <tr>
                                                             <th style="padding: 2px;">{{__('app.No')}}</th>
@@ -361,16 +372,16 @@
                                                                 <td style="padding: 2px;">{{ ++$key }}</td>
                                                                 <td style="padding: 2px;">{{ $studentMonthlyFee->month_name }}</td>
                                                                 <td style="padding: 2px;">{{ App\Models\FeesType::find(App\Models\StudentFee::find($studentMonthlyFee->student_fees_id)?->fees_type_id)?->title }}</td>
-                                                                <td style="padding: 2px;">{{ $studentMonthlyFee->paid_amount }} ৳ </td>
-                                                                <td style="padding: 2px;">{{ $studentMonthlyFee->amount - $studentMonthlyFee->paid_amount}} ৳ </td>                                                                    
+                                                                <td style="padding: 2px;white-space: nowrap;">{{ $studentMonthlyFee->paid_amount }}৳</td>
+                                                                <td style="padding: 2px;white-space: nowrap;">{{ $studentMonthlyFee->amount - $studentMonthlyFee->paid_amount}}৳ </td>                                                                    
                                                             </tr>
                                                         @endforeach
                                                         <tr>
                                                             <td style="padding: 2px;"></td>
                                                             <td style="padding: 2px;">Total :</td>
                                                             <td style="padding: 2px;"></td>
-                                                            <td style="padding: 2px;">{{$totalPaid}} ৳</td>
-                                                            <td style="padding: 2px;">{{$totalDue}} ৳</td>
+                                                            <td style="padding: 2px;white-space: nowrap;">{{$totalPaid}}৳ </td>
+                                                            <td style="padding: 2px;white-space: nowrap;">{{$totalDue}}৳</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -379,7 +390,7 @@
                                             {{-- End fees table --}}
 
                                             {{-- Start Class Teacher --}}
-                                            <div class="classTeacher">
+                                            <div class="classTeacher" style="font-size: 19px; white-space: nowrap;">
                                                 <table>
                                                     <tbody>
                                                         <tr>
@@ -393,36 +404,40 @@
                                                     </tbody>
                                                 </table>
                                                 <br>
-                                                <p><span style="color: red"> ১০ তারিখের মধ্যে বেতন পরিশোধের অনুরোধ রইল এবং <br> বেতন প্রদানের সময় সীটটি সঙ্গে আনতে হবে।</span></p>
+                                                <p><span style="color: red"> ১০ তারিখের মধ্যে বেতন পরিশোধের অনুরোধ রইল এবং <br>বেতন প্রদানের সময় সীটটি সঙ্গে আনতে হবে।</span></p>
                                             </div>
 
                                             {{-- End Class Teacher --}}
 
                                             {{-- signature start --}}
-                                            <div class="row">
-                                                <div class="d-flex justify-content-center">
-                                                    <div class="col-6" style="font-size: 12px;">
-                                                        <table class="table text-center" style="border-color: black;">
-                                                            
-                                                            <tbody>
-                                                                <tr style="height: 90%">
-                                                                    <td style="height: 50px; width:150px;"></td>
-                                                                    <td style="border: none;"></td>
-                                                                    <td style="height: 50px; width:150px;"></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="table-bordered" style="border-bottom: none;">Accountant Sign</td>&nbsp;
-                                                                    <td style="border: none;"></td>
-                                                                    <td class="table-bordered" style="border-bottom: none;">Guardian Sign</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                        <div class="text-center">
-                                                            <span>Class Teacher Copy</span>
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="d-flex justify-content-center">
+                                                        <div class="col" style="font-size: 22px;">
+                                                            <table class="table text-center" style="border-color: black;">
+                                                                
+                                                                <tbody>
+                                                                    <tr style="height: 90%">
+                                                                        <td style="height: 50px; width:150px;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="height: 50px; width:150px;"></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="table-bordered" style="border-bottom: none;white-space: nowrap;">Accountant Sign</td>&nbsp;
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td class="table-bordered" style="border-bottom: none;white-space: nowrap;">Guardian Sign</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="text-center">
+                                                                <span>Class Teacher Copy</span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    
-                                                </div>    
+                                                        
+                                                    </div>    
+                                                </div>
                                             </div>
                                             {{-- signature End --}}
                                                     
@@ -437,8 +452,8 @@
                                                 @endif
                                                 <div class="text-center">
                                                     <h4 style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> {{ strtoupper(Auth::user()->school_name) }} </h4>
-                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> <b>{{ Auth::user()->slogan != null ? '('.Auth::user()->slogan.')': ""}}</b> </p>
-                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;"> {{ Auth::user()->address }} </p>
+                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;font-size: 19px;"> <b>{{ Auth::user()->slogan != null ? '('.Auth::user()->slogan.')': ""}}</b> </p>
+                                                    <p style="margin-bottom: 0px;padding:0px; margin:0px;padding:0px;font-size: 19px;"> {{ Auth::user()->address }} </p>
                                                     
                                                 </div>
                                             </div>
@@ -449,40 +464,43 @@
                                             <div class="d-flex justify-content-between" >            
                                                 <div class="col-md-12">
                                                     <div class="row">                                                            
-                                                        <div class="col-12" style="font-size: 16px;">
+                                                        <div class="col-12" style="font-size: 19px;">
                                                             <table style="border-color: black; white-space: nowrap;">
                                                                 <tbody>
                                                                     <tr> 
-                                                                        <td>Student Name: {{$user->name}}</td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td><b> Student Name: </b>{{$user->name}}</td>                                                                        
+                                                                    </tr>
+                                                                                                                                       
+                                                                </tbody>
+                                                            </table>
+                                                            <table style="border-color: black; white-space: nowrap;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td><b>Class: </b>{{$user->clasRelation->class_name}}</td>                                                                            
+                                                                        <td><b><span style="padding-left: 40px;">Section: </span></b>{{$user->sectionRelation->section_name}}</td>
                                                                         
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Class: {{$user->clasRelation->class_name}}</td>                                                                            
-                                                                        <td>Section: {{$user->sectionRelation->section_name}}</td>
-                                                                        <td></td>
-                                                                    </tr>
-                                                                    <tr>
+                                                                    </tr>                                                                   
+                                                                </tbody>
+                                                            </table>
+                                                            <table style="border-color: black; white-space: nowrap; font-size: 20px;">
+                                                                <tbody>
+                                                                    <tr >
                                                                         <td>Roll: {{$user->roll_number}}</td> 
-                                                                        <td>ID No: {{$user->unique_id}}</td>
-                                                                        <td>Date : {{$date->format('d-m-Y')}}</td>
+                                                                        <td style="padding-left: 15px;"><b>ID No: </b>{{$user->unique_id}}</td>
+                                                                        <td style="padding-left: 15px;"><b>Date: </b>{{$date->format('d-m-Y')}}</td>
                                                                     </tr>
                                                                                                                                             
                                                                 </tbody>
                                                             </table>
-            
-                                                        </div>
-                                                        
+                                                        </div>                                                        
                                                     </div>
-            
                                                 </div>                                                        
                                             </div>
 
                                             {{-- end student Info --}}
                                             {{-- Start fees table --}}
                                             <div class="table">
-                                                <table class="table table-hover table-bordered">
+                                                <table class="table table-hover table-bordered" style="font-size: 19px;;">
                                                     <thead>
                                                         <tr>
                                                             <th style="padding: 2px;">{{__('app.No')}}</th>
@@ -500,16 +518,16 @@
                                                                 <td style="padding: 2px;">{{ ++$key}}</td>
                                                                 <td style="padding: 2px;">{{ $studentMonthlyFee->month_name }}</td>
                                                                 <td style="padding: 2px;">{{ App\Models\FeesType::find(App\Models\StudentFee::find($studentMonthlyFee->student_fees_id)?->fees_type_id)?->title }}</td>
-                                                                <td style="padding: 2px;">{{ $studentMonthlyFee->paid_amount }} ৳ </td>
-                                                                <td style="padding: 2px;">{{ $studentMonthlyFee->amount - $studentMonthlyFee->paid_amount}} ৳ </td>                                                                    
+                                                                <td style="padding: 2px;white-space: nowrap;">{{ $studentMonthlyFee->paid_amount }}৳ </td>
+                                                                <td style="padding: 2px;white-space: nowrap;">{{ $studentMonthlyFee->amount - $studentMonthlyFee->paid_amount}}৳ </td>                                                                    
                                                             </tr>
                                                         @endforeach
                                                         <tr>
                                                             <td style="padding: 2px;"></td>
                                                             <td style="padding: 2px;">Total :</td>
                                                             <td style="padding: 2px;"></td>
-                                                            <td style="padding: 2px;">{{$totalPaid}} ৳</td>
-                                                            <td style="padding: 2px;">{{$totalDue}} ৳</td>
+                                                            <td style="padding: 2px;white-space: nowrap;">{{$totalPaid}}৳</td>
+                                                            <td style="padding: 2px;white-space: nowrap;">{{$totalDue}}৳</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -518,7 +536,7 @@
                                             {{-- End fees table --}}
 
                                             {{-- Start Class Teacher --}}
-                                            <div class="classTeacher">
+                                            <div class="classTeacher" style="font-size: 19px; white-space: nowrap;">
                                                 <table>
                                                     <tbody>
                                                         <tr>
@@ -532,36 +550,40 @@
                                                     </tbody>
                                                 </table>
                                                 <br>
-                                                <p><span style="color: red"> ১০ তারিখের মধ্যে বেতন পরিশোধের অনুরোধ রইল এবং <br> বেতন প্রদানের সময় সীটটি সঙ্গে আনতে হবে।</span></p>
+                                                <p><span style="color: red"> ১০ তারিখের মধ্যে বেতন পরিশোধের অনুরোধ রইল এবং <br>বেতন প্রদানের সময় সীটটি সঙ্গে আনতে হবে।<span></p>
                                             </div>
 
                                             {{-- End Class Teacher --}}
 
                                             {{-- signature start --}}
-                                            <div class="row">
-                                                <div class="d-flex justify-content-center">
-                                                    <div class="col-6" style="font-size: 12px;">
-                                                        <table class="table text-center" style="border-color: black;">
-                                                            
-                                                            <tbody>
-                                                                <tr style="height: 90%">
-                                                                    <td style="height: 50px; width:150px;"></td>
-                                                                    <td style="border: none;"></td>
-                                                                    <td style="height: 50px; width:150px;"></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="table-bordered" style="border-bottom: none;">Accountant Sign</td>&nbsp;
-                                                                    <td style="border: none;"></td>
-                                                                    <td class="table-bordered" style="border-bottom: none;">Guardian Sign</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                        <div class="text-center">
-                                                            <span>Guardian Copy</span>
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="d-flex justify-content-center">
+                                                        <div class="col" style="font-size: 22px;">
+                                                            <table class="table text-center" style="border-color: black;">
+                                                                
+                                                                <tbody>
+                                                                    <tr style="height: 90%">
+                                                                        <td style="height: 50px; width:150px;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="height: 50px; width:150px;"></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="table-bordered" style="border-bottom: none;white-space: nowrap;">Accountant Sign</td>&nbsp;
+                                                                        <td style="border: none;"></td>
+                                                                        <td style="border: none;"></td>
+                                                                        <td class="table-bordered" style="border-bottom: none;white-space: nowrap;">Guardian Sign</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="text-center">
+                                                                <span>Guardian Copy</span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    
-                                                </div>    
+                                                        
+                                                    </div>    
+                                                </div>
                                             </div>
                                             {{-- signature End --}}
                                                    

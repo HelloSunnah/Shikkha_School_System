@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Price;
 use App\Models\Result;
 use App\Models\School;
+use App\Models\Ticket;
 use App\Models\Section;
 use App\Models\Subject;
 use App\Models\Teacher;
@@ -14,6 +16,7 @@ use App\Models\Employee;
 use App\Models\FeesType;
 use App\Models\Question;
 use App\Models\BorrowBook;
+use App\Models\Permission;
 use App\Models\ClassPeriod;
 use App\Models\LibBookType;
 use App\Models\Transection;
@@ -27,14 +30,13 @@ use App\Models\Shikkhabilling;
 use App\Models\LibraryBookInfo;
 use App\Models\OnlineAdmission;
 use App\Models\AssignStudentFee;
-use App\Models\Permission;
 use App\Models\StudentMonthlyFee;
+use App\Models\Billingtransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Models\ResultSubjectCountableMark;
-use App\Models\Ticket;
 
 class SettingsController extends Controller
 {
@@ -385,5 +387,36 @@ class SettingsController extends Controller
         );
         Alert::success(' role assigned', 'Success Message');
         return back();
+    }
+
+   public function school_billing(){
+        $school = School::find(Auth::id());
+        $billing=Shikkhabilling::where('school_id', $school->id)->orderBy('created_at', 'desc')->get();
+        return view ('frontend.school.schoolProfile.schoolbilling',compact('school','billing'));
+    }
+
+    public function billing_transaction(){
+        $school = School::find(Auth::id());
+        return view('frontend.school.schoolProfile.schoolbillingtransaction',compact('school'));
+    }
+    public function billing_transaction_Store(Request $request){
+             $request->validate([
+            'sending_number' => 'required',
+            'amount' => 'required',
+           ]);
+             try {
+            Billingtransaction::create([
+                'school_id' => $request->school_id,
+                'payment_method' => $request->payment_method,
+                'transaction_id' => $request->transaction_id,
+                'sending_number' => $request->sending_number,
+                'amount' => $request->amount,
+            ]);
+            Alert::success('Your Payment successfully done');
+            return redirect()->back();
+        } catch (Exception $e) {
+            Alert::error('Error');
+            return redirect()->back();
+        }
     }
 }

@@ -36,14 +36,31 @@ class TicketController extends Controller
         Alert::success('Department Created Succesfully', 'Success Message');
         return back();
     }
-    public function ticketmessage($id)
-    {
-        $data = SupportDepartment::find($id);
-        return view('frontend.school.support.ticketPage', compact('data'));
+    public function ticketmessage()
+    {   
+
+        return view('frontend.school.support.ticketPage');
+    }
+    public function  ticketmessageshow($id){
+         
+         $data = Reply::with('assignUser','assignAdmin')->where('ticket_id', $id)->latest()->take(5)->get();
+        return response()->json($data);
     }
 
 
-    public function  ticketmessagePost(Request $request,$id)
+
+
+
+
+    public function ticketmessageshowadmin($id){
+
+        $data = Reply::where('ticket_id', $id)->latest()->take(5)->get();
+       return response()->json($data);
+   }
+
+
+
+    public function  ticketmessagePost(Request $request)
     {
         $fileName = null;
         if ($request->hasFile('attachment')) {
@@ -54,7 +71,6 @@ class TicketController extends Controller
         $ticket = Ticket::create([
 
             'token' => Str::random(5),
-            'department_id' =>$id,
             'name' => Auth::user()->school_name,
             'email' => Auth::user()->email,
             'subject' => $request->input('subject'),
@@ -63,6 +79,7 @@ class TicketController extends Controller
 
         $message = new Reply();
         $message->message = $request->message;
+        $message->assign_id_user = Auth::user()->id;
         $message->attachment =  $fileName;
 
         $ticket->replies()->save($message);
@@ -83,31 +100,40 @@ class TicketController extends Controller
     public function ticketreply($id)
     {
         $data = Ticket::find($id);
-         $data1 = Reply::where('ticket_id', $id)->first();
-         $data2 = Reply::where('ticket_id', $id)->latest()->take(10)->get();
+        $data1 = Reply::where('ticket_id', $id)->first();
+        $data2 = Reply::where('ticket_id', $id)->latest()->take(5)->get();
         return view('frontend.school.support.replyPage', compact('data', 'data1', 'data2'));
     }
     public function ticketreplyPost(Request $request, $id)
     {
+
         $fileName = null;
         if ($request->hasFile('attachment')) {
             $fileName = time() . '.' . $request->file('attachment')->getclientOriginalExtension();
-            $request->file('attachment')->move(public_path('/uploads/support/admin'), $fileName);
-            $fileName = "/uploads/support/admin" . $fileName;
+            $request->file('attachment')->move(public_path('/uploads/support/'), $fileName);
+            $fileName = "/uploads/support/" . $fileName;
         }
-        $savemessage = new Reply();
-        $savemessage->message = $request->message;
-        $savemessage->ticket_id = $id;
-        $savemessage->assign_id = Auth::user()->id;
-        $savemessage->attachment =  $fileName;
 
-        $savemessage->save();
+
+
+        Reply::create([
+
+            'message' => $request->message,
+            'ticket_id' => $id,
+            'assign_id_user' => Auth::user()->id,
+            'attachment' => $fileName,
+
+        ]);
+
+
+
+
         Alert::success('Message Send Succesfully', 'Success Message');
 
         return back();
     }
 
-   
+
     public function adminticketmessagelist()
     {
         $ticket = Ticket::all();
@@ -131,14 +157,15 @@ class TicketController extends Controller
         $savemessage = new Reply();
         $savemessage->message = $request->message;
         $savemessage->ticket_id = $id;
-        $savemessage->assign_id = Auth::user()->id;
+        $savemessage->assign_id_admin = Auth::user()->id;
         $savemessage->attachment =  $fileName;
 
         $savemessage->save();
 
         return back();
     }
-    public function ticketDelete($id){
+    public function ticketDelete($id)
+    {
         $data = Ticket::find($id)->delete();
         return back();
     }

@@ -12,7 +12,7 @@
 
 
                         <div class="card text-left">
-                            <img class="card-img-top" src="holder.js/100px180/" alt="">
+                            <img class="card-img-top">
                             <div class="card-body">
                                 <h4 class="card-title">Finance</h4>
 
@@ -42,7 +42,7 @@
                     <div class="col-8">
                         <div class="card text-left">
                             <div class="card-body">
-                                <form action="{{route('ticket.reply.post',$data1->id)}}" method="post">
+                                <form action="{{route('ticket.reply.post',$data->id)}}" method="post" enctype="multipart/form-data">
                                     @csrf
                                     <h4 class="card-title">Reply</h4>
 
@@ -50,7 +50,7 @@
                                     <input type="hidden" name="ticket_id">
                                     <label for="">Attachement</label>
                                     <input type="file" class="form-control" name="attachment" multiple>
-                                    <button style="margin-left: 482px;" class="btn btn-primary">Send</button>
+                                    <button style="margin-left: 482px;margin-top:10px" class="btn btn-primary">Send</button>
                                 </form>
 
 
@@ -58,26 +58,12 @@
                             </div>
                         </div>
 
-                        @foreach($data2 as $value)
 
-                        <div id="data-container" class="card text-left">
-                            <div class="card-body">
-                                <div style="height:100px;width:auto;background-color:white auto;margin-top:3px">
-                                    <tr>
 
-                                        <td>
-                                            <h6 style="color:purple;">{{App\Models\School::find($value->assign_id)?->school_name}}</h6>
-                                        </td>
-                                        <td>
-                                            <h6 style="color:#7127ea;">{{$value->message}}</h6>
-                                        </td>
-                                        <td> {{$value->created_at}}</td>
-                                    </tr>
-                                </div>
-                            </div>
+                        <div id="dataLoad">
+
                         </div>
 
-                        @endforeach
 
                     </div>
 
@@ -89,29 +75,48 @@
 
 
         @endsection
+        @push('js')
         <script>
-           $(document).ready(function() {
-    function loadData() {
-        
-        
-        $.ajax({
-            url: '/ticket/reply/' + id,
-            type: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                $('#data-container').empty();
+            $(document).ready(function() {
+                function loadData() {
 
-                $.each(data, function(index, item) {
-                    $('#data-container').append('<p>' + item.name + '</p>');
-                });
-            },
-            error: function(xhr, status, error) {
-                console.log(error);
-            }
-        });
-    }
 
-    setInterval(loadData, 100);
-});
+                    $.ajax({
+                        url: '{{route('ticketmessage.show',$data->id)}}',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log(response);
+                            var html = '';
+                            response.forEach(function(item) {
+                                if (item.assign_id_user == null) {
+                                    var createdAt = new Date(item.created_at);
+                                    var formattedDate = createdAt.toLocaleString();
+                                    html += '<div class="card"><div class="card-body">' +
+                                        '<div style = "height:100px;width:auto;background-color:white auto;margin-top:3px" >' +
+                                        '<p style="color:blue;margin-left:380px">' + formattedDate + '</p>' + '<h6>' +
+                                        item.message + '</h6>' + '<p style="margin-left:500px;">' + item.assign_admin.name +
+                                        '</p>' + '</div>' + '</div></div>';
+                                } else {
 
+
+                                    var createdAt = new Date(item.created_at);
+                                    var formattedDate = createdAt.toLocaleString();
+                                    html += '<div class="card"><div class="card-body">' +
+                                        '<div style = "height:100px;width:auto;background-color:white auto;margin-top:3px" >' +
+                                        '<p style="color:blue;margin-left:380px">' +formattedDate+ '</p>' + '<h6>' +
+                                        item.message + '</h6>' + '<p style="margin-left:380px;">' + item.assign_user.school_name +
+                                        '</p>' + '</div>' + '</div></div>';
+
+                                }
+                            });
+
+                            $('#dataLoad').html(html);
+                        }
+                    });
+                }
+
+                setInterval(loadData, 1000);
+            });
         </script>
+        @endpush

@@ -75,7 +75,7 @@
     }
 
     .list-group-item.active {
-        border-color: blueviolet;
+        border-color: blueviolet !important;
         background: blueviolet !important;
         color: white !important;
     }
@@ -163,6 +163,13 @@
         font-size: 14px;
     }
 
+
+    .select2-container--default .select2-selection--single {
+        background-color: #202a40;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+    }
+
     .select2-container--default .select2-selection--single .select2-selection__placeholder {
         color: #ffffff;
     }
@@ -202,17 +209,17 @@
     }
 
     /* div#example_paginate {
-                        display: flex;
-                    } */
+                            display: flex;
+                        } */
     .page-item.active .page-link {
         background-color: blueviolet;
         border-color: blueviolet;
     }
 
     /* i.fas.fa-search.data-search-icon {
-                        margin-left:-110px
-                        color: blueviolet;
-                    } */
+                            margin-left:-110px
+                            color: blueviolet;
+                        } */
 
     .dataTables_wrapper .dataTables_filter select option:hover {
         background-color: #ff0000;
@@ -222,18 +229,18 @@
     }
 
     /* input#mySearchInput {
-                            width: 80% !important;
-                            background: #eeeeee !important;
-                            } */
+                                width: 80% !important;
+                                background: #eeeeee !important;
+                                } */
     div#example_info {
         display: none;
     }
 
     /* .custom-search-input-container {
-                            margin-right: 19px;
-                            padding-left: -20px;
-                            margin-bottom: 8px
-                        } */
+                                margin-right: 19px;
+                                padding-left: -20px;
+                                margin-bottom: 8px
+                            } */
 
     div#example_paginate {
         margin-top: 10px;
@@ -389,4 +396,72 @@
     }
 
     /* language toggle switch end*/
+
+
+
+    /* dark theme css start  */
+
+
+    /* dark theme form */
+    html.dark-theme body {
+        color: #fcfcfc;
+        background-color: #1a2232 !important;
+    }
+
+    html.dark-theme label.select-form {
+        position: absolute;
+        margin-top: -16px;
+        z-index: 1;
+        padding-left: 8px;
+        background: #202a40;
+        padding-right: 8px;
+        margin-left: 7px;
+        font-size: 14px;
+    }
+
+    html.dark-theme .form-label {
+        position: absolute;
+        margin-top: -13px;
+        background: #202a40;
+        margin-left: 12px;
+        font-size: 15px;
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    html.dark-theme .form-control,
+    html.dark-theme .form-select {
+        color: #fcfcfc;
+        background-color: #202a40;
+        border: 1px solid rgb(255 255 255 / 12%);
+    }
+
+    html.dark-theme .select2-container--default .select2-selection--single {
+        background-color: #202a40;
+        border: 1px solid rgb(255 255 255 / 12%);
+        border-radius: 4px;
+    }
+
+    /* dark theme form */
+
+    html.dark-theme i.fas.fa-search.search-icon {
+        background: #202a40;
+        color: blueviolet;
+        font-size: 20px;
+        margin-left: -22px;
+        padding-right: 2px;
+    }
+
+    html.dark-theme table.dataTable>thead {
+        background: #1a2232;
+    }
+
+    /* dark theme css end  */
+
+
+    .select2-container--default .select2-selection--single {
+        background-color: #fff;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+    }
 </style>

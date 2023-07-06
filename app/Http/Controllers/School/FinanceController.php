@@ -297,71 +297,92 @@ class FinanceController extends Controller
     }
 
 
-    // /**
-    //  * view fees blade
-    //  */
-    // public function index(Request $request)
-    // {
-    //     try
-    //     {
-    //         $schoolId = Auth::id();
-            
-    //         if($request->ajax())
-    //         {
-    //             if(isset($request->classId) && !empty($request->classId))
-    //             {
-    //                 $data = StudentFee::join('fees_types as f', 'f.id', 'student_fees.fees_type_id')
-    //                         ->join('institute_classes as class', 'class.id', 'student_fees.class_id')
-    //                         ->select('student_fees.id', 'f.title', 'student_fees.fees', 'class.class_name')
-    //                         ->where('student_fees.class_id', $request->classId)
-    //                         ->where('student_fees.school_id', $schoolId)
-    //                         ->get()->toArray();
 
-    //                 return $this->success("data fetched", $data);
-    //             }
-    //             else
-    //             {
-    //                 return $this->error("Something went wrong. Please try again");
-    //             }
-    //         }
-    //         else
-    //         {
-                
-    //             $data['classes'] = InstituteClass::where('school_id', $schoolId)->get();
-    //             $typeOfFees = FeesType::where('school_id', $schoolId)->get();
-    //             $classes = InstituteClass::where('school_id', $schoolId)->get();
 
-    //             if($typeOfFees->count() == 0)
-    //             {
-    //                 $newTypeOfFees = FeesType::create(
-    //                     ['school_id'=> $schoolId,'title'=>'Monthly Fee'],
-    //                     ['school_id'=> $schoolId,'title'=>'Absent Fee'],
-    //                 );
 
-    //                 foreach($classes as $class)
-    //                 {
-    //                     StudentFee::create(['class_id'=>$class->id, 'fees_type_id'=>$newTypeOfFees->id, 'fees'=>$class->class_fess, 'school_id'=>$schoolId]);
-    //                 }
+    /**
 
-    //                 $data['fee_types'] = $typeOfFees = FeesType::where('school_id', $schoolId)->get();
-    //             }
-            
-    //             return view('frontend.school.finance.fees-create')->with($data);
-    //         }
-    //     }
-    //     catch(Exception $e)
-    //     {
-    //         if($request->ajax())
-    //         {
-    //             return $this->error($e->getMessage());
-    //         }
-    //         else
-    //         {
-    //             Alert::error("Server Problem", $e->getMessage());
-    //             return back();
-    //         }
-    //     }
-    // }
+     * view fees blade
+
+     */
+
+    public function index(Request $request)
+
+    {
+
+        try
+
+        {
+
+
+
+            $schoolId = Auth::id();
+
+            $data['classes'] = InstituteClass::where('school_id', $schoolId)->get();
+
+            $data['fee_types'] = $typeOfFees = FeesType::where('school_id', $schoolId)->get();
+
+            $classes = InstituteClass::where('school_id', $schoolId)->get();
+
+
+
+            if($typeOfFees->count() == 0)
+
+            {
+
+                $newTypeOfFees = FeesType::create(['school_id'=> $schoolId,'title'=>'Monthly Fee']);
+
+
+
+                foreach($classes as $class)
+
+                {
+
+                    StudentFee::create(['class_id'=>$class->id, 'fees_type_id'=>$newTypeOfFees->id, 'fees'=>$class->class_fess, 'school_id'=>$schoolId]);
+
+                }
+
+
+
+                $data['fee_types'] = $typeOfFees = FeesType::where('school_id', $schoolId)->get();
+
+            }
+
+
+
+            if (isset($request['class']) && $request['class'] != 0) {
+
+                if (InstituteClass::where('school_id', $schoolId)->where('id', $request['class'])->exists()) :
+
+                    return view('frontend.school.finance.fees-create', compact('data'));
+
+                else :
+
+                    Alert::info('Sorry!', "Class does not exists. You can add more class");
+
+                    return back();
+
+                endif;
+
+            }
+
+
+
+            return view('frontend.school.finance.fees-create', compact('data'));
+
+        }
+
+        catch(Exception $e)
+
+        {
+
+            Alert::error("Server Problem", $e->getMessage());
+
+            return back();
+
+        }
+
+    }
 
 
 
@@ -511,6 +532,423 @@ class FinanceController extends Controller
 
 
 
+
+
+    /**
+
+     * show students list
+
+     */
+
+    public function userList(Request $request)
+
+    {        
+
+        try
+
+        {        
+
+            $users = User::with('class:id,class_name', 'section:id,section_name')->where('school_id', Auth::id());
+
+
+
+            if($request->has('classId') && !empty($request->classId))
+
+            {
+
+                $users->where('class_id', $request->classId);
+
+            }
+
+            
+
+            if($request->has('sectionId') && !empty($request->sectionId))
+
+            {
+
+                $users->where('section_id', $request->sectionId);
+
+            }
+
+
+
+            if($request->has('shift') && !empty($request->shift))
+
+            {
+
+                $users->where('shift', $request->shift);
+
+            }
+
+
+
+            if($request->has('groupId') && !empty($request->groupId))
+
+            {
+
+                $users->where('group_id', $request->groupId);
+
+            }
+
+
+
+            if($request->has('roll') && !empty($request->roll))
+
+            {
+
+                $users->where('roll_number', $request->roll);
+
+            }
+
+
+
+            if($request->has('limit') && !empty($request->limit))
+
+            {
+
+                $users->limit($request->limit);
+
+            }
+
+            else
+
+            {
+
+                $users->limit(100);
+
+            }
+
+
+
+            if($request->has('order') && !empty($request->order) && $request->order == "desc")
+
+            {
+
+                $users->latest();
+
+            }
+
+            else
+
+            {
+
+                $users->orderBy('roll_number');
+
+            }
+
+
+
+            $data['users'] = $users->get();
+
+            $data['classes'] = InstituteClass::where('school_id', Auth::id())->pluck('class_name', 'id');
+
+
+
+            if($request->ajax())
+
+            {
+
+                return $this->success(count($data['users']) . " record fetched", $data);
+
+            }
+
+            else
+
+            {
+
+                return view('frontend.school.finance.students-fee')->with($data);
+
+            }
+
+        }
+
+        catch(Exception $e)
+
+        {
+
+            if($request->ajax())
+
+            {
+
+                return $this->error($e->getMessage());
+
+            }
+
+            else
+
+            {
+
+                // Alert::error("Server Error", $e->getMessage());
+
+                return abort(403, $e->getMessage());
+
+            }
+
+        }
+
+        
+
+    }
+
+
+
+    /**
+     * get user information
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserInfo(Request $request)
+    {
+        try
+        {
+            if(Auth::check())
+            {
+                $schoolId = Auth::id();
+                $data['allPaid'] = false;
+
+                $records = DB::table('student_monthly_fees as smf')
+                ->select('smf.id', 'smf.month_name', 'smf.amount', 'smf.paid_amount', 'ft.title', 'users.discount')
+                ->join('student_fees as sf', 'sf.id', 'smf.student_fees_id')
+                ->join('fees_types as ft', 'ft.id', 'sf.fees_type_id')
+                ->join('users', 'users.id', 'smf.student_id')
+                ->where('smf.student_id', $request->sid)
+                ->where('smf.school_id', $schoolId)
+                ->where('smf.status', "<", 2)
+                // ->where('smf.month_id', '<', date('m'))
+                ->orderBy('smf.month_id', 'ASC')
+                ->get();
+
+                $paidRecords = DB::table('student_monthly_fees as smf')
+                ->select('smf.id', 'smf.month_name', 'smf.amount', 'smf.paid_amount', 'ft.title', 'users.discount')
+                ->join('student_fees as sf', 'sf.id', 'smf.student_fees_id')
+                ->join('fees_types as ft', 'ft.id', 'sf.fees_type_id')
+                ->join('users', 'users.id', 'smf.student_id')
+                ->where('smf.student_id', $request->sid)
+                ->where('smf.school_id', $schoolId)
+                ->where('smf.status', "=", 2)
+                ->count();
+
+                if($records->count() == 0 && $paidRecords > 0)
+                {
+                    $data['allPaid'] = true;
+                }
+
+                $studentMonthlyFees = $records->groupBy('month_name');
+                $data['student'] = User::with('class:id,class_name', 'section:id,section_name')->find($request->sid);
+
+                $resp = [];
+                foreach($studentMonthlyFees as $key => $val)
+                {
+                    $array = [];
+                    foreach($val as $item)
+                    {
+                        $feesAmount = $item->amount;
+
+                        if($item->paid_amount > 0)
+                        {
+                            $feesAmount = $feesAmount - $item->paid_amount;
+                        }
+
+                        $array[] = [
+                            'id' => $item->id,
+                            'amount'    => abs($feesAmount),
+                            'month_name'    =>  $item->month_name,
+                            'title'         =>  $item->title,
+                        ];
+                    }
+
+                    $resp[] = [
+                        'month_name'    =>  $key,
+                        'fees'          =>  $array
+                    ];
+                }
+
+                $fees = [];
+                foreach($records as $item)
+                {
+                    $feesAmount = $item->amount;
+
+                    if($item->paid_amount > 0)
+                    {
+                        $feesAmount = $feesAmount - $item->paid_amount;
+                    }
+
+                    $fees[] = [
+                        'id' => $item->id,
+                        'amount'    => abs($feesAmount),
+                        'month_name'    =>  $item->month_name,
+                        'title'         =>  $item->title,
+                    ];
+                }
+
+                
+                $data['fees'] = $resp;
+                $data['records'] = $fees;
+
+                return $this->success("Record Fetched", $data);
+            }
+            else
+            {
+                return $this->error("Unauthenticated User");
+            }
+        }
+        catch(Exception $e)
+        {
+            return $this->error($e->getMessage());
+        }
+    }
+
+
+
+
+
+
+    /**
+
+     * received fees
+
+     */
+
+    public function collectFees(Request $request)
+
+    {
+
+        try
+
+        {
+
+            if(isset($request->hiddenFeesId) && is_array($request->hiddenFeesId) && !empty($request->hiddenFeesId) && count($request->hiddenFeesId) > 0)
+
+            {
+
+                $html = "";
+
+
+
+                foreach($request->hiddenFeesId as $key => $id)
+
+                {
+
+                    $paidAmount = (double) $request->feesAmount[$key];                    
+
+
+
+                    $fee = StudentMonthlyFee::find($id);
+
+
+
+                    $requiredAmount = abs((double)$fee->amount - (double)$fee->paid_amount);
+
+
+
+                    if($fee->status < 2)
+
+                    {
+
+                        $fee->paid_amount += $paidAmount;
+
+
+
+                        if($paidAmount < $requiredAmount)
+
+                        {
+
+                            $fee->status = 1; // partial
+
+                        }
+
+                        elseif($requiredAmount == $paidAmount)
+
+                        {
+
+                            $fee->status = 2; // paid
+
+                        }
+
+
+
+                        if($paidAmount > $requiredAmount)
+
+                        {
+
+                            return $this->error("Please enter valid amount", $request->all());
+
+                        }
+
+
+
+                        $fee->save();
+
+                    }
+
+                    
+
+                }
+
+
+
+                $sid = $fee->student_id;
+
+            }
+
+            else
+
+            {
+
+                return $this->error("Invalid Data", $request->all());
+
+            }
+
+
+
+            return $this->success("Record stored successfully", $sid);
+
+        }
+
+        catch(Exception $e)
+
+        {
+
+            return $this->error($e->getMessage(), $request->all());
+
+        }
+
+        
+
+    }
+
+
+
+
+
+    /**domPDF */
+    public function domPdf(Request $request)
+    {
+        $data = [
+            "feesTable"      =>  $request->feesTable,
+            "student"      =>  User::find($request->studentId),
+            "school"      =>  Auth::user(),
+        ];
+
+        // return $data;
+        set_time_limit(300);
+
+        $pdf = Pdf::loadView("frontend.school.finance.pdf.pdf_collect_fees", $data);
+
+        $fileName =  date("dmYHis").'.'. 'pdf' ;
+        $pdf->save(public_path("collectFees") . '/' . $fileName);
+
+        $pdf = public_path("collectFees/".$fileName);
+
+        return response()->download($pdf);
+    }
+
+   
+
+
+
     public function studentSchoolScholarship(Request $request, $id)
 
     {
@@ -526,6 +964,9 @@ class FinanceController extends Controller
         return back();
 
     }
+
+
+
 
 
     /**
@@ -702,121 +1143,5 @@ class FinanceController extends Controller
 
     }
 
-
-    public function showAjaxfilter(Request $request)
-    {
-
-        if (isset($request->searchdate)) {
-            if (isset($request->enddate)) {
-                $sumTeacher = TeacherSalary::where('school_id', Auth::user()->id)->whereBetween('updated_at', [$request->searchdate, $request->enddate])->where('amount', '!=', '0')->sum('amount');
-                $sumstaff = EmployeeSalary::where('school_id', Auth::user()->id)->whereBetween('updated_at', [$request->searchdate, $request->enddate])->where('amount', '!=', '0')->sum('amount');
-                $sumexpenses = Transection::where('school_id', Auth::user()->id)->whereBetween('datee', [$request->searchdate, $request->enddate])->where('type', '=', '1')->where('amount', '!=', '0')->sum('amount');
-                $sumfund = Transection::where('school_id', Auth::user()->id)->where('type', '=', '2')->whereBetween('datee', [$request->searchdate, $request->enddate])->where('amount', '!=', '0')->sum('amount');
-                $sumstudent = StudentMonthlyFee::where('school_id', Auth::user()->id)->whereBetween('updated_at', [$request->searchdate, $request->enddate])->where('status', '2')->sum('amount');
-                $sumaccesories = Transection::where('school_id', Auth::user()->id)->where('type', '=', '3')->whereBetween('updated_at', [$request->searchdate, $request->enddate])->sum('amount');
-                $profit = $sumfund + $sumstudent + $sumaccesories - $sumexpenses - $sumstaff - $sumTeacher;
-
-                
-                return response()->json( [
-                    'sumexpenses'  =>  $sumexpenses,
-                    'sumstaff' =>  $sumstaff, 
-                    'sumTeacher' =>  $sumTeacher, 
-                    'sumfund' =>  $sumfund, 
-                    'sumstudent' =>  $sumstudent, 
-                    'sumaccesories' =>  $sumaccesories,
-                    'profit' => $profit,
-                ]);
-
-            } else {
-                $sumTeacher = TeacherSalary::where('school_id', Auth::user()->id)->wheredate('updated_at', $request->searchdate)->where('amount', '!=', '0')->sum('amount');
-                $sumstaff = EmployeeSalary::where('school_id', Auth::user()->id)->wheredate('updated_at', $request->searchdate)->where('amount', '!=', '0')->sum('amount');
-                $sumexpenses = Transection::where('school_id', Auth::user()->id)->wheredate('datee', $request->searchdate)->where('type', '=', '1')->where('amount', '!=', '0')->sum('amount');
-                $sumfund = Transection::where('school_id', Auth::user()->id)->wheredate('datee', $request->searchdate)->where('type', '=', '2')->where('amount', '!=', '0')->sum('amount');
-                $sumstudent = StudentMonthlyFee::where('school_id', Auth::user()->id)->wheredate('updated_at', $request->searchdate)->where('status', '2')->sum('amount');
-                $sumaccesories = Transection::where('school_id', Auth::user()->id)->where('type', '=', '3')->wheredate('updated_at', $request->searchdate)->sum('amount'); 
-                $profit = $sumfund + $sumstudent + $sumaccesories - $sumexpenses - $sumstaff - $sumTeacher;               
-                
-                return response()->json( [
-                    'sumexpenses'  =>  $sumexpenses, 
-                    'sumstaff' =>  $sumstaff, 
-                    'sumTeacher' =>  $sumTeacher, 
-                    'sumfund' =>  $sumfund, 
-                    'sumstudent' =>  $sumstudent, 
-                    'sumaccesories' =>  $sumaccesories,
-                    'profit' => $profit,
-                ]);
-
-            }
-        } 
-        elseif (isset($request->searchmonth)) {            
-            $sumTeacher = TeacherSalary::where('school_id', Auth::user()->id)->whereMonth('updated_at', $request->searchmonth)->where('amount', '!=', '0')->sum('amount');
-            $sumstaff = EmployeeSalary::where('school_id', Auth::user()->id)->whereMonth('updated_at', $request->searchmonth)->where('amount', '!=', '0')->sum('amount');
-            $sumexpenses = Transection::where('school_id', Auth::user()->id)->whereMonth('datee', $request->searchmonth)->where('type', '=', '1')->where('amount', '!=', '0')->sum('amount');
-            $sumfund = Transection::where('school_id', Auth::user()->id)->whereMonth('datee', $request->searchmonth)->where('type', '=', '2')->where('amount', '!=', '0')->sum('amount');
-            $sumstudent = StudentMonthlyFee::where('school_id', Auth::user()->id)->whereMonth('updated_at', $request->searchmonth)->where('status', '2')->sum('amount');
-            $sumaccesories = Transection::where('school_id', Auth::user()->id)->where('type', '=', '3')->whereMonth('updated_at', $request->searchmonth)->sum('amount');
-            $profit = $sumfund + $sumstudent + $sumaccesories - $sumexpenses - $sumstaff - $sumTeacher;
-            
-            return response()->json( [
-                'sumexpenses'  =>  $sumexpenses, 
-                'sumstaff' =>  $sumstaff, 
-                'sumTeacher' =>  $sumTeacher, 
-                'sumfund' =>  $sumfund, 
-                'sumstudent' =>  $sumstudent, 
-                'sumaccesories' =>  $sumaccesories,
-                'profit' => $profit,
-            ]);
-        } 
-        else {
-            $sumTeacher = TeacherSalary::where('school_id', Auth::user()->id)->where('amount', '!=', '0')->sum('amount');
-            $sumstaff = EmployeeSalary::where('school_id', Auth::user()->id)->where('amount', '!=', '0')->sum('amount');
-            $sumexpenses = Transection::where('school_id', Auth::user()->id)->where('type', '=', '1')->where('amount', '!=', '0')->sum('amount');
-            $sumfund = Transection::where('school_id', Auth::user()->id)->where('type', '=', '2')->where('amount', '!=', '0')->sum('amount');
-            $sumstudent = StudentMonthlyFee::where('school_id', Auth::user()->id)->where('status','=', '2')->sum('amount');
-            $sumaccesories = Transection::where('school_id', Auth::user()->id)->where('type', '=', '3')->sum('amount');
-            $profit = $sumfund + $sumstudent + $sumaccesories - $sumexpenses - $sumstaff - $sumTeacher;
-            
-            return response()->json( [
-                'sumexpenses'  =>  $sumexpenses, 
-                'sumstaff' =>  $sumstaff, 
-                'sumTeacher' =>  $sumTeacher, 
-                'sumfund' =>  $sumfund, 
-                'sumstudent' =>  $sumstudent, 
-                'sumaccesories' =>  $sumaccesories,
-                'profit' => $profit,
-            ]);
-        }
-    }
-
-    public function showAjaxfilterMonthly(Request $request)
-    {
-        // return $request;
-        // startDate:startDate,
-        // endDate:endDate,
-        // searchMonth:searchMonth,
-
-                    
-        $sumTeacher = TeacherSalary::where('school_id', Auth::user()->id)->whereMonth('updated_at', $request->searchmonth)->where('amount', '!=', '0')->sum('amount');
-        $sumstaff = EmployeeSalary::where('school_id', Auth::user()->id)->whereMonth('updated_at', $request->searchmonth)->where('amount', '!=', '0')->sum('amount');
-        $sumexpenses = Transection::where('school_id', Auth::user()->id)->whereMonth('datee', $request->searchmonth)->where('type', '=', '1')->where('amount', '!=', '0')->sum('amount');
-        $sumfund = Transection::where('school_id', Auth::user()->id)->whereMonth('datee', $request->searchmonth)->where('type', '=', '2')->where('amount', '!=', '0')->sum('amount');
-        $sumstudent = StudentMonthlyFee::where('school_id', Auth::user()->id)->whereMonth('updated_at', $request->searchmonth)->where('status', '2')->sum('amount');
-        $sumaccesories = Transection::where('school_id', Auth::user()->id)->where('type', '=', '3')->whereMonth('updated_at', $request->searchmonth)->sum('amount');
-        $profit = $sumfund + $sumstudent + $sumaccesories - $sumexpenses - $sumstaff - $sumTeacher;
-        
-        return response()->json( [
-            'sumexpenses'  =>  $sumexpenses, 
-            'sumstaff' =>  $sumstaff, 
-            'sumTeacher' =>  $sumTeacher, 
-            'sumfund' =>  $sumfund, 
-            'sumstudent' =>  $sumstudent, 
-            'sumaccesories' =>  $sumaccesories,
-            'profit' => $profit,
-        ]);
-        
-        
-    }
-
-    
 }
 

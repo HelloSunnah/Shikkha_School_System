@@ -13,7 +13,7 @@ $i = 1;
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="{{ asset('images/favicon.svg') }}" type="image/svg" />
-    <link href="{{ asset('schools/assets/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <!--plugins-->
     <link href="{{ asset('schools/assets/plugins/simplebar/css/simplebar.css') }}" rel="stylesheet" />
@@ -44,7 +44,8 @@ $i = 1;
     {{-- Bootstrap Icons --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 
-    <title>{{ isset($seo_array['seoTitle']) ? $seo_array['seoTitle'] : 'Shikkha - ' . Auth::user()->school_name }}</title>
+    <title>{{ isset($seo_array['seoTitle']) ? $seo_array['seoTitle'] : 'Shikkha - ' . Auth::user()->school_name }}
+    </title>
     <meta name="description"
         content="{{ isset($seo_array['seoDescription']) ? $seo_array['seoDescription'] : 'Shikkha - ' . Auth::user()->school_name }}">
     <meta name="keywords"
@@ -55,7 +56,6 @@ $i = 1;
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     {{-- OwlCarousel css --}}
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
         integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=="
         crossorigin="anonymous" />
@@ -180,7 +180,7 @@ $i = 1;
                     </ul>
                 </div> --}}
 
-                <div class="top-navbar-right ms-3">
+                <div class="top-navbar-right ms-3" style="cursor: pointer">
                     <ul class="navbar-nav align-items-center">
                         <li class="nav-item dropdown dropdown-large">
                             <a class="nav-link  dropdown-toggle-nocaret" data-bs-toggle="dropdown">
@@ -249,6 +249,18 @@ $i = 1;
                         </div>
                         </a>
                         </li> --}}
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('school.billingtransaction') }}">
+                                        <div class="d-flex align-items-center">
+                                            <div class="setting-icon" style="background-color:#7b00a7;color:white">৳
+                                            </div>
+                                            <div class="setting-text ms-3"><span>{{ __('app.pricing') }}</span></div>
+                                        </div>
+                                    </a>
+                                </li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -345,7 +357,7 @@ $i = 1;
                         <a href="{{route('user.role.show')}}"><button class="nav-link mb-0" data-bs-toggle="pill" data-bs-target="#pills-user_role" type="button"><img src="{{asset('assets/nav-icons-white/student.svg')}}" alt="user_role" width="20"></button></a>
                         <br> {{__('app.User_role')}}
                     </li> --}}
-                    
+
                     <li class="nav-item mb-2 text-center" data-bs-toggle="tooltip" data-bs-placement="right"
                         title="{{ __('app.Teacher') }}">
                         <a href="{{ route('teacher.Show') }}"><button class="nav-link mb-0" data-bs-toggle="pill"
@@ -389,7 +401,7 @@ $i = 1;
                             <br>{{ __('app.SMS') }}
                         </li>
                     @endif
-                    
+
                     <li class="nav-item mb-2 text-center" data-bs-toggle="tooltip" data-bs-placement="right"
                         title="{{ __('app.Exam') }}">
                         <a href="{{ route('term.index') }}"><button class="nav-link mb-0" data-bs-toggle="pill"
@@ -466,6 +478,7 @@ $i = 1;
                                     <div class="imgbox"><i class="bi bi-chevron-double-right "></i></div>
                                     {{ __('app.dashboard') }}
                                 </a>
+                                <a href="{{ route('online.Admission.Form', Auth::user()->unique_id) }}"
                                     class="list-group-item ">
                                     <div class="imgbox"><i class="bi bi-chevron-double-right"></i></div>
                                     {{ __('app.feater1a') }} {{ __('app.Admission') }}
@@ -645,7 +658,7 @@ $i = 1;
                                         {{ __('app.Auto') }} {{ __('app.Attendance') }}
                                     </a>
                                 @endif
-                                
+
                                 {{-- <a href="{{route('new.user.fingerprint')}}" class="list-group-item"> <i class="fadeIn animated fa fa-caret-right"></i> Add Fingerprint </a> --}}
                             </div>
                             <br>
@@ -690,7 +703,23 @@ $i = 1;
 
                     {{-- =================  Finance 
                         =================================================   --}}
-                    <div class="tab-pane fade @if((request()->segment(1) == " school" && request()->segment(2) == "finance") || Request::route()->getName() == "school.finance.dashoboard" || Request::route()->getName() == "school.finance.schoolFees" || Request::route()->getName() == "school.finance.assign.fees.index" || Request::route()->getName() == "school.finance.userlist" || Request::route()->getName() == "school.staff.salary.List" || Request::route()->getName() == "teacher.salary.Show" || Request::route()->getName() == "bankadd" || Request::route()->getName() == "expense.show" || Request::route()->getName() == "expense.list" || Request::route()->getName() == "fund.show" || Request::route()->getName() == "fund.list" || Request::route()->getName() == "reciept.create" || Request::route()->getName() == "bankadd.create" || Request::route()->getName() == "bankadd.edit") active show @endif" id="pills-finance">
+                    <div class="tab-pane fade @if (
+                        (request()->segment(1) == ' school' && request()->segment(2) == 'finance') ||
+                            Request::route()->getName() == 'school.finance.dashoboard' ||
+                            Request::route()->getName() == 'school.finance.schoolFees' ||
+                            Request::route()->getName() == 'school.finance.assign.fees.index' ||
+                            Request::route()->getName() == 'school.finance.userlist' ||
+                            Request::route()->getName() == 'school.staff.salary.List' ||
+                            Request::route()->getName() == 'teacher.salary.Show' ||
+                            Request::route()->getName() == 'bankadd' ||
+                            Request::route()->getName() == 'expense.show' ||
+                            Request::route()->getName() == 'expense.list' ||
+                            Request::route()->getName() == 'fund.show' ||
+                            Request::route()->getName() == 'fund.list' ||
+                            Request::route()->getName() == 'reciept.create' ||
+                            Request::route()->getName() == 'bankadd.create' ||
+                            Request::route()->getName() == 'bankadd.edit') active show @endif"
+                        id="pills-finance">
                         <div class="list-group list-group-flush">
                             <div class="list-group-item">
                                 <div class="d-flex w-100 justify-content-between">
@@ -848,18 +877,18 @@ $i = 1;
                                     <div class="imgbox"><i class="bi bi-chevron-double-right"></i></div>
                                     {{ __('app.Result Upload') }}
                                 </a>
-                                @if (Auth::user()-> subscription_status != 0)
+                                @if (Auth::user()->subscription_status != 0)
                                     <a href="{{ route('sms.result') }}" class="list-group-item ">
                                         <div class="imgbox"><i class="bi bi-chevron-double-right"></i></div>
                                         {{ __('app.Result') }} {{ __('app.SMS') }}
                                     </a>
                                 @endif
-                                
+
                                 <a href="{{ route('class.wise.result') }}" class="list-group-item ">
                                     <div class="imgbox"><i class="bi bi-chevron-double-right"></i></div>
                                     {{ __('app.Result_Show') }}
                                 </a>
-                                
+
                                 <a href="{{ route('result.pdf') }}" class="list-group-item">
                                     <div class="imgbox"><i class="bi bi-box-arrow-in-right"></i></div>Result Pdf
                                 </a>

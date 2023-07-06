@@ -1,58 +1,66 @@
 @extends('layouts.school.master')
 
 @section('content')
-<!--start content-->
-<style>
-    .search-field{
-        width: 200%;
-    }
-    .search-btn{
-        margin-left: 160px !important;
-    }
-</style>
-<main class="page-content">
-    <div class="">
-        <div class="row">
-            <div class="col-xl-12 mx-auto">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="border p-3 rounded">
-                            <h6 class="mb-0 text-uppercase">{{__('app.Student')}} {{__('app.search')}}</h6>
-                            <hr />
-                            <form class="row g-3" method="get" action="{{route('student.find')}}">
-                                {{-- @csrf --}}
-                                <div class="col-md-12">
-                                    @include('frontend.layouts.message')
-                                </div>
-                                <div class="col-2">
-                                    <input type="hidden" name="url_data" value="{{ request()->segment(2)}}">
-                                    <label class="select-form">{{__('app.Class')}}</label>
-                                    <select class="form-control mb-3 js-select" name="class_id" id="class_id" onchange="loadSection()">
-                                        <option value="" selected></option>
-                                        @foreach($class as $data)
-                                        <option value="{{$data->id}}" {{ (old('class_id') == $data->id) ? 'selected' : ''}}>{{$data->class_name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-2">
-                                    <label class="select-form">{{__('app.Section')}}</label>
-                                    <select class="form-control js-select mb-3" id="section_id" name="section_id" onchange="loadClass()">
-                                        <option value="" selected></option>
-                                    </select>
-                                </div>
-    
-                                <div class="col-2">
-                                    <label class="select-form">{{__('app.Shift')}}</label>
-                                    <select class="form-control js-select mb-3" id="shift_id" name="shift_id">
-                                        <option value="" selected></option>
-                                        <option value="1" {{ (old('shift_id') == 1) ? 'selected' : ''}}>Morning</option>
-                                        <option value="2" {{ (old('shift_id') == 2) ? 'selected' : ''}}>Day</option>
-                                        <option value="3" {{ (old('shift_id') == 3) ? 'selected' : ''}}>Evening</option>
-                                    </select>
-                                </div>
-    
-                                <div class="col-2" id="group-select">
-                                    {{-- <label class="form-label">Group Name</label>
+    <!--start content-->
+    <style>
+        .search-field {
+            width: 200%;
+        }
+
+        .search-btn {
+            margin-left: 160px !important;
+        }
+    </style>
+    <main class="page-content">
+        <div class="">
+            <div class="row">
+                <div class="col-xl-12 mx-auto">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="border p-3 rounded">
+                                <h6 class="mb-0 text-uppercase">{{ __('app.Student') }} {{ __('app.search') }}</h6>
+                                <hr />
+                                <form class="row g-3" method="get" action="{{ route('student.find') }}">
+                                    {{-- @csrf --}}
+                                    <div class="col-md-12">
+                                        @include('frontend.layouts.message')
+                                    </div>
+                                    <div class="col-2">
+                                        <input type="hidden" name="url_data" value="{{ request()->segment(2) }}">
+                                        <label class="select-form">{{ __('app.Class') }}</label>
+                                        <select class="form-control mb-3 js-select" name="class_id" id="class_id"
+                                            onchange="loadSection()">
+                                            <option value="" selected></option>
+                                            @foreach ($class as $data)
+                                                <option value="{{ $data->id }}"
+                                                    {{ old('class_id') == $data->id ? 'selected' : '' }}>
+                                                    {{ $data->class_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="select-form">{{ __('app.Section') }}</label>
+                                        <select class="form-control js-select mb-3" id="section_id" name="section_id"
+                                            onchange="loadClass()">
+                                            <option value="" selected></option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-2">
+                                        <label class="select-form">{{ __('app.Shift') }}</label>
+                                        <select class="form-control js-select mb-3" id="shift_id" name="shift_id">
+                                            <option value="" selected></option>
+                                            <option value="1" {{ old('shift_id') == 1 ? 'selected' : '' }}>Morning
+                                            </option>
+                                            <option value="2" {{ old('shift_id') == 2 ? 'selected' : '' }}>Day
+                                            </option>
+                                            <option value="3" {{ old('shift_id') == 3 ? 'selected' : '' }}>Evening
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-2" id="group-select">
+                                        {{-- <label class="form-label">Group Name</label>
                                         <select class="form-control mb-3 js-select" id="group_id" name="group_id">
                                             <option selected>Select one</option>
                                         </select> --}}
@@ -634,38 +642,35 @@
             loadGroup();
         @endif
 
-            function loadGroup() {
-                let class_id = $("#class_id").val();
-                let groupElement = `<label>Group Name</label>
+        function loadGroup() {
+            let class_id = $("#class_id").val();
+            let groupElement = `<label>Group Name</label>
                                     <select class="form-control mb-3 js-select" id="group_id" name="group_id">
                                         <option value=" " selected>Select one</option>
-                                        <option value="1" @if(isset($studentEdit))@if($studentEdit->group_id==1){{'selected'}}@endif @endif > Science </option>
-                                        <option value="2" @if(isset($studentEdit))@if($studentEdit->group_id==2){{'selected'}}@endif @endif> Commerce </option>
-                                        <option value="3" @if(isset($studentEdit))@if($studentEdit->group_id==3){{'selected'}}@endif @endif> Humanities </option>
+                                        <option value="1" @if (isset($studentEdit)) @if ($studentEdit->group_id == 1){{ 'selected' }} @endif @endif > Science </option>
+                                        <option value="2" @if (isset($studentEdit)) @if ($studentEdit->group_id == 2){{ 'selected' }} @endif @endif> Commerce </option>
+                                        <option value="3" @if (isset($studentEdit)) @if ($studentEdit->group_id == 3){{ 'selected' }} @endif @endif> Humanities </option>
                                     </select>`;
-                $.ajax({
-                    url:'{{route('admin.show.section')}}',
-                    method:'POST',
-                    data:{
-                        '_token':'{{csrf_token()}}',
-                        class_id:class_id
-                    },
-                    success: function (response) {
+            $.ajax({
+                url: '{{ route('admin.show.section') }}',
+                method: 'POST',
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                    class_id: class_id
+                },
+                success: function(response) {
 
-                        $('#section_id').html(response.html);
+                    $('#section_id').html(response.html);
 
-                        if(response.group == 1)
-                        {
-                            $("#group-id").html(groupElement);
-                        }
-                        else
-                        {
-                            $("#group-id").html('');
-                        }
+                    if (response.group == 1) {
+                        $("#group-id").html(groupElement);
+                    } else {
+                        $("#group-id").html('');
                     }
-                });
+                }
+            });
 
-            }
+        }
     </script>
 
     <script>
@@ -679,35 +684,7 @@
                                     <option value="3" > Humanities </option>
                                 </select>`;
 
-            $(function(e) {
-                $("#select_all_ids").click(function() {
-                    $('.check_id').prop('checked', $(this).prop('checked'));
-                });
-                $("#all_delete").click(function(e) {
-                    e.preventDefault();
-                    var all_ids = [];
-                    $('input:checkbox[name=ids]:checked').each(function() {
-                        all_ids.push($(this).val());
-                    });
-                    //console.log(all_ids);
-                    $.ajax({
-                        url: "{{ route('student.Check.delete') }}",
-                        type: "DELETE",
-                        data: {
-                            ids: all_ids,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            $.each(all_ids, function(key, val) {
-                                $('#student_ids' + val).remove();
-                                window.location.reload(true);
-                            });
-                        }
-                    });
 
-                });
-
-            });
             $.ajax({
                 url: '{{ route('admin.show.section') }}',
                 method: 'POST',
@@ -728,5 +705,37 @@
             });
 
         }
+    </script>
+
+    <script>
+        $(function(e) {
+            $("#select_all_ids").click(function() {
+                $('.check_id').prop('checked', $(this).prop('checked'));
+            });
+            $("#all_delete").click(function(e) {
+                e.preventDefault();
+                var all_ids = [];
+                $('input:checkbox[name=ids]:checked').each(function() {
+                    all_ids.push($(this).val());
+                });
+                //console.log(all_ids);
+                $.ajax({
+                    url: "{{ route('student.Check.delete') }}",
+                    type: "DELETE",
+                    data: {
+                        ids: all_ids,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        $.each(all_ids, function(key, val) {
+                            $('#student_ids' + val).remove();
+                            window.location.reload(true);
+                        });
+                    }
+                });
+
+            });
+
+        });
     </script>
 @endpush

@@ -31,7 +31,7 @@
             } 
         } */
         
-        @media print { 
+        /* @media print { 
             @page {
                 margin: .8cm;  
                 size: letter; 
@@ -44,7 +44,7 @@
             @bottom-left, @bottom-center, @bottom-right {
                 display: none;
             }
-        }
+        } */
         
     </style>
     
@@ -103,7 +103,7 @@
 
                                     {{-- End School Info --}}
     
-                                    {{-- <hr style="margin-top: 0px;"> --}}
+                                    <hr style="margin-top: 0px;">
     
                                     {{-- Start Student Info --}}
                                     

@@ -12,12 +12,13 @@
             </head>
 
             <div class="col-md-12">
-                <form action="{{route('ticketmessage.create.post',$data->id)}}" method="post" enctype="multipart/form-data">
+                <form action="{{route('ticketmessage.create.post')}}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-6">
                             <label for="">Subject</label> <input class="form-control" name="subject" type="text">
                         </div>
+                        <input type="hidden" name="department_id" value="">
                         <div class="col-6">
                             <label for="">Priority</label>
                             <select class="form-control" name="priority" id="">

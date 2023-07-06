@@ -15,6 +15,7 @@ use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Rats\Zkteco\Lib\ZKTeco;
 
 class ZktecoController extends Controller
@@ -47,9 +48,10 @@ class ZktecoController extends Controller
 
     public function testOnly()
     {
-        $result = $this->sendCurlRequestToStellar('fetch_user_in_device_list', 'WinnerModel');
 
-        return in_array('230280045', array_column($result->device_user, 'registraton_id'));
+        // $result = $this->sendCurlRequestToStellar('fetch_user_in_device_list', 'WinnerModel');
+
+        // return in_array('230280045', array_column($result->device_user, 'registraton_id'));
     }
 
 

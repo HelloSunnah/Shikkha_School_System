@@ -279,7 +279,7 @@
                                 <td>
                                     <div class="btn-group mr-2" role="group" aria-label="First group">
                                         <a href="{{ route('restore.student', $data->id) }}" class="btn btn-outline-primary btn-sm recycle1" style="border-color:blueviolet !important;color:blueviolet"><i class="bi bi-recycle"></i>Restore</a>
-                                        <a href="{{ route('Pdelete.student', $data->id) }}" class="btn btn-outline-danger btn-sm " data-bs-toggle="modal" data-bs-target="#class"><i class="bi bi-trash2"></i>Parmanent Delete</a>
+                                        <a href="{{ route('Pdelete.student', $data->id) }}" class="btn btn-outline-danger btn-sm " ><i class="bi bi-trash2"></i>Parmanent Delete</a>
 
                                     </div>
                                 </td>
