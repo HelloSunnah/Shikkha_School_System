@@ -16,9 +16,9 @@
                     <div class="d-sm-flex align-items-center">
                         <h5 class="mb-2 mb-sm-0">{{__('app.Class')}} {{__('app.Show')}}</h5>
                         <div class="ms-auto">
-                            <button type="button" title="{{__('app.Back')}}" class="btn btn-secondary btn-sm" onclick="history.back()"><i class="bi bi-arrow-left-square"></i> </button>
-                            <a href="{{route('class.create')}}" title="{{__('app.Class')}} {{__('app.Create')}}" class="btn btn-primary btn-sm "><i class="bi bi-plus-square"></i> </a>
-                            <button type="button" title="{{__('app.Tutorial')}}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="lni lni-youtube"></i></button>
+                            <button type="button" title="{{__('app.Back')}}" class="btn-secondary btn-sm" onclick="history.back()"><i class="bi bi-arrow-left-square"></i></button>
+                            <a href="{{route('class.create')}}" title="{{__('app.Class')}} {{__('app.Create')}}" class="btn btn-primary btn-sm"><i class="bi bi-plus-square m-0"></i></a>
+                            <button type="button" title="{{__('app.Tutorial')}}" class="btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="lni lni-youtube"></i></button>
 
                         </div>
                     </div>

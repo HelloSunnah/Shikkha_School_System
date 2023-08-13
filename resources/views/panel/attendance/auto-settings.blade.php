@@ -25,7 +25,7 @@
                                 @endphp
                                
                                 <div class="col-12 mb-3 form-group">
-                                    <label for="" class="form-label">Morning</label>
+                                    <label for="" class="select-form">Morning</label>
                                     <select name="send_absent_sms_at_morning" class="form-control js-select">
                                         <option value="" selected>Select One</option>
                                         @for ($i = 0; $i < 13; $i++)
@@ -36,7 +36,7 @@
                                 </div>
 
                                 <div class="col-12 mb-3 form-group">
-                                    <label for="" class="form-label">Day</label>
+                                    <label for="" class="select-form">Day</label>
                                     <select name="send_absent_sms_at_day" class="form-control js-select">
                                         <option value="" selected>Select One</option>
                                         @for ($i = 0; $i < 13; $i++)
@@ -47,7 +47,7 @@
                                 </div>
 
                                 <div class="col-12 mb-3 form-group">
-                                    <label for="" class="form-label">Evening</label>
+                                    <label for="" class="select-form">Evening</label>
                                     <select name="send_absent_sms_at_evening" class="form-control js-select">
                                         <option value="" selected>Select One</option>
                                         @for ($i = 0; $i < 13; $i++)
@@ -79,12 +79,13 @@
                                 </div>
                                
                                 <div class="mb-3">
-                                    <label for="">Select Class  <small><strong>(Press control and select multitple classes)</strong></small></label>
+                                    <label for="" class="select-form">Select Class</label>
                                     <select name="classIds[]" class="js-select" multiple>
                                         @foreach (\App\Models\InstituteClass::where('school_id', Auth::id())->get() as $item)
                                             <option value="{{$item->id}}">{{$item->class_name}}</option>
                                         @endforeach
                                     </select>
+                                    <small><strong>(Press control and select multiple classes)</strong></small>
                                 </div>
 
                                 <ul class="px-3">

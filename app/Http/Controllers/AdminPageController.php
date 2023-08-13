@@ -19,22 +19,26 @@ use App\Models\ContactUs;
 use App\Models\SchoolFee;
 use App\Models\AddonModel;
 use App\Models\AppReleased;
+use App\Models\FeatureList;
 use App\Models\FeatureMenu;
+use App\Models\LogActivity;
 use Illuminate\Support\Str;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
+use App\Models\AddonPurchase;
 use App\Models\MessagePackage;
 use App\Models\SchoolCheckout;
 use App\Models\Shikkhabilling;
+use App\Models\Testimonialimg;
 use App\Models\Billingtransaction;
 use App\Models\FeatureDetailsPage;
+use Illuminate\Support\Facades\DB;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Artisan;
 use RealRashid\SweetAlert\Facades\Alert;
-
 
 class AdminPageController extends Controller
 {
@@ -54,7 +58,34 @@ class AdminPageController extends Controller
         $messages = Message::all()->count();
         $payment = Payment::all()->count();
         $school_fees = SchoolFee::all()->sum("amount");
-        return view('admin', compact('schools', 'teachers', 'students', 'stuff', 'messages', 'payment', 'school_fees'));
+        $userActivityData = DB::table('log_activities') ->select('subject', 'count')
+                                            ->orderByDesc('count')
+                                            ->get();
+
+                                            
+        $groupedData = [];
+
+        foreach ($userActivityData as $activity) {
+            $subject = $activity->subject;
+            $count = $activity->count;
+            
+            if (isset($groupedData[$subject])) {
+                $groupedData[$subject] += $count; 
+            } else {
+                $groupedData[$subject] = $count;  
+            }
+        }
+
+        $xValues = array_keys($groupedData);    
+        $yValues = array_values($groupedData);
+        $colors = [];
+        $xCount = count($xValues);
+        for($i = 0; $i < $xCount; $i++) {
+            $color = '#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $colors[] = $color;
+        }
+    
+        return view('admin', compact('schools', 'teachers', 'students', 'stuff', 'messages', 'payment', 'school_fees','xValues', 'yValues', 'colors'));
     }
     public function contactusIndex()
     {
@@ -474,10 +505,40 @@ class AdminPageController extends Controller
     //liza
 
     public function school_view()
-    {
+    {   
+         $currentMonth = Carbon::now()->format('m');
         $schools = School::with('schoolfee_Relation')->get();
-        return view('backend.admin.Schoolview.Schoolview', compact('schools'));
+        return view('backend.admin.Schoolview.Schoolview', compact('schools','currentMonth'));
     }
+
+    // school analysis
+    public function school_analysis()
+    {   
+        $currentMonth = Carbon::now()->format('m');
+        $schools = School::with('schoolfee_Relation')->get();
+        return view('backend.admin.analysis.analysis', compact('schools','currentMonth'));
+    }
+
+    // school Single analysis
+    public function school_Single_Analysis($id)
+    {   
+        $school = School::find($id);
+
+        $users = User::select(DB::raw("Count(*) as count"))->where('school_id', $school)->whereYear('created_at', date('Y'))
+                ->groupby(DB::raw("Month(created_at)"))->pluck('count');
+
+        $months = User::select(DB::raw("Month(created_at) as month"))->where('school_id', $school)->whereYear('created_at', date('Y'))
+                ->groupby(DB::raw("Month(created_at)"))->pluck('month');
+        //dd($months);
+        $datas = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+        foreach ($months as $index => $month) {
+            $datas[$month] = $users[$index];
+        }
+        return view('backend.admin.analysis.single_analysis', compact('school', 'datas'));
+    }
+
+    // school list search
     public function SchoolListsearch(Request $request)
     {
         //dd($request->all());
@@ -519,10 +580,28 @@ class AdminPageController extends Controller
         return back();
     }
 
-    public function school_SingleView($id)
+    public function school_SingleView(Request $request, $id)
     {
+        $today = Carbon::today();
         $school = School::find($id);
-        return view('backend.admin.Schoolview.SchoolSingleView', compact('school'));
+        $logs = LogActivity::where('school_id', $id)->wheredate('created_at', $today)->orderByDesc('count')->get();
+
+        $userActivityData = LogActivity::where('school_id', $id )
+                                            ->wheredate('created_at', $today)
+                                            ->select('subject', 'count')
+                                            ->orderByDesc('count')
+                                            ->get();
+        //return $userActivityData;
+        $xValues = $userActivityData->pluck('subject')->toArray();
+        $yValues = $userActivityData->pluck('count')->toArray();
+        $colors = [];
+        $xCount = count($xValues);
+        for($i = 0; $i < $xCount; $i++) {
+            $color = '#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $colors[] = $color;
+        }
+        
+        return view('backend.admin.Schoolview.SchoolSingleView', compact('school','logs','xValues', 'yValues', 'colors'));
     }
 
     public function changestatus($id)
@@ -599,26 +678,45 @@ class AdminPageController extends Controller
 
     public function AddonList()
     {
-        $addons = AddonModel::all();
-        return view('backend.admin.addon.addonlist', compact('addons'));
+        $schools=School::get();
+        $addons = AddonModel::orderBy('title')->get();
+        $paidaddons = AddonPurchase::all();
+        $features =FeatureList::all();
+        return view('backend.admin.addon.addonlist', compact('addons','schools','paidaddons','features'));
     }
     public function Addon_form()
     {
-        return view('backend.admin.addon.addonform');
+        $features =FeatureList::all();
+        return view('backend.admin.addon.addonform',compact('features'));
     }
     public function Addon_create(Request $request)
     {
         $request->validate([
-            'title' => 'required|min:18|max:25',
+            'title' => 'required|max:25',
+            'feature_id' => 'required|unique:addon_models',
+            'image' => 'required',
             'price' => 'required',
-            'month' => 'required',
+            'button' => 'required',
+            'status' => 'required',
+            'description' => 'required|min:185|max:190', 
+            'longdescription' => 'required', 
         ]);
-        try {
+        try {          
+            $fileName = null;
+            if ($request->hasFile('image')) {
+                $fileName = time() . '.' . $request->file('image')->getclientOriginalExtension();
+                $request->file('image')->move(public_path('/uploads/AddonImage/'), $fileName);
+                $fileName = "/uploads/AddonImage/".$fileName;
+            }
             AddonModel::create([
                 'title' => $request->title,
+                'feature_id'=>$request->feature_id,
+                'image' => $fileName,
                 'price' => $request->price,
-                'month' => $request->month,
+                'button' => $request->button,
+                'status' => $request->status,
                 'description' => $request->description,
+                'longdescription' => $request->longdescription,
             ]);
             Toastr::success('Addon Create successfully');
             return redirect()->route('AddonList');
@@ -627,6 +725,7 @@ class AdminPageController extends Controller
             return redirect()->route('Addon.Form');
         }
     }
+
     public function school_edit($id)
     {
         $school = School::find($id);
@@ -686,25 +785,28 @@ class AdminPageController extends Controller
     }
     public function billing_store(Request $request)
     {
-        // $request->validate([
-        //     'title' => 'required|min:18|max:25',
-        //     'price' => 'required',
-        //     'month' => 'required',
-        // ]);
-        try {
-            Shikkhabilling::create([
-                'month' => $request->month,
-                'school_id' => $request->school_id,
-                'ammount' => $request->ammount,
-                'status' => $request->status,
-            ]);
-            Toastr::success('billing Create successfully');
-            return redirect()->back();
-        } catch (Exception $e) {
-            Toastr::error('Error');
-            return redirect()->route('Addon.Form');
-        }
-    }
+        $schools = School::where('subscription_status', 1)->get();
+
+                $currentMonth = Carbon::now()->format('m');
+
+                foreach ($schools as $school) {
+                    $existingBilling = Shikkhabilling::where('school_id', $school->id)
+                                                    ->where('month', $currentMonth)
+                                                    ->first();
+
+                    if (!$existingBilling) {
+                        $billing = new Shikkhabilling;
+                        $billing->school_id = $school->id;
+                        $billing->ammount = $school->billing_add ?? 0;
+                        $billing->status = 0;
+                        $billing->month = $currentMonth;
+                        $billing->save();
+                    }
+                }
+
+                return redirect()->back();
+         }
+    
     // where('school_id',Auth::user()->id)
     public function billing_status(Request $request, $id)
     {
@@ -726,9 +828,27 @@ class AdminPageController extends Controller
     public function Addon_Delete($id)
     {
         AddonModel::find($id)->delete();
+        AddonPurchase::where('addon_id',$id)->delete();
         Toastr::success('Addon delete successfully');
         return back();
     }
+    public function Addon_status($id)
+    {
+        $getstatus=AddonModel::select('status')->where('id',$id)->first();
+        if($getstatus->status == 0){
+            $status=1;
+        }
+        elseif($getstatus->status == 1){
+            $status=0;
+        }            
+        else{
+            $status=2;
+        }
+        AddonModel::where('id',$id)->update(['status'=>$status]);
+        Toastr::success('Addon Status changed successfully');
+        return back();
+    }
+    
     public function Addon_Edit($id)
     {
         $editAddon = AddonModel::find($id);
@@ -737,19 +857,41 @@ class AdminPageController extends Controller
     public function Addon_Update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required|min:18|max:25',
+            'title' => 'required|max:25',
             'price' => 'required',
-            'month' => 'required',
-            'description' => 'max:255',
+            'button' => 'required',
+            'description' => 'required|min:185|max:190', 
+            'longdescription' => 'required',
         ]);
         $updateAddon = AddonModel::find($id);
         try {
-            $updateAddon->update([
+
+            if ($request->hasFile('image')) {
+            File::delete(public_path($updateAddon->image));
+            $fileName = time() . '.' . $request->file('image')->getclientOriginalExtension();
+            $request->file('image')->move(public_path('/uploads/AddonImage'), $fileName);
+            $fileName = "/uploads/AddonImage/" . $fileName;
+            $updateAddon->image=$fileName;
+             $updateAddon->update([
+                'title' => $request->title,
+                'image' => $fileName,
+                'price' => $request->price,
+                'button' => $request->button,
+                'description' => $request->description,
+                'longdescription' => $request->longdescription,
+                //'status' => $request->status,
+            ]);
+             }
+             else{
+                $updateAddon->update([
                 'title' => $request->title,
                 'price' => $request->price,
-                'month' => $request->month,
+                'button' => $request->button,
                 'description' => $request->description,
+                'longdescription' => $request->longdescription,
+                //'status' => $request->status,
             ]);
+             }
             Toastr::success('Addon Update successfully');
             return redirect()->route('AddonList');
         } catch (Exception $e) {
@@ -829,7 +971,8 @@ class AdminPageController extends Controller
     } 
 
     public function showMaintainance(){
-        return view('backend.admin.Setting.maintainance.show');
+         $logs = LogActivity::all();
+        return view('backend.admin.Setting.maintainance.show',compact('logs'));
     }
     
     public function setMaintenanceMode()
@@ -890,6 +1033,17 @@ class AdminPageController extends Controller
         $blog = Blog::all();
         return view('backend.admin.blog.bloglist', compact('blog'));
     }
+
+
+    public function subscription(Request $request){
+        $subcript = new subscribe();
+
+       $subcript->email = $request->email;
+       $subcript->save();
+       return back();
+    
+    }
+    
     public function  blogCreate()
     {
 
@@ -897,11 +1051,11 @@ class AdminPageController extends Controller
     }
     public function  blogedit($id)
     {
-         $blogEdit = Blog::find($id);
+        $blogEdit = Blog::find($id);
         return view('backend.admin.blog.blogcreate', compact('blogEdit'));
     }
     public function  blogeditPost(Request $request, $id)
-    {
+    { 
         $blog= Blog::find($id);
         if ($request->hasFile('image')) {
             File::delete(public_path($blog->image));
@@ -912,6 +1066,9 @@ class AdminPageController extends Controller
         }
         $blog->title = $request->title;
         $blog->content = $request->content;
+
+        $blog->blog_type = $request->blog_type;
+        $blog->blog_design = $request->blog_design;
         $blog->slug = Str::slug($request->title);
         $blog->written_by = Auth::guard('admin')->user()->id;
         $blog->save();
@@ -926,7 +1083,6 @@ class AdminPageController extends Controller
         $request->validate([
             'title' => 'required',
             'content' => 'required',
-            'image' => 'required',
 
 
         ]);
@@ -938,6 +1094,8 @@ class AdminPageController extends Controller
         }
         $blog = new Blog();
         $blog->title = $request->title;
+        $blog->blog_type = $request->blog_type;
+        $blog->blog_design = $request->blog_design;
         $blog->content = $request->content;
         $blog->slug = Str::slug($request->title);
         $blog->written_by = Auth::guard('admin')->user()->id;
@@ -954,4 +1112,277 @@ class AdminPageController extends Controller
 
         return redirect(route('bloglist'))->with('success', 'Blog Created Successfully');
     }
+
+    public function testimonial_imagelist(){
+        $data =Testimonialimg::all();
+        return view('backend.admin.testmonialfeature.testimonialimglist',compact('data'));
+    }
+    
+    public function testimonial_imgstore(Request $request){
+
+        $request->validate([
+            'image' => 'required'
+        ]);
+
+        $fileName = null;
+        if ($request->hasFile('image')) {
+            $fileName = time() . '.' . $request->file('image')->getclientOriginalExtension();
+            $request->file('image')->move(public_path('/uploads/testimonialimg/'), $fileName);
+            $fileName = "/uploads/testimonialimg/" . $fileName;
+        }
+        $testimg = new Testimonialimg();
+        $testimg->image = $fileName;
+        $testimg->save();
+         Alert::success('Success', "image  added Successfully");
+        return back();
+    }
+
+    public function testimonial_imgdelete($id){
+        $data = Testimonialimg::find($id)->delete();
+        Alert::success('Success', "image deleted Successfully");
+        return redirect()->back();
+    }
+
+    public function data_addToLog()
+    {
+        LogActivity::addToLog('user_view');
+        $page = 'your_page_url'; 
+        $userViewCount = LogActivityService::countUserViewActivity($page);
+    }
+    //   public function log_ActivityLists()
+    // {
+    //      $logs = LogActivity::logActivityLists();
+    //      return view('backend.admin.Setting.maintainance.show',compact('logs'));
+    // }
+    public function Addon_purchase_status($id)
+    {
+        $getstatus=AddonPurchase::select('status')->where('id',$id)->first();
+        if($getstatus->status == 0){
+            $status=1;
+        }
+        elseif($getstatus->status == 1){
+            $status=2;
+        }            
+        else{
+            $status=1;
+        }
+        AddonPurchase::where('id',$id)->update(['status'=>$status]);
+        Toastr::success('Addon Purchase Status changed successfully');
+        return back();
+    }
+
+    
+    public function feature_status($id)
+    {
+        $getstatus=FeatureList::select('status')->where('id',$id)->first();
+        if($getstatus->status == 1){
+            $status=0;
+        }
+        elseif($getstatus->status == 0){
+            $status=1;
+        }            
+        else{
+            $status=1;
+        }
+        FeatureList::where('id',$id)->update(['status'=>$status]);
+        Toastr::success('Feature Status changed successfully');
+        return back();
+    }
+
+
+
+    
+
+    public function school_ChartYesterday($id)
+    {
+        $yesterday = Carbon::yesterday();
+        $school = School::find($id);
+        $logs = LogActivity::where('school_id', $id)->wheredate('created_at', $yesterday)->get();
+        $userActivityData = LogActivity::where('school_id', $id )
+                                            ->wheredate('created_at', $yesterday)
+                                            ->select('subject', 'count')
+                                            ->orderByDesc('count')
+                                            ->get();
+
+        $xValues = $userActivityData->pluck('subject')->toArray();
+        $yValues = $userActivityData->pluck('count')->toArray();
+        $colors = [];
+        $xCount = count($xValues);
+        for($i = 0; $i < $xCount; $i++) {
+            $color = '#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $colors[] = $color;
+        }
+        
+        return view('backend.admin.Schoolview.SchoolSingleView', compact('school','logs','xValues', 'yValues', 'colors'));
+    }
+    public function school_ChartLastweek($id)
+    {
+        $school = School::find($id);
+        $last7DaysStart = Carbon::now()->subDays(7);
+        $userActivityData = DB::table('log_activities')->where('school_id', $id )
+                                            ->where('created_at','>=', $last7DaysStart)
+                                            ->select('subject', 'count')
+                                            ->orderByDesc('count')
+                                            ->get();
+
+        $groupedData = [];
+        foreach ($userActivityData as $activity) {
+            $subject = $activity->subject;
+            $count = $activity->count;
+            
+            if (isset($groupedData[$subject])) {
+                $groupedData[$subject] += $count; 
+            } else {
+                $groupedData[$subject] = $count;  
+            }
+        }
+
+        $xValues = array_keys($groupedData);    
+        $yValues = array_values($groupedData);
+        $colors = [];
+        $xCount = count($xValues);
+        for($i = 0; $i < $xCount; $i++) {
+            $color = '#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $colors[] = $color;
+        }
+        
+        return view('backend.admin.Schoolview.SchoolSingleView', compact('school','xValues', 'yValues', 'colors'));
+    }
+    public function school_ChartLastmonth($id)
+    {
+       $school = School::find($id);
+        $lastMonthStart = Carbon::now()->subMonths(1);
+        $userActivityData = DB::table('log_activities')->where('school_id', $id )
+                                            ->where('created_at','>=', $lastMonthStart)
+                                            ->select('subject', 'count')
+                                            ->orderByDesc('count')
+                                            ->get();
+        
+        $groupedData = [];
+        foreach ($userActivityData as $activity) {
+            $subject = $activity->subject;
+            $count = $activity->count;
+            
+            if (isset($groupedData[$subject])) {
+                $groupedData[$subject] += $count; 
+            } else {
+                $groupedData[$subject] = $count;  
+            }
+        }
+
+        $xValues = array_keys($groupedData);    
+        $yValues = array_values($groupedData);
+        $colors = [];
+        $xCount = count($xValues);
+        for($i = 0; $i < $xCount; $i++) {
+            $color = '#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $colors[] = $color;
+        }
+        
+        return view('backend.admin.Schoolview.SchoolSingleView', compact('school','xValues', 'yValues', 'colors'));
+    }
+    public function school_ChartSixmonth($id)
+    {
+       $school = School::find($id);
+        $lastSixmonth = Carbon::now()->subMonths(6);
+        $userActivityData = DB::table('log_activities')->where('school_id', $id )
+                                            ->where('created_at','>=', $lastSixmonth)
+                                            ->select('subject', 'count')
+                                            ->orderByDesc('count')
+                                            ->get();
+
+                                            
+        $groupedData = [];
+
+        foreach ($userActivityData as $activity) {
+            $subject = $activity->subject;
+            $count = $activity->count;
+            
+            if (isset($groupedData[$subject])) {
+                $groupedData[$subject] += $count; 
+            } else {
+                $groupedData[$subject] = $count;  
+            }
+        }
+
+        $xValues = array_keys($groupedData);    
+        $yValues = array_values($groupedData);
+        $colors = [];
+        $xCount = count($xValues);
+        for($i = 0; $i < $xCount; $i++) {
+            $color = '#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $colors[] = $color;
+        }
+        
+        return view('backend.admin.Schoolview.SchoolSingleView', compact('school','xValues', 'yValues', 'colors'));
+    }
+    public function school_ChartThisYear($id)
+    {
+       $school = School::find($id);
+        $lastSixmonth = Carbon::now()->subMonths(12);
+        $userActivityData = DB::table('log_activities')->where('school_id', $id )
+                                            ->where('created_at','>=', $lastSixmonth)
+                                            ->select('subject', 'count')
+                                            ->orderByDesc('count')
+                                            ->get();
+
+                                            
+        $groupedData = [];
+
+        foreach ($userActivityData as $activity) {
+            $subject = $activity->subject;
+            $count = $activity->count;
+            
+            if (isset($groupedData[$subject])) {
+                $groupedData[$subject] += $count; 
+            } else {
+                $groupedData[$subject] = $count;  
+            }
+        }
+
+        $xValues = array_keys($groupedData);    
+        $yValues = array_values($groupedData);
+        $colors = [];
+        $xCount = count($xValues);
+        for($i = 0; $i < $xCount; $i++) {
+            $color = '#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $colors[] = $color;
+        }
+        
+        return view('backend.admin.Schoolview.SchoolSingleView', compact('school','xValues', 'yValues', 'colors'));
+    }
+    public function school_ChartTotal($id)
+    {
+       $school = School::find($id);
+        $userActivityData = DB::table('log_activities')->where('school_id', $id )
+                                            ->select('subject', 'count')
+                                            ->orderByDesc('count')
+                                            ->get();
+
+                                            
+        $groupedData = [];
+
+        foreach ($userActivityData as $activity) {
+            $subject = $activity->subject;
+            $count = $activity->count;
+            
+            if (isset($groupedData[$subject])) {
+                $groupedData[$subject] += $count; 
+            } else {
+                $groupedData[$subject] = $count;  
+            }
+        }
+
+        $xValues = array_keys($groupedData);    
+        $yValues = array_values($groupedData);
+        $colors = [];
+        $xCount = count($xValues);
+        for($i = 0; $i < $xCount; $i++) {
+            $color = '#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $colors[] = $color;
+        }
+        
+        return view('backend.admin.Schoolview.SchoolSingleView', compact('school','xValues', 'yValues', 'colors'));
+    }
+
 }

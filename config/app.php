@@ -247,7 +247,7 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Image' => Intervention\Image\Facades\Image::class,
 
-
+         'LogActivity' => App\Helpers\LogActivity::class,
         // package
         'Image' => Intervention\Image\Facades\Image::class
 

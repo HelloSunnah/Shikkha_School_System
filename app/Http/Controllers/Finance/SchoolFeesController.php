@@ -20,7 +20,15 @@ class SchoolFeesController extends Controller
      * view fees blade
      */
     public function index(Request $request)
-    {
+    {   
+        $seoTitle = 'School Fees';
+        $seoDescription = 'School Fees';
+        $seoKeyword = 'School Fees';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         try
         {
             $schoolId = Auth::id();
@@ -65,7 +73,7 @@ class SchoolFeesController extends Controller
                     $data['fee_types'] = $typeOfFees = FeesType::where('school_id', $schoolId)->get();
                 }
             
-                return view('frontend.school.finance.fees-create')->with($data);
+                return view('frontend.school.finance.fees-create',compact('seo_array'))->with($data);
             }
         }
         catch(Exception $e)

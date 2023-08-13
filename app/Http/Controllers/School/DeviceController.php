@@ -32,8 +32,9 @@ class DeviceController extends Controller
      * view auto settings
      */
     public function autoAttendanceSettings()
-    {
-        return view('panel.attendance.auto-settings');
+    {   
+         
+        return view('panel.attendance.auto-settings',compact('seo_array'));
     }
 
 
@@ -396,7 +397,15 @@ class DeviceController extends Controller
      */
     public function index()
     {
-        return view('frontend.school.settings.form');
+        $seoTitle = 'Device  Setting';
+        $seoDescription = 'Device  Setting' ;
+        $seoKeyword = 'Device  Setting' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.school.settings.form',compact('seo_array'));
     }
 
 

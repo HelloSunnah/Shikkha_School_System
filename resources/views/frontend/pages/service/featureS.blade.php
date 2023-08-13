@@ -10,9 +10,9 @@
                         <br> {{__('app.sp1')}}</h1>
                     <p class="text-muted mt-4">{{__('app.sp2')}} <br>{{__('app.sp3')}}</p>
                     <ul class="mt-4">
-                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.sp4')}}
+                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.sp4')}}
                         </li>
-                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.sp5')}}</li>
+                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.sp5')}}</li>
                         <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.sp6')}}</li>
                     </ul>
 

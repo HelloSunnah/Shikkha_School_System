@@ -165,7 +165,15 @@ class AttendanceController extends Controller
      * input attendance
      */
     public function inputAttendance(Request $request)
-    {
+    {   
+        $seoTitle = 'Custom Attendance Students';
+        $seoDescription = 'Subject Show';
+        $seoKeyword = 'Subject Show';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $query = User::where('school_id', Auth::id());
 
         if($request->has('class_id') && !empty($request->class_id))
@@ -188,7 +196,7 @@ class AttendanceController extends Controller
         $data['class'] = InstituteClass::where('school_id', Auth::id())->get();
         $data['terms'] = ResultSetting::where('school_id', Auth::id())->get();
 
-        return view('panel.attendance.input')->with($data);
+        return view('panel.attendance.input', compact('seo_array'))->with($data);
     }
 
 
@@ -290,20 +298,36 @@ class AttendanceController extends Controller
     // Staff Attendance
 
     public function staffAttendancePage(){
+        $seoTitle = 'Staff Take/View Attendance';
+        $seoDescription = 'Staff Attendance';
+        $seoKeyword = 'Staff Attendance';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $defaultDate = Carbon::today()->format('Y-m-d');
-        return view('frontend.school.staff.StaffAttendance.ViewPage',compact('defaultDate'));
+        return view('frontend.school.staff.StaffAttendance.ViewPage',compact('defaultDate','seo_array'));
     }
 
 
 
     public function StaffAttendance($date)
-    {
+    {   
+        $seoTitle = 'Staff Attendance';
+        $seoDescription = 'Staff Attendance';
+        $seoKeyword = 'Staff Attendance';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('d M, Y');
         $school = School::find(Auth::user()->id);
         $dataAttendance = StaffAttendance::where('school_id', Auth::id())->whereDate('created_at', $date)->get()->unique('employee_id');
         $dataShow=Employee::where("school_id", Auth::user()->id)->get();
          
-        return view('frontend.school.staff.StaffAttendance.StaffAttendance',compact('dataShow','dataAttendance','date', 'formattedDate', 'school'));
+        return view('frontend.school.staff.StaffAttendance.StaffAttendance',compact('dataShow','dataAttendance','date', 'formattedDate', 'school','seo_array'));
     }
 
 
@@ -380,8 +404,16 @@ class AttendanceController extends Controller
 
 
    public function StaffAttendance_AllView()
-   {
-        return view('frontend.school.staff.StaffAttendance.AllStaffAttendance');
+   {    
+        $seoTitle = 'Staff Attendance Monthly';
+        $seoDescription = 'Staff Attendance Monthly';
+        $seoKeyword = 'Staff Attendance Monthly';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.school.staff.StaffAttendance.AllStaffAttendance',compact('seo_array'));
    }
 
 
@@ -407,16 +439,32 @@ class AttendanceController extends Controller
     }
 
     public function StaffAttendance_Month($date){
+        $seoTitle = 'Staff Attendance Monthly';
+        $seoDescription = 'Staff Attendance Monthly';
+        $seoKeyword = 'Staff Attendance Monthly';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $school = School::find(Auth::user()->id);
         $dataAttendance = StaffAttendance::where("school_id", Auth::user()->id)->whereDate('created_at', $date)->get();
         $dataShow = Employee::where("school_id", Auth::user()->id)->get();
-        return view('frontend.school.staff.StaffAttendance.AttendanceMonthView',compact('school','dataAttendance','dataShow','date'));
+        return view('frontend.school.staff.StaffAttendance.AttendanceMonthView',compact('school','dataAttendance','dataShow','date','seo_array'));
     }
     
     //teacher Attendance
     public function Teacher_datepage(){
+        $seoTitle = 'Teacher Take/View Attendance';
+        $seoDescription = 'Teacher Take/View Attendance';
+        $seoKeyword = 'Teacher Take/View Attendance';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $defaultDate = Carbon::today()->format('Y-m-d');
-        return view('frontend.school.teacher.TeacherAttendance.dateView',compact('defaultDate'));
+        return view('frontend.school.teacher.TeacherAttendance.dateView',compact('defaultDate','seo_array'));
     }
 
     public function datepage_post(Request $request){
@@ -442,12 +490,20 @@ class AttendanceController extends Controller
 
 
     public function TeacherAttendance_page($date)
-    {
+    {   
+        $seoTitle = 'Teacher Attendance';
+        $seoDescription = 'Teacher Attendance';
+        $seoKeyword = 'Teacher Attendance';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('d M, Y');
         $dataAttendance = TeacherAttendance::where('school_id', Auth::id())->whereDate('created_at',$date)->get()->unique('teacher_id');
         $dataShow=Teacher::where("school_id", Auth::user()->id)->get();
         $school = School::find(Auth::user()->id);
-        return view('frontend.school.teacher.TeacherAttendance.TeacherAttendancePage' ,compact('dataAttendance','dataShow','formattedDate','school','date'));
+        return view('frontend.school.teacher.TeacherAttendance.TeacherAttendancePage' ,compact('dataAttendance','dataShow','formattedDate','school','date','seo_array'));
     }
     
 
@@ -482,7 +538,15 @@ class AttendanceController extends Controller
    }
 
     public function TeacherAttendance_AllView(){
-        return view('frontend.school.teacher.TeacherAttendance.AllTeacherView');
+        $seoTitle = 'Teacher Attendance Monthly';
+        $seoDescription = 'Teacher Attendance Monthly';
+        $seoKeyword = 'Teacher Attendance Monthly';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.school.teacher.TeacherAttendance.AllTeacherView',compact('seo_array'));
     }
 
     public function TeacherAttendance_Viewpost(Request $request){
@@ -505,10 +569,18 @@ class AttendanceController extends Controller
     }
 
     public function TeacherAttendance_Month($date){
+        $seoTitle = 'Teacher Attendance Monthly';
+        $seoDescription = 'Teacher Attendance Monthly';
+        $seoKeyword = 'Teacher Attendance Monthly';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $school = School::find(Auth::user()->id);
         $dataAttendance = TeacherAttendance::where("school_id", Auth::user()->id)->whereDate('created_at', $date)->get();
         $dataShow = Teacher::where("school_id", Auth::user()->id)->get();
-        return view('frontend.school.teacher.TeacherAttendance.TeacherMonthView',compact('school','dataAttendance','dataShow','date'));
+        return view('frontend.school.teacher.TeacherAttendance.TeacherMonthView',compact('school','dataAttendance','dataShow','date','seo_array'));
    }
 
    public function Teacher_confirmabsentpresent(Request $request, $id){
@@ -531,7 +603,15 @@ class AttendanceController extends Controller
 
 
    public function Attendance_dashboard(){
-    return view ('frontend.school.student.Attendancedashboard.Sdashboard');
+    $seoTitle = 'Student Attendance Dashboard';
+    $seoDescription = 'Student Attendance Dashboard';
+    $seoKeyword = 'Student Attendance Dashboard';
+    $seo_array = [
+        'seoTitle' => $seoTitle,
+        'seoKeyword' => $seoKeyword,
+        'seoDescription' => $seoDescription,
+    ];
+    return view ('frontend.school.student.Attendancedashboard.Sdashboard', compact('seo_array'));
    }
    public function Attendance_profile(){
     return view ('frontend.school.student.Attendancedashboard.SAttendanceProfile');
@@ -542,9 +622,17 @@ class AttendanceController extends Controller
     * show student list in dashboard
     */
    public function Studentdetailsdashboard(Request $request)
-   {
+   {  
         try
         {
+            $seoTitle = 'Student Attendance Dashboard';
+            $seoDescription = 'Student Attendance Dashboard';
+            $seoKeyword = 'Student Attendance Dashboard';
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
             $users = User::with('class:id,class_name', 'section:id,section_name')->where('school_id', Auth::id());
 
             if($request->has('classId') && !empty($request->classId))
@@ -599,7 +687,73 @@ class AttendanceController extends Controller
             }
             else
             {
-                return view('frontend.school.student.Attendancedashboard.Studentdetailsdashboard')->with($data);
+                return view('frontend.school.student.Attendancedashboard.Studentdetailsdashboard',compact('seo_array'))->with($data);
+            }
+        }
+        catch(Exception $e)
+        {
+            if($request->ajax())
+            {
+                return $this->error($e->getMessage());
+            }
+            else
+            {
+                return abort(403, $e->getMessage());
+            }
+        }
+   }
+
+
+   /**
+    * show Teacher list in dashboard
+    */
+   public function teacherAttendanceDashboard(Request $request)
+   {
+        try
+        {    
+            $seoTitle = 'Teacher Attendance Dashboard';
+            $seoDescription = 'Teacher Attendance Dashboard';
+            $seoKeyword = 'Teacher Attendance Dashboard';
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
+            $users = Teacher::where('school_id', Auth::id());
+
+            if($request->has('shift') && !empty($request->shift))
+            {
+                $users->where('shift', $request->shift);
+            }
+
+
+            if($request->has('limit') && !empty($request->limit))
+            {
+                $users->limit($request->limit);
+            }
+            else
+            {
+                $users->limit(100);
+            }
+
+            if($request->has('order') && !empty($request->order) && $request->order == "desc")
+            {
+                $users->latest();
+            }
+            else
+            {
+                $users->orderBy('id');
+            }
+
+            $data['users'] = $users->get();
+
+            if($request->ajax())
+            {
+                return $this->success(count($data['users']) . " record fetched", $data);
+            }
+            else
+            {
+                return view('frontend.school.student.Attendancedashboard.teacher_dashboard',compact('seo_array'))->with($data);
             }
         }
         catch(Exception $e)
@@ -640,10 +794,15 @@ class AttendanceController extends Controller
                     
                         foreach($students as $userId => $uniqueId)
                         {
+                            $user = User::find($userId);
                             if(in_array($uniqueId, $connectedUsers))
                             {
-                                User::find($userId)->update(['device_connected'=>1]);
+                                $user->update(['device_connected'=>1]);
                                 ++$updateCount;
+                            }
+                            else
+                            {
+                                $user->update(['device_connected'=>0]);
                             }
                         } 
                     
@@ -658,7 +817,7 @@ class AttendanceController extends Controller
                             }
                         }
 
-                        return $this->success($updateCount . " record updated successfully", $resp);
+                        return $this->success($updateCount . " record updated successfully");
                     }
                     else
                     {

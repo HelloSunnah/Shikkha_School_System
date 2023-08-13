@@ -17,6 +17,7 @@ class CreateSubjectsTable extends Migration
             $table->id();
             $table->foreignId('class_id')->constrained('institute_classes')->cascadeOnDelete();
             $table->foreignId('section_id')->constrained('sections')->cascadeOnDelete();
+            $table->string('subject_code')->nullable();
             $table->integer('group_id')->nullable();
             $table->string('subject_name')->nullable();
             $table->string('subject_name_bn')->nullable();

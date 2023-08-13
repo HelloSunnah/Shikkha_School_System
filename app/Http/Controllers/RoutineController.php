@@ -33,13 +33,22 @@ class RoutineController extends Controller
      */
     public function index()
     {
+        $seoTitle = 'Routine Searchpage';
+            $seoDescription = 'Routine Searchpage';
+            $seoKeyword = 'Routine Searchpage';
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
+
         $classes = DB::table('institute_classes')->where('school_id',$this->school->id)->get();
         $sections = DB::table('sections')->where('school_id',$this->school->id)->get();
 
 
         //return $abc =  $this->school->id;
 
-        return view('frontend.school.routine.index')->with(compact('classes', 'sections'));
+        return view('frontend.school.routine.index')->with(compact('classes', 'sections','seo_array'));
     }
 
     /**
@@ -102,13 +111,21 @@ class RoutineController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request)
-    {
+    { 
+        $seoTitle = 'Class RoutineShow';
+            $seoDescription = 'Class RoutineShow';
+            $seoKeyword = 'Class RoutineShow';
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
         $rows = Routine::where([
             'school_id' => $this->school->id,
             'class_id'  => $request->class,
             'section_id'   => $request->section,
             'shift'   => $request->shift,
-        ])->get()->groupBy('day');
+        ])->orderByRaw("FIELD(day, 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')")->get()->groupBy('day');
 
         $data = $request->only('class', 'section', 'shift');
         $data['dataFor'] = "create";
@@ -118,7 +135,7 @@ class RoutineController extends Controller
 
         if($data['periods']->count() > 0)
         {
-            return view('frontend.school.routine.table')->with(compact('rows', 'data'));
+            return view('frontend.school.routine.table')->with(compact('rows', 'data','seo_array'));
         }
         else
         {
@@ -149,7 +166,7 @@ class RoutineController extends Controller
             'class_id'  => $data['class'],
             'section_id'   => $data['section'],
             'shift'   => $data['shift'],
-        ])->get()->groupBy('day');
+        ])->orderByRaw("FIELD(day, 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')")->get()->groupBy('day');
 
 
         $data['editRoutine'] = Routine::where([
@@ -158,8 +175,7 @@ class RoutineController extends Controller
                                     'section_id'   => $data['section'],
                                     'shift'   => $data['shift'],
                                     'day'   => $data['day'],
-                                ])
-                                ->get();
+                                ])->get();
 
         $data['dataFor'] = "edit";
 
@@ -203,7 +219,7 @@ class RoutineController extends Controller
     }
 
     public function school_Routine_view(){
-
+         
         $periods = ClassPeriod::where(['school_id' => $this->school->id, 'shift' => 1])->get();
         $rows = Routine::with('period', 'class', 'subject', 'section')->where(['school_id' => $this->school->id, 'shift' => 1])->orderBy('day', 'asc')->get();
         $rowsec = Routine::where(['school_id' => $this->school->id, 'shift' => 1])->orderBy('day', 'asc')->get()->groupBy('section_id');

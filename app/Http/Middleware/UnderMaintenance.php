@@ -22,6 +22,8 @@ class UnderMaintenance
         {
             if(Auth::user()->is_down == 1)
             {
+                Session:: flush();
+                Auth::logout();
                 return redirect("/error/503");
             }
             else{
@@ -34,6 +36,8 @@ class UnderMaintenance
             $user = \App\Models\School::find(Auth::user()->school_id)->first()->is_down;
             if($user == 1)
             {
+                Session:: flush();
+                Auth::logout();
                 return redirect("/error/503");
             }
             else{
@@ -46,6 +50,8 @@ class UnderMaintenance
             $user = \App\Models\School::find(Auth::user()->school_id)->first()->is_down;
             if($user == 1)
             {
+                Session:: flush();
+                Auth::logout();
                 return redirect("/error/503");
             }
             else{

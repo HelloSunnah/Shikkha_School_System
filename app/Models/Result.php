@@ -10,6 +10,8 @@ class Result extends Model
 {
     use HasFactory,SoftDeletes;
 
+    protected $guarded = [];
+    
     public function subject()
     {
         return $this->belongsTo(Subject::class,'subject_id', 'id');

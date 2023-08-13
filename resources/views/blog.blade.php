@@ -1,59 +1,93 @@
 @extends('frontend.layouts.app')
 
 @section('main')
-<br><br><br><br><br><br>
+<br><br><br>
 <style>
-    .btn1:hover {
-        background-color: blueviolet;
-        color: white !important;
+    .container {
+        position: relative;
+        text-align: left;
     }
+
+    .container img {
+        display: block;
+        margin: 0 auto;
+    }
+
+    .text-container {
+        position: absolute;
+        top: 50%;
+        color: white;
+        padding: 4px;
+        margin-left: 80px;
+    }
+    .typewriter h1 {
+  color:blueviolet;
+  font-family: monospace;
+  overflow: hidden;
+  border-right: .15em solid blueviolet; 
+  white-space: nowrap; 
+  margin: 0 auto; 
+  letter-spacing: .15em;
+  animation: 
+    typing 3.5s steps(30, end),
+    blink-caret .5s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: blueviolet }
+}
 </style>
 
 <div class="site-wrapper-reveal ">
 
     <!--====================  Blog Area Start ====================-->
 
+    <div class="row">
 
+        @if(count($blog) > 0)
 
-    <center>
-        <h1 style="color: purple;padding-bottom:40px">Shikkha Blog</h1>
-        <p style="margin-left: 200px;margin-right:200px;margin-bottom:50px;">
-            Our blog includes informative guides, tutorials, the latest news, and articles related to the web app and mobile
-            app developments. Use these guidelines to get
-            started on your software outsourcing projects.</p>
-    </center>
-    <div class="blog-pages-wrapper section-space--ptb_100">
         <div class="container">
-
-            <div class="row">
-                @foreach($blog as $data)
-
-                <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-6 col-sm-6">
-                    <a href="{{route('blog.view',$data->slug)}}">
-
-                        <div class="services__inner hover__active mb-30 wow fadeInUp" data-wow-delay=".3s">
-
-                            <div class="text-center services__item white-bg transition-3 p-3">
-                                <div class="services__icon mb-25 d-flex align-items-end justify-content-center">
-                                    <img width="200px" src="{{ asset($data->image ?? 'frontend/assets/img/icon/services/home-1/services-1.png') }}" alt="">
-                                </div>
-                                <div class="services__content">
-                                    <div style="overflow: hidden;height:50px">
-                                        <p class="services__title"><a href="#"> <br>{!! substr(strip_tags($data->title), 0, 100) !!}</a></p>
-
-                                    </div>
-                                    <p>{{$data->created_at->format('M d, Y')}}</p>
-                                    <br>
-                                    <a href="{{route('blog.view',$data->slug)}}" class="btn btn-outline-primary btn1" style="border-color:blueviolet !important;background-color: #7127ea;color:white">View Blog</a>
-
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-
+            <img height="400px" width="1300px" src="{{ asset($blog->first()?->image??'frontend/assets/img/page-title/5.jpg') }}" alt="Image">
+            <div class="text-container">
+                <div class="col-6">
+                    <h3 class="animated-text" style="color: white;text-align:left">{{ $blog->first()?->title }}</h3>
                 </div>
+                <div class="col-2">
+                    <a href="{{route('blog.view',$blog->first()?->slug)}}" style="color:black;text-align:left;border-radius:5px;background-color:aliceblue;margin-left:0px" class="btn btn-white">Read More</a>
+                </div>
+            </div>
+        </div>
 
-                @endforeach
+        <div class="blog-pages-wrapper section-space--ptb_100">
+            <div class="container">
+                <div style="margin-top:50px;">
+                    <div class="row">
+                        @foreach($blog->toQuery()->where('id','!=', $blog->first()->id)->get() as $data)
+
+                        <div class="col-md-4">
+                            <a href="{{route('blog.view',$data->slug)}}">
+
+                                <div>
+                                    <img style="border-radius: 10px;" Width="300px" Height="250px" src="{{ asset($data->image ?? 'frontend/assets/img/page-title/1.png') }}" alt="">
+                                    <div style="height: 180px;">
+                                        <h6 style="margin-top: 20px;text-align:left;margin-left:20px;margin-right:20px">
+                                            {!! substr(strip_tags($data->title), 0, 100) !!}</h6>
+                                        <p style="text-align:left ;margin-left:20px">{!! substr(strip_tags($data->content), 0, 150) !!}.....</p>
+                                    </div>
+                                    <a href="{{route('blog.view',$data->slug)}}" class="btn btn-white" style="width:110px;border-color:blueviolet;margin-left:20px;margin-bottom:20px" onmouseover="this.style.backgroundColor='blueViolet';color='white'" onmouseout="this.style.backgroundColor='white';">Read More</a>
+
+                                </div>
+                        </div>
+                        @endforeach
+
+                    </div>
+                </div>
 
 
 
@@ -62,42 +96,21 @@
 
             </div>
         </div>
+        <!--====================  Blog Area End  ====================-->
+
+        @else
+
+
+        <section  class="contact__area pb-10 p-relative z-index-1">
+            <div style="margin-top:180px;margin-left:500px; width:500px;height:300px" class="typewriter">
+                    <h1>Comming-soon</h1>
+            </div>
+        </section>
+
+
+        @endif
     </div>
-    <!--====================  Blog Area End  ====================-->
 
+    <!--===========  feature-large-images-wrapper  End =============-->
 
-
-
-
-
-
-
-
-
-
-    <!--========== Call to Action Area Start ============-->
-    {{-- <div class="cta-image-area_one section-space--ptb_80 cta-bg-image_one">
-                <div class="container">
-                    <div class="row align-items-center">
-                        <div class="col-xl-8 col-lg-7">
-                            <div class="cta-content md-text-center">
-                                <h3 class="heading text-white">Assess your business potentials and find opportunities <span class="text-color-secondary">for bigger success</span></h3>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-lg-5">
-                            <div class="cta-button-group--one text-center">
-                                <a href="#" class="btn btn--white btn-one"><span class="btn-icon mr-2"><i class="far fa-comment-alt-dots"></i></span> Let's talk</a>
-                                <a href="#" class="btn btn--secondary  btn-two"><span class="btn-icon mr-2"><i class="far fa-info-circle"></i></span> Get info</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> --}}
-    <!--========== Call to Action Area End ============-->
-
-
-</div>
-
-<!--===========  feature-large-images-wrapper  End =============-->
-
-@endsection
+    @endsection

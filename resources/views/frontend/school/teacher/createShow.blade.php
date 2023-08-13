@@ -15,8 +15,8 @@
                                 <div class="col-md-12">
                                     @include('frontend.layouts.message')
                                 </div>
-                                <div class="col-12">
-                                    <label for="Select Class">{{__('app.select')}} {{__('app.class')}}</label>
+                                <div class="col-12 mb-3">
+                                    <label for="Select Class" class="select-form">{{__('app.select')}} {{__('app.class')}}</label>
                                     <select class="form-control mb-3 js-select" aria-label="Default select example" name="class_id" id="class_id" onchange="loadSection()" required>
                                         <option value="" selected>Class Name</option>
                                         @foreach($class as $data)
@@ -24,15 +24,15 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label">{{__('app.Section')}} {{__('app.Name')}}</label>
+                                <div class="col-12 mb-3">
+                                    <label class="select-form">{{__('app.Section')}} {{__('app.Name')}}</label>
                                     <select class="form-control mb-3 js-select" id="section_id" name="section_id" onchange="loadGroup()" required>
-                                        <option selected>Select one</option>
+                                        <option value="" selected>Select one</option>
                                     </select>
                                 </div>
 
-                                <div class="col-12">
-                                    <label class="form-label">{{__('app.Subject')}}</label>
+                                <div class="col-12 mb-3">
+                                    <label class="select-form">{{__('app.Subject')}}</label>
                                     <select class="form-control mb-3 js-select" id="subject_id" name="subject_id" onchange="loadTeacher()" required>
                                         <option value="" selected >Select Subject</option>
                                         @foreach ($subjects as $item)
@@ -41,16 +41,16 @@
                                     </select>
                                 </div>
 
-                                <div class="col-12">
-                                    <label class="form-label">{{__('app.Teacher')}}</label>
+                                <div class="col-12 mb-3">
+                                    <label class="select-form">{{__('app.Teacher')}}</label>
                                     <select class="form-control mb-3 js-select" name="teacher_id" id="teacher_id" required>
-                                        <option value=" " selected >Select Teacher</option>
+                                        <option value="" selected >Select Teacher</option>
                                         @foreach ($teachers as $teacher )
                                             <option value="{{ $teacher->id }}" >{{ $teacher->full_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-12" id="group-select">
+                                <div class="col-12 mb-3" id="group-select">
                                     {{-- <label class="form-label">Group Name</label>
                                     <select class="form-control mb-3 js-select" id="group_id" name="group_id">
                                         <option selected>Select one</option>

@@ -36,6 +36,8 @@ class CreateUsersTable extends Migration
             $table->integer('scholarship')->default(1);
             $table->foreignId('school_id')->constrained('schools')->cascadeOnDelete();
             $table->tinyInteger('shift')->default(2)->comment('1=morning, 2=day, 3=eveing');
+            $table->text('subject_list')->nullable();
+            $table->text('optional_subject')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

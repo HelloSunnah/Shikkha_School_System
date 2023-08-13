@@ -95,7 +95,7 @@ class LoginController extends Controller
     public function schoolLogin(Request $request)
     {
         // dd($request->all());
-        $data =   $this->validate(
+        $data =  $this->validate(
             $request,
             [
                 'email'   => 'required|email',
@@ -136,9 +136,8 @@ class LoginController extends Controller
                 return back()->withInput($request->only('email', 'remember'));
             }
         } elseif ($request->BannerTypes == 'teacher') {
-
             if (Auth::guard('teachers')->attempt(['email' => $request->email, 'password' => $request->password], $request->get('remember'))) {
-
+                
                 return redirect()->intended('/teachers');
             } else {
                 $email = Teacher::where('email', $request->email)->first();
@@ -201,7 +200,6 @@ class LoginController extends Controller
     
     public function  forgotPassword()
     {
-
         return view('auth.passwords.email');
     }
 

@@ -617,7 +617,7 @@ $i = 1;
                     {{-- Attendance --}}
                     <div class="tab-pane fade <?php if (Request::segment(1) == 'school' and Request::segment(2) == 'student' and (Request::segment(3) == 'attendanceshow' or Request::segment(3) == 'all' and Request::segment(4) == 'attendanceshow' or Request::segment(3) == 'attendance' and Request::segment(4) == 'attendanceshow' or Request::segment(3) == 'attendance' and Request::segment(4) == 'show' or Request::segment(3) == 'attendance' and Request::segment(4) == 'dashboard' or Request::segment(3) == 'attendance' and Request::segment(4) == 'profile' or Request::segment(3) == 'attendance' and Request::segment(4) == 'list') or Request::segment(3) == 'datepage' or Request::segment(3) == 'datepage' or Request::segment(3) == 'StaffAttendancePage' or Request::segment(3) == 'TeacherAttendance' or Request::segment(3) == 'TeacherView' or Request::segment(3) == 'Teacher-Attendance-Month' or Request::segment(2) == 'Staff' and Request::segment(3) == 'Staff' and Request::segment(4) == 'Attendance' or Request::segment(3) == 'StaffAttendance') {
                         echo 'active show';
-                    } ?>" id="pills-attentdance">
+                    }elseif(Request::route()->getName() == 'auto.attendance'){echo 'active show';} ?>" id="pills-attentdance">
                         <div class="list-group list-group-flush">
                             <div class="list-group-item">
                                 <div class="d-flex w-100 justify-content-between">
@@ -655,7 +655,7 @@ $i = 1;
                                 @if (Auth::user()->subscription_status != 0)
                                     <a href="{{ route('auto.attendance') }}" class="list-group-item ">
                                         <div class="imgbox"><i class="bi bi-chevron-double-right"></i></div>
-                                        {{ __('app.Auto') }} {{ __('app.Attendance') }}
+                                        {{ __('app.auto_attendance') }}
                                     </a>
                                 @endif
 
@@ -785,7 +785,7 @@ $i = 1;
                     </div>
 
                     {{-- SMS --}}
-                    <div class="tab-pane fade <?php if (Request::segment(1) == 'school' and Request::segment(2) == 'send' and Request::segment(3) == 'sms' and (Request::segment(4) == 'teacher' or Request::segment(4) == 'student')) {
+                    <div class="tab-pane fade <?php if (Request::segment(1) == 'school' and Request::segment(2) == 'send' and Request::segment(3) == 'sms' and (Request::segment(4) == 'teacher' or Request::segment(4) == 'student' or Request::segment(4) == 'employee')) {
                         echo 'active show';
                     } ?>" id="pills-sms">
                         <div class="list-group list-group-flush">
@@ -819,7 +819,7 @@ $i = 1;
                     </div>
 
                     {{-- Exams --}}
-                    <div class="tab-pane fade <?php if (Request::segment(1) == 'school' and Request::segment(2) == 'term' or (Request::segment(3) == 'exam' or Request::segment(3) == 'create/question' or Request::segment(3) == 'admit' and Request::segment(4) == 'card' or Request::segment(3) == 'sit' and Request::segment(4) == 'plan')) {
+                    <div class="tab-pane fade <?php if (Request::segment(1) == 'school' and Request::segment(2) == 'term' or (Request::segment(3) == 'exam' or Request::segment(3) == 'create/question' or Request::segment(3) == 'question'  or Request::segment(3) == 'admit' and Request::segment(4) == 'card' or Request::segment(3) == 'sit' and Request::segment(4) == 'plan')) {
                         echo 'active show';
                     } ?>" id="pills-exam">
                         <div class="list-group list-group-flush">
@@ -1027,7 +1027,6 @@ $i = 1;
     <!--end wrapper-->
 
     <!-- Bootstrap bundle JS -->
-    {{-- <script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script> --}}
     <script src="http://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Bootstrap bundle JS -->
@@ -1092,15 +1091,7 @@ $i = 1;
     <script src="{{ asset('schools/assets/js/index5.js') }}"></script>
 
     @include('sweetalert::alert')
-    <style>
-        function toggle-status(id) {}
-    </style>
-
-
-    @include('sweetalert::alert')
-    <style>
-        function toggle-status(id) {}
-    </style>
+    
 
     <!--for owl-carousel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
@@ -1135,6 +1126,10 @@ $i = 1;
         });
     </script>
 
+ {{-- <!--for owl-carousel --> hello --}}
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<!--for owl-carousel -->
 </body>
 
 </html>

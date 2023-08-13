@@ -14,7 +14,15 @@ class BankController extends Controller
      /** --------------- bank account data table
      * =============================================*/
     public function show()
-    {
+    {  
+        $seoTitle = 'Bank List';
+        $seoDescription = 'Bank List';
+        $seoKeyword = 'Bank List';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -39,7 +47,7 @@ class BankController extends Controller
             $profit = $totalSchoolFund - $ExpenseThisMonth;
 
             $bankadd = Bank::where('school_id', Auth::user()->id)->latest()->get();
-            return view('frontend.school.bank_account.table')->with(compact('bankadd','profit'));
+            return view('frontend.school.bank_account.table')->with(compact('bankadd','profit','seo_array'));
         }
     }
 
@@ -47,7 +55,15 @@ class BankController extends Controller
     /** --------------- bank account data table
      * =============================================*/
     public function create()
-    {
+    {   
+        $seoTitle = 'Add Bank';
+        $seoDescription = 'Add Bank';
+        $seoKeyword = 'Add Bank';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -57,7 +73,7 @@ class BankController extends Controller
         if (Auth::user()->is_editor != 3) {
             return back();
         } else{
-            return view('frontend.school.bank_account.form');
+            return view('frontend.school.bank_account.form',compact('seo_array'));
         }
     }
 

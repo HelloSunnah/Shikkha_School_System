@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use Exception;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Price;
+use App\Mail\Reminder;
 use App\Models\Result;
 use App\Models\School;
 use App\Models\Ticket;
@@ -15,6 +17,7 @@ use App\Models\Teacher;
 use App\Models\Employee;
 use App\Models\FeesType;
 use App\Models\Question;
+use App\Models\Todolist;
 use App\Models\BorrowBook;
 use App\Models\Permission;
 use App\Models\ClassPeriod;
@@ -27,14 +30,18 @@ use App\Models\TeacherSalary;
 use App\Models\EmployeeSalary;
 use App\Models\InstituteClass;
 use App\Models\Shikkhabilling;
+use Illuminate\Support\Carbon;
 use App\Models\LibraryBookInfo;
 use App\Models\OnlineAdmission;
 use App\Models\AssignStudentFee;
+use PhpParser\Node\Stmt\Return_;
 use App\Models\StudentMonthlyFee;
 use App\Models\Billingtransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Redirect;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Models\ResultSubjectCountableMark;
 
@@ -52,8 +59,6 @@ class SettingsController extends Controller
         });
     }
 
-
-
     /**
      * show index
      * 
@@ -63,13 +68,19 @@ class SettingsController extends Controller
     {
         //$institute_class= DB::table("institute_classes")->where('school_id'==Auth::user())->get();
         //return $institute_class;
+         $seoTitle = 'School Setting';
+        $seoDescription = 'School Setting' ;
+        $seoKeyword = 'School Setting' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         if (!empty($institute_classes)) {
-
             $data = [];
             $data['sections'] = DB::table("common_classes")->whereNotNull('section')->get();
             $data['classes'] = [];
             $classes = DB::table("common_classes")->whereNull('section')->get();
-
             foreach ($classes as $class) {
                 $data['classes'][] = [
                     'id' =>  $class->id,
@@ -77,14 +88,13 @@ class SettingsController extends Controller
                     'subjects'  =>  DB::table("common_subjects")->where('class', $class->id)->get(['id', 'code', 'name'])
                 ];
             }
-            return view('frontend.school.settings')->with(compact('data'));
+            return view('frontend.school.settings')->with(compact('data','seo_array'));
         } else {
 
             $data = [];
             $data['sections'] = DB::table("common_classes")->whereNotNull('section')->get();
             $data['classes'] = [];
             $classes = DB::table("common_classes")->whereNull('section')->get();
-
             foreach ($classes as $class) {
                 $data['classes'][] = [
                     'id' =>  $class->id,
@@ -92,18 +102,22 @@ class SettingsController extends Controller
                     'subjects'  =>  DB::table("common_subjects")->where('class', $class->id)->get(['id', 'code', 'name'])
                 ];
             }
-            //return $data;
-            return view('frontend.school.settings')->with(compact('data'));
+            return view('frontend.school.settings')->with(compact('data','seo_array'));
         }
     }
 
 
 
     /**
-     * Store Data
+     * Store Subject in Database
      * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Shahidul 
+     * @modifier Sajjad <sajjad.develpr.gmail.com>
+     * @modifed 05-07-23
      * @param Request 
      * @param $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -120,9 +134,17 @@ class SettingsController extends Controller
             foreach ($request->class as $classId) {
                 $class = DB::table('common_classes')->where('id', $classId)->first();
 
+                $justName = str_replace("Class ", "", $class->title);
+
+                if (InstituteClass::where(['school_id' => Auth::user()->id, 'class_name' => $class->title])->exists()) {
+                    $class_name = $class->title;
+                } else {
+                    $class_name = $justName;
+                }
+
                 $newClass = InstituteClass::updateOrCreate(
                     [
-                        'class_name'    =>  $class->title,
+                        'class_name'    =>  $class_name,
                         'school_id'     =>  $this->school->id,
                     ],
                     [
@@ -137,12 +159,18 @@ class SettingsController extends Controller
                     ->get();
 
                 foreach ($subjects as $item) {
-                    Subject::updateOrCreate([
-                        'class_id'  =>  $newClass->id,
-                        'subject_name'  =>  $item->name,
-                        'school_id'     =>  $this->school->id,
-                        'active'        =>  1
-                    ], []);
+                    Subject::updateOrCreate(
+                        [
+                            'class_id'      =>  $newClass->id,
+                            'subject_name'  =>  $item->name,
+                            'school_id'     =>  $this->school->id,
+                            'active'        =>  1,
+                        ],
+                        [
+                            'subject_code'  =>  $item->code,
+                            'group_id'      =>  $item->group
+                        ]
+                    );
                 }
             }
 
@@ -241,6 +269,8 @@ class SettingsController extends Controller
     }
 
 
+
+    //todo list over
     public function Recyclepage()
     {
         $school = School::find(Auth::id());
@@ -251,9 +281,6 @@ class SettingsController extends Controller
         $expense = Transection::onlyTrashed()->where('school_id', $school->id)->where('status', 1)->orderBy('deleted_at', 'desc')->get();
         $fund = Transection::onlyTrashed()->where('school_id', $school->id)->where('status', 2)->orderBy('deleted_at', 'desc')->get();
         $studentMontyFee = StudentMonthlyFee::onlyTrashed()->where('school_id', $school->id)->orderBy('deleted_at', 'desc')->get();
-
-
-
 
         $syllabus = ClassSyllabus::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
         $resultCountablemark = ResultSubjectCountableMark::onlyTrashed()->where('school_id', $school->id)->orderBy('deleted_at', 'desc')->paginate(5);
@@ -298,7 +325,6 @@ class SettingsController extends Controller
             'question'
         ));
     }
-   
 
     public function userRoleShow()
     {
@@ -389,22 +415,25 @@ class SettingsController extends Controller
         return back();
     }
 
-   public function school_billing(){
+    public function school_billing()
+    {
         $school = School::find(Auth::id());
-        $billing=Shikkhabilling::where('school_id', $school->id)->orderBy('created_at', 'desc')->get();
-        return view ('frontend.school.schoolProfile.schoolbilling',compact('school','billing'));
+        $billing = Shikkhabilling::where('school_id', $school->id)->orderBy('created_at', 'desc')->get();
+        return view('frontend.school.schoolProfile.schoolbilling', compact('school', 'billing'));
     }
 
-    public function billing_transaction(){
+    public function billing_transaction()
+    {
         $school = School::find(Auth::id());
-        return view('frontend.school.schoolProfile.schoolbillingtransaction',compact('school'));
+        return view('frontend.school.schoolProfile.schoolbillingtransaction', compact('school'));
     }
-    public function billing_transaction_Store(Request $request){
-             $request->validate([
+    public function billing_transaction_Store(Request $request)
+    {
+        $request->validate([
             'sending_number' => 'required',
             'amount' => 'required',
-           ]);
-             try {
+        ]);
+        try {
             Billingtransaction::create([
                 'school_id' => $request->school_id,
                 'payment_method' => $request->payment_method,

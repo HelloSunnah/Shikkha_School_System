@@ -11,9 +11,9 @@
                     <div class="d-sm-flex align-items-center">
                         <h5 class="mb-2 mb-sm-0">{{__('app.Section')}}</h5>
                         <div class="ms-auto">
-                            <button type="button" class="btn btn-secondary btn-sm" title="{{__('app.Back')}}" onclick="history.back()"><i class="bi bi-arrow-left-square"></i></button>
-                            <a href="{{route('section.create')}}" class="btn btn-primary btn-sm" title="{{__('app.Section')}} {{__('app.Create')}}"><i class="bi bi-plus-square"></i></a>
-                            <button type="button" class="btn btn-danger btn-sm" title="{{__('app.Tutorial')}}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="lni lni-youtube"></i></button>
+                            <button type="button" class="btn btn-secondary btn-sm" title="{{__('app.Back')}}" onclick="history.back()"><i class="bi bi-arrow-left-square m-0"></i></button>
+                            <a href="{{route('section.create')}}" class="btn btn-primary btn-sm" title="{{__('app.Section')}} {{__('app.Create')}}"><i class="bi bi-plus-square m-0"></i></a>
+                            <button type="button" class="btn btn-danger btn-sm" title="{{__('app.Tutorial')}}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="lni lni-youtube m-0"></i></button>
                         </div>
                     </div>
                 </div>

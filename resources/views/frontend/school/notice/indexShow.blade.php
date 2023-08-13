@@ -20,20 +20,15 @@
                     </div>
                     <div class="card-body">
                             <table class="table table-bordered table-hover">
-                                {{-- <a class="btn btn-danger btn-sm mb-2" href="javascript::" onclick="if(confirm('Are you sure? Do you want to delete?')){location.replace()}" id="delete_all_records">Delete All</a> --}}
-
-                                <button type="button" class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#delete_all_records" >
-                                    {{__('app.deleteall')}}
-                               </button>
                                 <thead>
-                                <tr>
-                                    <th><input type="checkbox" id="select_all_ids"></th>
-                                    <th>{{__('app.nong')}}</th>
-                                    <th>{{__('app.topic')}}</th>
-                                    <th width="50%">{{__('app.description')}}</th>
-                                    <th>{{__('app.class')}}</th>
-                                    <th>{{__('app.action')}}</th>
-                                </tr>
+                                    <tr>
+                                        <th><input type="checkbox" id="select_all_ids"></th>
+                                        <th>{{__('app.nong')}}</th>
+                                        <th>{{__('app.topic')}}</th>
+                                        <th width="50%">{{__('app.description')}}</th>
+                                        <th>{{__('app.class')}}</th>
+                                        <th>{{__('app.action')}}</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($dataNotice as $key => $data)
@@ -74,6 +69,9 @@
                                 </tbody>
 
                             </table>
+                            <button type="button" class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#delete_all_records" >
+                                {{__('app.deleteall')}}
+                            </button>
                     </div>
                 </div>
             </div>

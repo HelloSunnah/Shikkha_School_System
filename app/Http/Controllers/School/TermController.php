@@ -16,9 +16,17 @@ class TermController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    {   
+        $seoTitle = 'Term Show';
+        $seoDescription = 'Term Show' ;
+        $seoKeyword = 'Term Show' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $rows = Term::where('school_id', Auth::id())->get();
-        return view('frontend.school.student.result.term.show', compact('rows'));
+        return view('frontend.school.student.result.term.show', compact('rows','seo_array'));
     }
 
     /**
@@ -27,8 +35,16 @@ class TermController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        return view('frontend.school.student.result.term.create');
+    {   
+        $seoTitle = 'Term Create';
+        $seoDescription = 'Term Create' ;
+        $seoKeyword = 'Term Create' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.school.student.result.term.create',compact('seo_array'));
     }
 
     /**
@@ -74,9 +90,17 @@ class TermController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
+    {  
+        $seoTitle = 'Term Edit';
+        $seoDescription = 'Term Edit' ;
+        $seoKeyword = 'Term Edit' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $row = Term::find($id);
-        return view('frontend.school.student.result.term.create', compact('row'));
+        return view('frontend.school.student.result.term.create', compact('row','seo_array'));
     }
 
     /**

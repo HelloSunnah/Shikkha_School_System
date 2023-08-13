@@ -1,18 +1,62 @@
 @extends('frontend.layouts.app')
 
 @section('main')
-<!-- hero area start -->
 <section class="hero__area hero__height p-relative d-flex align-items-center">
-   {{-- <!-- <div class="hero__area__img">
-       <img src="{{ asset('frontend/assets/img/header/header.png') }}" alt="">
-   </div> --> --}}
    <style>
       .btn1:hover {
          background-color: blueviolet;
          color: white !important;
       }
+      .wrapper {
+         display: flex;
+         justify-content: center;
+         margin-top: 50px;
+      }
+      .item {
+         width: 100px;
+         height: 20px;
+         margin: 10px;
+         position: relative;
+      }
+      button {
+         border: 1px solid purple;
+         background: white;
+         width: 100%;
+         padding: 5px;
+         border-radius: 3px;
+         color: blue;
+         transition: background 0.5s ease;
+      }
+      button:hover {
+         background: pink;
+         color: white;
+         font-weight: normal;
+      }
+      @keyframes slide1 {
+         0%,
+         100% {
+            transform: translate(0, 0);
+         }
+         50% {
+            transform: translate(10px, 0);
+         }
+      }
+      button:hover i {
+         color: white;
+      }
+      i {
+         color: blue;
+         margin-left: 20px;
+      }
+      .arrow1 {
+         animation: slide1 1s ease-in-out infinite;
+         margin-left: 9px;
+      }
+      .card-body:hover {
+         background-color: blueviolet;
+         color: white !important;
+      }
    </style>
-
    <div class="hero__shape">
       <img class="hero-circle-1" src="{{ asset('frontend/assets/img/icon/hero/home-1/circle-1.png') }}" alt="">
       <img class="hero-circle-2" src="{{ asset('frontend/assets/img/icon/hero/home-1/circle-2.png') }}" alt="">
@@ -45,6 +89,8 @@
    </div>
 </section>
 <!-- hero area end -->
+
+
 
 <!-- services area start -->
 <section class="services__area p-relative pt-150 pb-130">
@@ -302,7 +348,8 @@
 </section>
 <!-- testimonial area end -->
 
-
+<!-- Blog Start -->
+@if(count($blog) > 0)
 
 <section class="services__area p-relative pt-150 pb-130">
    <div class="services__shape">
@@ -319,52 +366,44 @@
             </div>
          </div>
       </div>
-      <div class="row">
-         @foreach($blog as $data)
+   </div>
+   <div class="blog-pages-wrapper section-space--ptb_100">
+            <div class="container">
+                <div style="margin-top:50px;margin-left:10px">
+                    <div class="row">
+                        @foreach($blog as $data)
 
-         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-6 col-sm-6">
-            <a href="{{route('blog.view',$data->slug)}}">
+                        <div class="col-md-4">
+                            <a href="{{route('blog.view',$data->slug)}}">
 
-               <div class="services__inner hover__active mb-30 wow fadeInUp" data-wow-delay=".3s">
+                                <div>
+                                    <img style="border-radius: 10px; margin-left:1px" Width="330px" Height="250px" src="{{ asset($data->image ?? 'frontend/assets/img/page-title/1.png') }}" alt="">
+                                    <div style="height: 150px;">
+                                    <h6 style="margin-top: 20px;text-align:justify;margin-left:5px;margin-right:20px;overflow:hidden">
+                                        {!! substr(strip_tags($data->title), 0, 100) !!}</h6>
+                                    <p style="text-align:left ;margin-left:5px">{!! substr(strip_tags($data->content), 0, 130) !!}.....</p></div>
+                                    <a href="{{route('blog.view',$data->slug)}}" class="btn btn-white" style="width:110px;border-color:blueviolet;margin-left:20px;margin-bottom:20px" onmouseover="this.style.backgroundColor='blueViolet';color='white'" onmouseout="this.style.backgroundColor='white';">Read More</a>
 
-                  <div class="text-center services__item white-bg transition-3 p-3">
-                     <div class="services__icon mb-25 d-flex align-items-end justify-content-center">
-                        <img width="180px" src="{{ asset($data->image ?? 'frontend/assets/img/icon/services/home-1/services-1.png') }}" alt="">
-                     </div>
-                     <div class="services__content">
-                        <div style="overflow: hidden;height:50px">
-                           <p class="services__title"><a href="{{route('blog.view',$data->slug)}}"> <br>{!! substr(strip_tags($data->title), 0, 3000) !!}</a></p>
-
+                                </div>
                         </div>
-                        <p>{{$data->created_at->format('M d, Y')}}</p>
-                        <br>
-                        <a href="{{route('blog.view',$data->slug)}}" class="btn btn-outline-primary btn1" style="border-color:blueviolet !important;background-color: #7127ea;color:white">View Blog</a>
+                        @endforeach
 
-                     </div>
-                  </div>
-               </div>
-            </a>
-
-         </div>
-         @endforeach
-
-
-
+                    </div>
+                </div>
+            </div>
+        </div>
+   <div class="wrapper">
+      <div class="item">
+         <button>More
+            <a  href="{{route('blog.page')}}"><i class="fa fa-long-arrow-right arrow1" aria-hidden="true"></i></a>
+         </button>
       </div>
-      <center> <a href="{{route('blog.page')}}" class="btn btn-outline-primary btn1" style="border-color:blueviolet !important;background-color: #7127ea;color:white">More</a>
-      </center>
 
    </div>
 </section>
+@endif
 
-
-
-
-
-
-
-
-
+<!-- blog end -->
 <!-- features area start -->
 <section class="overflow-y-visible features__area pt-60 pb-155 p-relative">
    <div class="circle-animation features">

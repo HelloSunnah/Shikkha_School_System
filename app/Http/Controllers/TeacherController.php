@@ -37,16 +37,16 @@ use Illuminate\Support\Str;
 
 class TeacherController extends Controller
 {
-
-
     public function teacherDashboard(){
         $abc = Carbon::now()->format('Y-m-d');
         $data = AssignTeacher::where('teacher_id',Auth::user()->id)->get();
         $showData = Notice::where('school_id',Auth::user()->school_id)->orderby('id','desc')->get()->toArray();
         $todo = \App\Models\Todolist::where('teacher_id',Auth::user()->id)->where('date', '>=', $abc )->orderBy('date', 'asc')->get();
+        //  return $abc;
+        //return $abc = \App\Models\Routine::where('teacher_id',Auth::user()->id)->get()->groupBy('subject_id');
         return view('frontend.teacher.dashboard',compact('data','showData','todo'));
     }
-
+    
     public function myClassRoom(){
         $data = AssignTeacher::where('teacher_id',Auth::user()->id)->get();
         $classes = Routine:: where('teacher_id', Auth::user()->id)->get()->groupBy('subject_id');

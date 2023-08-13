@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\File;
 
 class User extends Authenticatable
 {
@@ -38,16 +39,44 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'subject_list'      => 'json',
+        'optional_subject'  => 'json',
     ];
 
 
+    public function getImageAttribute($image)
+    {
+        if(is_null($image))
+        {
+            return "d/no-img2.jpg";
+        }
+        else
+        {
+            if(File::exists(public_path($image)))
+            {
+                return $image;
+            }
+            else
+            {
+                return "d/no-img2.jpg";
+            }
+        }
+        
+    }
+
+    
+    /**
+     * User with result relation
+     * 
+     * @return array
+     */
     public function result(): BelongsTo
     {
-        return $this->belongsTo(Result::class,'id','student_id');
+        return $this->belongsTo(Result::class,'id', 'student_id');
     }
 
     public function clasRelation(){
-        return $this->belongsTo(InstituteClass::class,'class_id','id');
+        return $this->belongsTo(InstituteClass::class,'class_id', 'id');
     }
 
     public function sectionRelation(){

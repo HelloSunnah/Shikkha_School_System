@@ -7,8 +7,11 @@ use App\Models\ResultSubjectCountableMark;
 use App\Models\SchoolCheckout;
 use App\Models\StaffAttendance;
 use App\Models\AssignStudentFee;
+use App\Models\CustomAttendanceInput;
 use App\Models\Result;
+use App\Models\ResultSetting;
 use App\Models\TeacherAttendance;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -192,7 +195,7 @@ function getSectionCount()
 }
 
 function workPlace(){
-    $data = \App\Models\WorkplaceInfo::where('school_id',Auth::user()->id)->first();
+    $data = \App\Models\WorkplaceInfo::where('school_id', Auth::user()->id)->first();
     return isset($data) ? $data : 0 ;
 }
 
@@ -350,7 +353,7 @@ function getAttData($student_id,$class_id,$section_id,$group_id,$month_id,$id)
         $fData = '...';
     }
     elseif($dateStudent->attendance == 1){
-        $fData = '<span class="cursor-pointer" title="'.date('g:i:s A', strtotime($dateStaff->access_time)).'">✅</span>';
+        $fData = '<span class="cursor-pointer" title="'.date('g:i:s A', strtotime($dateStudent->access_time)).'">✅</span>';
     }
     elseif($dateStudent->attendance == 0){
         $fData = '❌';
@@ -514,7 +517,7 @@ function getUserNameForAll($id)
 
 function getStudentName($id)
 {
-    $data = \App\Models\User::where('id',$id)->first();
+    $data = \App\Models\User::where('id', $id)->first();
     return isset($data) ? $data : null ;
 }
 
@@ -636,15 +639,51 @@ function totalMark($data)
  * Grade
  */
 // function grade($total, $term_id)
-function grade($total, $result_setting_id, $class_id, $subject_id)
-{
+function grade($mcq, $written, $practical, $total, $result_setting_id, $class_id, $subject_id)
+{   
     $subjectMark = ResultSubjectCountableMark::where(['result_setting_id' => $result_setting_id, 'institute_class_id'  => $class_id, 'subject_id'   => $subject_id,  'school_id' => Auth::user()->id])->first();
     $totalMark = $total * 100 / $subjectMark->mark;
-
+    
     $grading_scale = array(
         'A+' => 80, 'A' => 70, 'A-' => 60, 'B' => 50, 'C' => 40, 'D' => 33, 'F' => 0
     );
 
+    if ($mcq != 199 && $subjectMark->mcq != null) {
+        $mcqMark = $mcq * 100 / $subjectMark->mcq;
+        foreach ($grading_scale as $grade => $minimum_score) {
+            if ($mcqMark >= $minimum_score) {
+                if ($grade == "F") {
+                    return $grade;
+                }
+                break;
+            }
+        }
+    }
+  
+    if ($written != 199 && $subjectMark->written != null) {
+        $writtenMark = $written * 100 / $subjectMark->written;
+        foreach ($grading_scale as $grade => $minimum_score) {
+            if ($writtenMark >= $minimum_score) {
+                if ($grade == "F") {
+                    return $grade;
+                }
+                break;
+            }
+        }
+    }
+
+    if ($practical != 199 && $subjectMark->practical != null) {
+        $practicalMark = $practical * 100 / $subjectMark->practical;
+        foreach ($grading_scale as $grade => $minimum_score) {
+            if ($practicalMark >= $minimum_score) {
+                if ($grade == "F") {
+                    return $grade;
+                }
+                break;
+            }
+        }
+    }
+    
     foreach ($grading_scale as $grade => $minimum_score) {
         if ($totalMark >= $minimum_score) {
             return $grade;
@@ -698,18 +737,55 @@ function finalGrade($total, $schoolId = null)
 }
 
 /**
- * GPA
+ * Show Gpa
+ * 
+ * @author CodeCell <support@codecell.com.bd>
+ * @contributor Sajjad
+ * 
  */
-// function gpa($total, $term_id)
-function gpa($total, $result_setting_id, $class_id, $subject_id)
+function gpa($mcq, $written, $practical, $total, $result_setting_id, $class_id, $subject_id)
 {
-    // $term = \App\Models\Term::find($term_id);
     $subjectMark = ResultSubjectCountableMark::where(['result_setting_id' => $result_setting_id, 'institute_class_id'  => $class_id, 'subject_id'   => $subject_id,  'school_id' => Auth::user()->id])->first();
     $totalMark = $total * 100 / $subjectMark->mark;
-    // $totalMark = $total * 100 / $term->total_mark;
     $grading_point = array(
         '5' => 80, '4' => 70, '3.5' => 60, '3' => 50, '2' => 40, '1' => 33, '0' => 0
     );
+
+    if ($mcq != 199 && $subjectMark->mcq != null) {
+        $mcqMark = $mcq * 100 / $subjectMark->mcq;
+        foreach ($grading_point as $gpa => $minimum_score) {
+            if ($mcqMark >= $minimum_score) {
+                if ($gpa == "0") {
+                    return $gpa;
+                }
+                break;
+            }
+        }
+    }
+  
+    if ($written != 199 && $subjectMark->written != null) {
+        $writtenMark = $written * 100 / $subjectMark->written;
+        foreach ($grading_point as $gpa => $minimum_score) {
+            if ($writtenMark >= $minimum_score) {
+                if ($gpa == "0") {
+                    return $gpa;
+                }
+                break;
+            }
+        }
+    }
+
+    if ($practical != 199 && $subjectMark->practical != null) {
+        $practicalMark = $practical * 100 / $subjectMark->practical;
+        foreach ($grading_point as $gpa => $minimum_score) {
+            if ($practicalMark >= $minimum_score) {
+                if ($gpa == "0") {
+                    return $gpa;
+                }
+                break;
+            }
+        }
+    }
 
     foreach ($grading_point as $gpa => $minimum_score) {
         if ($totalMark >= $minimum_score) {
@@ -768,7 +844,6 @@ function finalGpa($total, $schoolId = null)
  */
 function classWiseGpa($total)
 {
-    // dd($total);
     $grading_point = array(
         'A+' => 5, 'A' => 4, 'A-' => 3.5, 'B' => 3, 'C' => 2, 'D' => 1, 'F' => 0
     );
@@ -776,7 +851,6 @@ function classWiseGpa($total)
     foreach ($grading_point as $gpa => $minimum_score) {
         if ($total >= $minimum_score) {
             return $gpa;
-
         }
     }
 }
@@ -872,10 +946,10 @@ function getTeacherAttendance($teacher_id,$date)
 function subjectMark($result_setting_id, $class_id, $subject_id)
 {
     $subjectMark = ResultSubjectCountableMark::where(['result_setting_id' => $result_setting_id, 'institute_class_id'  => $class_id, 'subject_id'   => $subject_id,  'school_id' => Auth::user()->id])->first();
-    // dd($subjectMark);
     if($subjectMark == null){
         return "1";
     }
+    
     return ($subjectMark->mark);
 }
 
@@ -939,5 +1013,379 @@ function sectionWiseStudnetRank($class_id, $section_id, $term_id, $student_id)
     return $studentRank;
 }
 
+/**
+ * Get Student Subject Wise
+ * 
+ * @author CodeCell <support@codecell.com.bd>
+ * @contributor Sajjad <sajjad.develpr@gmail.com>
+ * @param $class_id
+ * @param $section_id
+ * @param $group_id
+ * @param $subject_id
+ * 
+ * @return Array
+ */
+function getStudent($class_id, $section_id, $group_id, $subject_code)
+{   
+    $columnAndKey = "subject_list->$subject_code";
+    $optionalColumnAndKey = "optional_subject->$subject_code";
+    
+    if ($group_id == 4) {
+        $getOptional = User::where('school_id', Auth::user()->id)
+                        ->where('class_id', $class_id)
+                        ->where('section_id', $section_id)
+                        ->whereJsonContains($optionalColumnAndKey, $subject_code)
+                        ->get();
 
+        $getMain = User::where('school_id', Auth::user()->id)
+                        ->where('class_id', $class_id)
+                        ->where('section_id', $section_id)
+                        ->whereJsonContains($columnAndKey, $subject_code)
+                        ->get();
+
+        $dataShow = $getOptional->merge($getMain)->sortBy('roll_number');
+            
+        return $dataShow;
+    } elseif($group_id == Null || $group_id == 0) {
+        $dataShow = User::where('school_id', Auth::user()->id)->where('class_id', $class_id)->where('section_id', $section_id)->orderBy('roll_number', 'asc')->get();
+        
+        return $dataShow;
+    } elseif ($subject_code == "127" || $subject_code == "149") {
+        $dataShow = User::where('school_id', Auth::user()->id)->where('class_id', $class_id)->where('section_id', $section_id)->whereIn('group_id', [2, 3])->orderBy('roll_number', 'asc')->get();
+        
+        return $dataShow;
+    }
+
+    $dataShow = User::where('school_id', Auth::user()->id)
+                        ->where('class_id', $class_id)
+                        ->where('section_id', $section_id)
+                        ->whereJsonContains($columnAndKey, $subject_code)
+                        ->orderBy('roll_number', 'asc')
+                        ->get();
+    return $dataShow;
+                       
+}
+
+/**
+ * Filter Class
+ * 
+ * @author CodeCell <support@codecell.com.bd>
+ * @contributor Sajjad <sajjad.develpr@gmail.com>
+ * @return array
+ * 
+ */
+function classFilter()
+{
+    $class = [  "Class Nine", "Nine", "Class 9", "9", "class nine", "class 9", "nine",
+                "Class Ten", "Ten", "Class 10", "10", "class ten", "class 10", "ten",
+                "Class Eleven", "Eleven", "Class 11", "11", "Class XI", "XI", "class eleven", "class 11", "eleven", "class xi", "xi",
+                "Class Twelve", "Twelve", "Class 12", "12", "Class XII", "XII", "class twelve", "class 12", "twelve", "class xii", "xii",
+            ];
+    
+    return $class;
+}
+
+/**
+ * Class Wise Rank Grade, Total Mark, Present, Roll Number 
+ * 
+ * @contributor Sajjad <sajjad.develpr@gmail.com>
+ * @param int $class_id
+ * @param int $request_setting_id
+ * @param int $student_id
+ * 
+ * @return int
+ */
+function singleStudentRank($class_id, $result_setting_id, $student_id)
+{
+    $students =  User::where('school_id', Auth::user()->id)->where('class_id', $class_id)->onlyTrashed()->get()->pluck('id')->toArray();
+
+    $classResults = Result::where('results.school_id', Auth::user()->id)
+                                            ->where('institute_class_id', $class_id)
+                                            ->where('term_id', $result_setting_id)
+                                            ->whereNotIn('student_id', $students)
+                                            ->get()->groupBy('student_id');
+   
+    $studentsId = array_keys($classResults->toArray());
+                                    
+    $attendanceCount = CustomAttendanceInput::where('school_id', Auth::user()->id)
+                                                    ->where('result_setting_id', $result_setting_id)
+                                                    ->whereIn('user_id', $studentsId)->count();
+    
+    if ($attendanceCount != count($classResults)) {
+        $classResults = $classResults;
+    } else {
+        $classResults = Result::leftJoin('custom_attendance_input as attendance', 'results.student_id', '=', 'attendance.user_id')
+                                        ->whereNotIn('student_id', $students)
+                                        ->where('results.school_id', Auth::user()->id)
+                                        ->where('attendance.school_id', Auth::user()->id)
+                                        ->where('institute_class_id', $class_id)
+                                        ->where('term_id', $result_setting_id)
+                                        ->where('attendance.result_setting_id', $result_setting_id)
+                                        ->get()->groupBy('student_id');
+    }
+
+    $grading_point = array(
+        5 => 'A+', 4 => 'A', '3.5' => 'A-', 3 => 'B', 2 => 'C', 1 => 'D', 0 => 'F'
+    );
+    
+    $result_pass_mark = ResultSetting::findOrFail($result_setting_id);
+    
+    $arrOfResult =[];
+    foreach ($classResults as $result => $data){
+        $total = 0;  
+        $totalGpa = 0.000;
+        $totalSubject = 0;
+        $resultStatus = 1;
+
+        foreach($data as $results){
+            if($results->absent == 1 || $results->total != 0) {
+                $total += $results->total;
+                $totalGpa += $results->gpa;
+                $optionalSubject = $data->first()->user?->optional_subject;
+                if ($optionalSubject != null) {
+                    $optionalSubjectId = \App\Models\Subject::where('school_id', Auth::user()->id)->where('class_id', $class_id)->whereIn('subject_code', $optionalSubject)->get()->pluck('id')->toArray();
+                    $optionalResult = $data->whereIn('subject_id', $optionalSubjectId)->first();
+                    $not = $optionalResult->subject_id == $results->subject_id;
+                    if (!$not) {
+                        if( gpa($results->mcq, $results->written, $results->practical, $results->total, $result_setting_id, $class_id, $results->subject_id) == 0 ) $resultStatus = 0;
+                    } 
+                } else {
+                    if( gpa($results->mcq, $results->written, $results->practical, $results->total, $result_setting_id, $class_id, $results->subject_id) == 0 ) $resultStatus = 0;
+                }
+                $totalSubject++;
+            }
+        }
+        
+        $optionalSubject = $data->first()->user?->optional_subject;
+        if (in_array($data->first()->user?->class?->class_name, classFilter()) && $optionalSubject != null) {
+            $totalSubject = $totalSubject - 1; 
+            $optionalSubjectId = \App\Models\Subject::where('school_id', Auth::user()->id)->where('class_id', $class_id)->whereIn('subject_code', $optionalSubject)->get()->pluck('id')->toArray();
+            $optionalResult = $data->whereIn('subject_id', $optionalSubjectId)->first();
+            $totalGpa = $totalGpa - $optionalResult->gpa;
+            $addOptionalPoint = $optionalResult->gpa - 2;
+            $addOptionalPoint = $addOptionalPoint < 0 ? 0 : $addOptionalPoint;
+            $totalGpa = $totalGpa + $addOptionalPoint;
+            
+            $totalGpa = number_format($totalGpa / $totalSubject, 2);
+            $totalGpa = $totalGpa > 5 ? 5 : $totalGpa; 
+        } else {
+            $totalSubject = $totalSubject > 0 ? $totalSubject : 2;
+            $totalGpa = number_format($totalGpa / $totalSubject, 2);
+        }
+        
+        $arrOfResult[][$total]= [
+            'totalGpa'               => $totalGpa,   
+            'grade'                  => array_search(classWiseGpa($totalGpa), $grading_point),
+            'total'                  => $total,
+            'present'                => isset($data[0]->present) ? $data[0]->present : 0,
+            'student_roll_number'    => $data[0]->student_roll_number,
+            'student_id'             => $data[0]->student_id,
+            'resultStatus'           => $resultStatus,
+        ];
+    }
+
+    $passStudent = [];
+    $failStudent = [];
+
+    foreach ($arrOfResult as $key => $results) {
+        foreach ($results as $key => $result) {
+            if($result['resultStatus'] == 1) {
+                $passStudent[] = $result;
+            }else{
+                $failStudent[] = $result;
+            }
+        }
+    }
+    
+    $findPassStudentGpaColumn   = array_column($passStudent, 'totalGpa');
+    $findPassStudentGradeColumn   = array_column($passStudent, 'grade');
+    $findPassStudentTotalColumn = array_column($passStudent, 'total');
+    $findPassStudentPresentColumn = array_column($passStudent, 'present');
+    $findPassStudentStudent_roll_number = array_column($passStudent, 'student_roll_number');
+    array_multisort($findPassStudentGpaColumn, SORT_DESC, $findPassStudentGradeColumn, SORT_DESC, $findPassStudentTotalColumn, SORT_DESC, $findPassStudentPresentColumn, SORT_DESC, $findPassStudentStudent_roll_number, SORT_ASC, $passStudent);
+
+    $findFailStudentGpaColumn   = array_column($failStudent, 'totalGpa');
+    $findFailStudentGradeColumn   = array_column($failStudent, 'grade');
+    $findFailStudentTotalColumn = array_column($failStudent, 'total');
+    $findFailStudentPresentColumn = array_column($failStudent, 'present');
+    $findFailStudentStudent_roll_number = array_column($failStudent, 'student_roll_number');
+    array_multisort($findFailStudentGpaColumn, SORT_DESC, $findFailStudentGradeColumn, SORT_DESC, $findFailStudentTotalColumn, SORT_DESC, $findFailStudentPresentColumn, SORT_DESC, $findFailStudentStudent_roll_number, SORT_ASC, $failStudent);
+    
+    $passRank = collect($passStudent);
+    $failRank = collect($failStudent); 
+    
+    $student = $passRank->where('student_id', $student_id)->first();
+    if($student == null) {
+        $student = $failRank->where('student_id', $student_id)->first();
+    }
+
+    if ($student == null) {
+        return 0;
+    }
+
+    if ($student['resultStatus'] == 1) {
+        $passStudentRank = $passRank->where('student_id', $student_id)->keys()->first() + 1;
+
+        return $passStudentRank == " " ? 0 : $passStudentRank;
+    } else {
+        $passStudentCount = count($passStudent);
+        $failStudentRank = $failRank->where('student_id', $student_id)->keys()->first() + 1 + $passStudentCount;
+
+        return $failStudentRank == " " ? 0 : $failStudentRank;
+    }
+    
+}
+/**
+ * Section Wise Rank Grade, Total Mark, Present, Roll Number 
+ * 
+ * @contributor Sajjad <sajjad.develpr@gmail.com>
+ * @param int $class_id
+ * @param int $section_id
+ * @param int $request_setting_id
+ * @param int $student_id
+ * 
+ * @return int
+ */
+function sectionWiseSingleStudentRank($class_id, $section_id, $result_setting_id, $student_id)
+{   
+    $students =  User::where('school_id', Auth::user()->id)->where('class_id', $class_id)->where('section_id', $section_id)->onlyTrashed()->get()->pluck('id')->toArray();
+
+    $classResults = Result::where('results.school_id', Auth::user()->id)
+                                            ->where('institute_class_id', $class_id)
+                                            ->where('section_id', $section_id)
+                                            ->where('term_id', $result_setting_id)
+                                            ->whereNotIn('student_id', $students)
+                                            ->get()->groupBy('student_id');
+    
+    $studentsId = array_keys($classResults->toArray());
+
+    $attendanceCount = CustomAttendanceInput::where('school_id', Auth::user()->id)
+                                                ->where('result_setting_id', $result_setting_id)
+                                                ->whereIn('user_id', $studentsId)->count();
+
+    if ($attendanceCount != count($classResults)) {
+        $classResults = $classResults;
+    } else {
+        $classResults = Result::leftJoin('custom_attendance_input as attendance', 'results.student_id', '=', 'attendance.user_id')
+                                            ->whereNotIn('results.student_id', $students)
+                                            ->where('results.school_id', Auth::user()->id)
+                                            ->where('attendance.school_id', Auth::user()->id)
+                                            ->where('institute_class_id', $class_id)
+                                            ->where('section_id', $section_id)
+                                            ->where('term_id', $result_setting_id)
+                                            ->where('attendance.result_setting_id', $result_setting_id)
+                                            ->get()->groupBy('student_id');
+    }
+
+    $grading_point = array(
+        5 => 'A+', 4 => 'A', '3.5' => 'A-', 3 => 'B', 2 => 'C', 1 => 'D', 0 => 'F'
+    );
+    
+    $result_pass_mark = ResultSetting::findOrFail($result_setting_id);
+    
+    $arrOfResult =[];
+    foreach ($classResults as $result => $data){
+        $total = 0; 
+        $totalGpa = 0.000;
+        $totalSubject = 0;
+        $resultStatus = 1;
+
+        foreach($data as $results){
+            if($results->absent == 1 || $results->total != 0) {
+                $total += $results->total;
+                $totalGpa += $results->gpa;
+                $optionalSubject = $data->first()->user?->optional_subject;
+                if ($optionalSubject != null) {
+                    $optionalSubjectId = \App\Models\Subject::where('school_id', Auth::user()->id)->where('class_id', $class_id)->whereIn('subject_code', $optionalSubject)->get()->pluck('id')->toArray();
+                    $optionalResult = $data->whereIn('subject_id', $optionalSubjectId)->first();
+                    $not = $optionalResult->subject_id == $results->subject_id;
+                    if (!$not) {
+                        if( gpa($results->mcq, $results->written, $results->practical, $results->total, $result_setting_id, $class_id, $results->subject_id) == 0 ) $resultStatus = 0;
+                    } 
+                } else {
+                    if( gpa($results->mcq, $results->written, $results->practical, $results->total, $result_setting_id, $class_id, $results->subject_id) == 0 ) $resultStatus = 0;
+                }
+                $totalSubject++;
+            }
+        }
+
+        $optionalSubject = $data->first()->user?->optional_subject;
+        if (in_array($data->first()->user?->class?->class_name, classFilter()) && $optionalSubject != null) {
+            $totalSubject = $totalSubject - 1; 
+            $optionalSubjectId = \App\Models\Subject::where('school_id', Auth::user()->id)->where('class_id', $class_id)->whereIn('subject_code', $optionalSubject)->get()->pluck('id')->toArray();
+            $optionalResult = $data->whereIn('subject_id', $optionalSubjectId)->first();
+            $totalGpa = $totalGpa - $optionalResult->gpa;
+            $addOptionalPoint = $optionalResult->gpa - 2;
+            $addOptionalPoint = $addOptionalPoint < 0 ? 0 : $addOptionalPoint;
+            $totalGpa = $totalGpa + $addOptionalPoint;
+            
+            $totalGpa = number_format($totalGpa / $totalSubject, 2);
+            $totalGpa = $totalGpa > 5 ? 5 : $totalGpa; 
+        } else {
+            $totalSubject = $totalSubject > 0 ? $totalSubject : 2;
+            $totalGpa = number_format($totalGpa / $totalSubject, 2);
+        }
+        $arrOfResult[][$total]= [
+            'totalGpa'               => $totalGpa,
+            'grade'                  => array_search(classWiseGpa($totalGpa), $grading_point),
+            'total'                  => $total,
+            'present'                => isset($data[0]->present) ? $data[0]->present : 0,
+            'student_roll_number'    => $data[0]->student_roll_number,
+            'student_id'             => $data[0]->student_id,
+            'resultStatus'           => $resultStatus,
+        ];
+    }
+
+    $passStudent = [];
+    $failStudent = [];
+
+    foreach ($arrOfResult as $key => $results) {
+        foreach ($results as $key => $result) {
+            if($result['resultStatus'] == 1) {
+                $passStudent[] = $result;
+            }else{
+                $failStudent[] = $result;
+            }
+        }
+    }
+    
+    $findPassStudentGpaColumn   = array_column($passStudent, 'totalGpa');
+    $findPassStudentGradeColumn   = array_column($passStudent, 'grade');
+    $findPassStudentTotalColumn = array_column($passStudent, 'total');
+    $findPassStudentPresentColumn = array_column($passStudent, 'present');
+    $findPassStudentStudent_roll_number = array_column($passStudent, 'student_roll_number');
+    array_multisort($findPassStudentGpaColumn, SORT_DESC, $findPassStudentGradeColumn, SORT_DESC, $findPassStudentTotalColumn, SORT_DESC, $findPassStudentPresentColumn, SORT_DESC, $findPassStudentStudent_roll_number, SORT_ASC, $passStudent);
+
+    $findFailStudentGpaColumn   = array_column($failStudent, 'totalGpa');
+    $findFailStudentGradeColumn   = array_column($failStudent, 'grade');
+    $findFailStudentTotalColumn = array_column($failStudent, 'total');
+    $findFailStudentPresentColumn = array_column($failStudent, 'present');
+    $findFailStudentStudent_roll_number = array_column($failStudent, 'student_roll_number');
+    array_multisort($findFailStudentGpaColumn, SORT_DESC, $findFailStudentGradeColumn, SORT_DESC, $findFailStudentTotalColumn, SORT_DESC, $findFailStudentPresentColumn, SORT_DESC, $findFailStudentStudent_roll_number, SORT_ASC, $failStudent);
+    
+    $passRank = collect($passStudent);
+    $failRank = collect($failStudent); 
+
+    $student = $passRank->where('student_id', $student_id)->first();
+    
+    if ($student == null) {
+        $student = $failRank->where('student_id', $student_id)->first();
+    }
+
+    if ($student == null) {
+        return 0;
+    }
+   
+    if ($student['resultStatus'] == 1) {
+        $passStudentRank = $passRank->where('student_id', $student_id)->keys()->first() + 1;
+
+        return $passStudentRank == " " ? 0 : $passStudentRank;
+    } else {
+        $passStudentCount = count($passStudent);
+        $failStudentRank = $failRank->where('student_id', $student_id)->keys()->first() + 1 + $passStudentCount;
+
+        return $failStudentRank == " " ? 0 : $failStudentRank;
+    }
+    
+}
 ?>

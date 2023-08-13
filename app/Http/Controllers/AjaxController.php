@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccesoriesTransaction;
+use App\Models\MarkType;
 use App\Models\ResultSetting;
 use App\Models\ResultSubjectCountableMark;
 use Str;
@@ -42,10 +43,6 @@ class AjaxController extends Controller
          return $data = School::where('id', $id)->get();
         return response()->json($data);
     }
-
-
-
-
 
     public function ajaxLoaderaccesories(Request $request)
     {
@@ -148,22 +145,52 @@ class AjaxController extends Controller
 
         return $html;
     }
+
+    /**
+     * Subject Load
+     * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param Request
+     * @param $request
+     * @return html
+     */
     public function ajaxLoaderSubjectResult(Request $request)
     {   
         $subjects = Subject::where('class_id', $request->class_id)->where('school_id', Auth::user()->id)->get();
-
+       
         $html = ' ';
         
         $resultSetting = ResultSetting::findOrFail($request->resultSettingId);
-        foreach ($subjects as $subject) {
+        foreach ($subjects as $key => $subject) {
             $subjectMark = ResultSubjectCountableMark::where(["school_id" => Auth::user()->id, "result_setting_id"  => $resultSetting->id, "institute_class_id" => $request->class_id, "subject_id" => $subject->id])->first();
             $mark = ($subjectMark != null) ? $subjectMark->mark : $resultSetting->all_subject_mark;
+            $mcq = isset($subjectMark->mcq) ? $subjectMark->mcq : '';
+            $written = isset($subjectMark->written) ? $subjectMark->written : " ";
+            $practical = isset($subjectMark->practical) ? $subjectMark->practical : '';
+        
             $html .=
-            '<div class="mb-1 d-flex row">
-            <label class="col-sm-9 col-form-label">'.$subject->subject_name.' </label>
+            '<div class="mb-1 row">
+                <label class="col-sm col-form-label">'.$subject->subject_name.' </label>
                 <input type="hidden" name="resultSettingId" value="'.$resultSetting->id.'">
-                <div class="col-md-3">
-                    <input type="number" min="1" name="subjectMark['.$subject->class_id.']['.$subject->id. ']" class="form-control input-field" value="'. $mark.'" required>
+
+                <div class="d-none col-sm mcq">
+                    <label class="col-sm col-form-label">MCQ </label>
+                    <input type="number" min="1" id="mcq'.$subject->id.'" name="mcqMark['.$subject->class_id.']['.$subject->id. ']" class="form-control" value="'. $mcq.'" onkeyup="keyUpDistributionMarkSave('.$resultSetting->id.', '.$subject->class_id.', '.$subject->id.');" required>
+                </div>
+
+                <div class="d-none col-sm written">
+                    <label class="col-sm col-form-label">Written </label>
+                    <input type="number" min="1" id="written'.$subject->id.'" name="writtenMark['.$subject->class_id.']['.$subject->id. ']" class="form-control" value="'. $written.'" onkeyup="keyUpDistributionMarkSave('.$resultSetting->id.', '.$subject->class_id.', '.$subject->id.');" required>
+                </div>
+
+                <div class="d-none col-sm practical">
+                    <label class="col-sm col-form-label">Practical </label>
+                    <input type="number" min="1" id="practical'.$subject->id.'" name="practicalMark['.$subject->class_id.']['.$subject->id. ']" class="form-control" value="'. $practical.'" onkeyup="keyUpDistributionMarkSave('.$resultSetting->id.', '.$subject->class_id.', '.$subject->id.');" required>
+                </div>
+
+                <div class="col-md">
+                    <input type="number" min="1" id="mark'.$subject->id.'" name="subjectMark['.$subject->class_id.']['.$subject->id. ']" class="form-control input-field" value="'. $mark.'" onkeyup="keyUpDistributionMarkSave('.$resultSetting->id.', '.$subject->class_id.', '.$subject->id.');" required>
                 </div>
             </div>';
         }

@@ -17,11 +17,12 @@ class CreateTicketsTable extends Migration
             $table->id();
             $table->string('token');
             $table->string('department_id');
+            $table->string('school_id');
             $table->string('subject')->nullable();
             $table->string('priority');
             $table->string('name');
             $table->string('email');
-            $table->tinyInteger('status')->default(0)->comment("1=running, 2=close, 0=pending");
+            $table->tinyInteger('status')->default(0)->comment("1=close, 0=running");
             $table->timestamps();
         });
     }

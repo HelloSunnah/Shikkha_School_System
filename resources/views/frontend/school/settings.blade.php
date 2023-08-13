@@ -30,7 +30,7 @@
 
                                     <div class="ms-3">
                                         @forelse ($class['subjects'] as $id => $subject)
-                                        <div class="form-check">
+                                        <div class="form-check">    
                                             <input 
                                                 type="checkbox" 
                                                 class="subject-check-{{$key}}"

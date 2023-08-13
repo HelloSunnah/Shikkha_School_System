@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class Teacher extends Authenticatable
 {
@@ -22,10 +23,40 @@ class Teacher extends Authenticatable
         'password', 'remember_token',
     ];
 
-
+    /**
+     * Relation with School
+     */
     public function school()
     {
         return $this->belongsTo(School::class);
     }
 
+    /**
+     * Relation with permission
+     */
+    public function permission()
+    {
+        return $this->hasOne(Permission::class);
+    }
+
+    // default logo
+    public function getImageAttribute($image)
+    {
+        if(is_null($image))
+        {
+            return asset('d/no-img2.jpg');
+        }
+        else
+        {
+            if(File::exists(public_path($image)))
+            {
+                return $image;
+            }
+            else
+            {
+                return asset('d/no-img2.jpg');
+            }
+        }
+        
+    }
 }

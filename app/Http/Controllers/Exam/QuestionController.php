@@ -13,6 +13,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Validated;
 use Facade\Ignition\DumpRecorder\Dump;
+use Illuminate\Support\Facades\DB;
+
 use function PHPUnit\Framework\isNull;
 
 use RealRashid\SweetAlert\Facades\Alert;
@@ -26,12 +28,20 @@ class QuestionController extends Controller
      * @return \Illuminate\Contracts\View\ 
      */
     public function index()
-    {
+    {   
+        $seoTitle = 'Question Add';
+        $seoDescription = 'Question Add' ;
+        $seoKeyword = 'Question Add' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $data['classes'] = InstituteClass::where('school_id', Auth::user()->id)->get();
         $data['terms']   = Term::where('school_id', Auth::user()->id)->get();
         $data['json'] = Question::get();
 
-        return view('frontend.school.question.index', $data);
+        return view('frontend.school.question.index', $data,compact('seo_array'));
     }
 
     /**
@@ -497,12 +507,20 @@ class QuestionController extends Controller
      * @return View
      */
     public function showQuestion()
-    {
+    {  
+        $seoTitle = 'Question List';
+        $seoDescription = 'Question List' ;
+        $seoKeyword = 'Question List' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $data['questions'] = Question::with('term', 'class', 'subject')->where('school_id', auth()->user()->id)->get();
         $data['classes'] = InstituteClass::where('school_id', Auth::user()->id)->get();
         $data['terms']   = Term::where('school_id', Auth::user()->id)->orderBy('id','desc')->get();
         
-        return view('frontend.school.question.questionShow', $data);
+        return view('frontend.school.question.questionShow', $data , compact('seo_array'));
     }
     
     /**
@@ -512,7 +530,8 @@ class QuestionController extends Controller
      * @return 
      */
     public function viewSingleQuestion($id)
-    {
+    {   
+        
         $questions = Question::with('school', 'term', 'class', 'subject')->where('school_id', auth()->user()->id)
                                 ->where('id', $id)->latest()->get(); 
 
@@ -526,11 +545,19 @@ class QuestionController extends Controller
      * @return 
      */
     public function viewMcqCreativeQuestion($id)
-    {
+    {   
+        $seoTitle = 'Question View';
+        $seoDescription = 'Question View' ;
+        $seoKeyword = 'Question View' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $questions = Question::with('school', 'term', 'class', 'subject')->where('school_id', auth()->user()->id)
                                 ->where('id', $id)->latest()->get();
         
-        return view('frontend.school.question.view_single_question', compact('questions'));                        
+        return view('frontend.school.question.view_single_question', compact('questions','seo_array'));                        
     }
 
     /**
@@ -554,14 +581,22 @@ class QuestionController extends Controller
      * @return 
      */
     public function editQuestion($id)
-    {
+    {   
+        $seoTitle = 'Question Edit';
+        $seoDescription = 'Question Edit' ;
+        $seoKeyword = 'Question Edit' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $data['question'] = Question::with('school', 'term', 'class', 'subject')
                                 ->where('school_id', auth()->user()->id)
                                 ->where('id', $id)->first();
         $data['classes'] = InstituteClass::where('school_id', Auth::user()->id)->get();
         $data['terms']   = Term::where('school_id', Auth::user()->id)->get();
         $data['subjects'] = Subject::where('school_id', Auth::user()->id)->get();
-        return view('frontend.school.question.edit_question', $data);
+        return view('frontend.school.question.edit_question', $data ,compact('seo_array'));
     }
 
     /**

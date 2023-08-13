@@ -239,7 +239,15 @@ function ordinalNumber($number)
     }
 }
 
-
+/**
+ * Array of Subjects
+ * @author CodeCell <support@codecell.com.bd>
+ * @contributor Shahidul
+ * @modifier Sajjad <sajjad.develpr@gmail.com>
+ * @modified 05-07-23
+ * 
+ * @return Array
+ */
 function defaultSubjects()
 {
     $data =  array (
@@ -985,7 +993,7 @@ function defaultSubjects()
             'id' => 68,
             'code' => '134',
             'name' => 'Agriculture Studies',
-            'group' => 0,
+            'group' => 4,
             'class' => 11,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:00.000000Z',
@@ -996,7 +1004,7 @@ function defaultSubjects()
             'id' => 69,
             'code' => '151',
             'name' => 'Home science',
-            'group' => 0,
+            'group' => 4,
             'class' => 11,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:00.000000Z',
@@ -1006,7 +1014,7 @@ function defaultSubjects()
         array (
             'id' => 70,
             'code' => '154',
-            'name' => 'Information and Communication Technology',
+            'name' => 'Information & Communication Technology',
             'group' => 0,
             'class' => 11,
             'status' => 1,
@@ -1016,7 +1024,7 @@ function defaultSubjects()
         70 => 
         array (
             'id' => 71,
-            'code' => 'Null',
+            'code' => '133',
             'name' => 'Health and Sports',
             'group' => 0,
             'class' => 11,
@@ -1027,7 +1035,7 @@ function defaultSubjects()
         71 => 
         array (
             'id' => 72,
-            'code' => 'Null',
+            'code' => '156',
             'name' => 'Career Education',
             'group' => 0,
             'class' => 11,
@@ -1049,7 +1057,7 @@ function defaultSubjects()
         73 => 
         array (
             'id' => 74,
-            'code' => 'Null',
+            'code' => '048',
             'name' => 'Bangla literature',
             'group' => 0,
             'class' => 11,
@@ -1084,7 +1092,7 @@ function defaultSubjects()
             'id' => 77,
             'code' => '138',
             'name' => 'Biology',
-            'group' => 1,
+            'group' => 4,
             'class' => 11,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:00.000000Z',
@@ -1095,7 +1103,7 @@ function defaultSubjects()
             'id' => 78,
             'code' => '126',
             'name' => 'Higher Math',
-            'group' => 1,
+            'group' => 4,
             'class' => 11,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:00.000000Z',
@@ -1105,7 +1113,7 @@ function defaultSubjects()
         array (
             'id' => 79,
             'code' => '150',
-            'name' => 'Bangladesh and World',
+            'name' => 'Bangladesh and Global Studies',
             'group' => 1,
             'class' => 11,
             'status' => 1,
@@ -1138,7 +1146,7 @@ function defaultSubjects()
         array (
             'id' => 82,
             'code' => '143',
-            'name' => 'Business Ent.',
+            'name' => 'Business Entrepreneurship',
             'group' => 2,
             'class' => 11,
             'status' => 1,
@@ -1167,28 +1175,28 @@ function defaultSubjects()
             'created_at' => '2023-02-09T09:55:00.000000Z',
             'updated_at' => '2023-02-09T09:55:00.000000Z',
         ),
-        84 => 
-        array (
-            'id' => 85,
-            'code' => '127',
-            'name' => 'General Science',
-            'group' => 3,
-            'class' => 11,
-            'status' => 1,
-            'created_at' => '2023-02-09T09:55:00.000000Z',
-            'updated_at' => '2023-02-09T09:55:00.000000Z',
-        ),
-        85 => 
-        array (
-            'id' => 86,
-            'code' => '149',
-            'name' => 'Music',
-            'group' => 3,
-            'class' => 11,
-            'status' => 1,
-            'created_at' => '2023-02-09T09:55:00.000000Z',
-            'updated_at' => '2023-02-09T09:55:00.000000Z',
-        ),
+        // 84 => 
+        // array (
+        //     'id' => 85,
+        //     'code' => '3127',
+        //     'name' => 'General Science (Arts)',
+        //     'group' => 3,
+        //     'class' => 11,
+        //     'status' => 1,
+        //     'created_at' => '2023-02-09T09:55:00.000000Z',
+        //     'updated_at' => '2023-02-09T09:55:00.000000Z',
+        // ),
+        // 85 => 
+        // array (
+        //     'id' => 86,
+        //     'code' => '3149',
+        //     'name' => 'Music (Arts)',
+        //     'group' => 3,
+        //     'class' => 11,
+        //     'status' => 1,
+        //     'created_at' => '2023-02-09T09:55:00.000000Z',
+        //     'updated_at' => '2023-02-09T09:55:00.000000Z',
+        // ),
         86 => 
         array (
             'id' => 87,
@@ -1304,7 +1312,7 @@ function defaultSubjects()
             'id' => 97,
             'code' => '134',
             'name' => 'Agriculture Studies',
-            'group' => 0,
+            'group' => 4,
             'class' => 12,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:00.000000Z',
@@ -1315,7 +1323,7 @@ function defaultSubjects()
             'id' => 98,
             'code' => '151',
             'name' => 'Home science',
-            'group' => 0,
+            'group' => 4,
             'class' => 12,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1325,7 +1333,7 @@ function defaultSubjects()
         array (
             'id' => 99,
             'code' => '154',
-            'name' => 'Information and Communication Technology',
+            'name' => 'Information & Communication Technology',
             'group' => 0,
             'class' => 12,
             'status' => 1,
@@ -1335,7 +1343,7 @@ function defaultSubjects()
         99 => 
         array (
             'id' => 100,
-            'code' => 'Null',
+            'code' => '133',
             'name' => 'Health and Sports',
             'group' => 0,
             'class' => 12,
@@ -1346,7 +1354,7 @@ function defaultSubjects()
         100 => 
         array (
             'id' => 101,
-            'code' => 'Null',
+            'code' => '156',
             'name' => 'Career Education',
             'group' => 0,
             'class' => 12,
@@ -1368,7 +1376,7 @@ function defaultSubjects()
         102 => 
         array (
             'id' => 103,
-            'code' => 'Null',
+            'code' => '048',
             'name' => 'Bangla literature',
             'group' => 0,
             'class' => 12,
@@ -1403,7 +1411,7 @@ function defaultSubjects()
             'id' => 106,
             'code' => '138',
             'name' => 'Biology',
-            'group' => 1,
+            'group' => 4,
             'class' => 12,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1414,7 +1422,7 @@ function defaultSubjects()
             'id' => 107,
             'code' => '126',
             'name' => 'Higher Math',
-            'group' => 1,
+            'group' => 4,
             'class' => 12,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1424,7 +1432,7 @@ function defaultSubjects()
         array (
             'id' => 108,
             'code' => '150',
-            'name' => 'Bangladesh and World',
+            'name' => 'Bangladesh and Global Studies',
             'group' => 1,
             'class' => 12,
             'status' => 1,
@@ -1457,7 +1465,7 @@ function defaultSubjects()
         array (
             'id' => 111,
             'code' => '143',
-            'name' => 'Business Ent.',
+            'name' => 'Business Entrepreneurship',
             'group' => 2,
             'class' => 12,
             'status' => 1,
@@ -1486,28 +1494,28 @@ function defaultSubjects()
             'created_at' => '2023-02-09T09:55:01.000000Z',
             'updated_at' => '2023-02-09T09:55:01.000000Z',
         ),
-        113 => 
-        array (
-            'id' => 114,
-            'code' => '127',
-            'name' => 'General Science',
-            'group' => 3,
-            'class' => 12,
-            'status' => 1,
-            'created_at' => '2023-02-09T09:55:01.000000Z',
-            'updated_at' => '2023-02-09T09:55:01.000000Z',
-        ),
-        114 => 
-        array (
-            'id' => 115,
-            'code' => '149',
-            'name' => 'Music',
-            'group' => 3,
-            'class' => 12,
-            'status' => 1,
-            'created_at' => '2023-02-09T09:55:01.000000Z',
-            'updated_at' => '2023-02-09T09:55:01.000000Z',
-        ),
+        // 113 => 
+        // array (
+        //     'id' => 114,
+        //     'code' => '3127',
+        //     'name' => 'General Science (Arts)',
+        //     'group' => 3,
+        //     'class' => 12,
+        //     'status' => 1,
+        //     'created_at' => '2023-02-09T09:55:01.000000Z',
+        //     'updated_at' => '2023-02-09T09:55:01.000000Z',
+        // ),
+        // 114 => 
+        // array (
+        //     'id' => 115,
+        //     'code' => '3149',
+        //     'name' => 'Music (Arts)',
+        //     'group' => 3,
+        //     'class' => 12,
+        //     'status' => 1,
+        //     'created_at' => '2023-02-09T09:55:01.000000Z',
+        //     'updated_at' => '2023-02-09T09:55:01.000000Z',
+        // ),
         115 => 
         array (
             'id' => 116,
@@ -1600,7 +1608,7 @@ function defaultSubjects()
         array (
             'id' => 124,
             'code' => '275',
-            'name' => 'Information and Communication Technology',
+            'name' => 'Information & Communication Technology',
             'group' => 0,
             'class' => 13,
             'status' => 1,
@@ -1656,7 +1664,7 @@ function defaultSubjects()
             'id' => 129,
             'code' => '178',
             'name' => 'Biology First Paper',
-            'group' => 1,
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1667,7 +1675,7 @@ function defaultSubjects()
             'id' => 130,
             'code' => '179',
             'name' => 'Biology Second Paper',
-            'group' => 1,
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1676,9 +1684,9 @@ function defaultSubjects()
         130 => 
         array (
             'id' => 131,
-            'code' => '265',
-            'name' => 'Higher Math second Paper',
-            'group' => 1,
+            'code' => '266',
+            'name' => 'Higher Math Second Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1687,9 +1695,9 @@ function defaultSubjects()
         131 => 
         array (
             'id' => 132,
-            'code' => '266',
+            'code' => '265',
             'name' => 'Higher Math First Paper',
-            'group' => 1,
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1699,8 +1707,8 @@ function defaultSubjects()
         array (
             'id' => 133,
             'code' => '292',
-            'name' => 'Finance & Banking First paper',
-            'group' => 2,
+            'name' => 'Finance & Banking First Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1711,7 +1719,7 @@ function defaultSubjects()
             'id' => 134,
             'code' => '293',
             'name' => 'Finance & Banking Second Paper',
-            'group' => 2,
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1721,7 +1729,7 @@ function defaultSubjects()
         array (
             'id' => 135,
             'code' => '253',
-            'name' => 'Accounting First Papre',
+            'name' => 'Accounting First Paper',
             'group' => 2,
             'class' => 13,
             'status' => 1,
@@ -1732,7 +1740,7 @@ function defaultSubjects()
         array (
             'id' => 136,
             'code' => '254',
-            'name' => 'Accounting Second Papre',
+            'name' => 'Accounting Second Paper',
             'group' => 2,
             'class' => 13,
             'status' => 1,
@@ -1743,7 +1751,7 @@ function defaultSubjects()
         array (
             'id' => 137,
             'code' => '277',
-            'name' => 'Business Organization and management First Papre',
+            'name' => 'Business Organization & Management First Paper',
             'group' => 2,
             'class' => 13,
             'status' => 1,
@@ -1754,7 +1762,7 @@ function defaultSubjects()
         array (
             'id' => 138,
             'code' => '278',
-            'name' => 'Business Organization and management Second Papre',
+            'name' => 'Business Organization & Management Second Paper',
             'group' => 2,
             'class' => 13,
             'status' => 1,
@@ -1765,8 +1773,8 @@ function defaultSubjects()
         array (
             'id' => 139,
             'code' => '286',
-            'name' => 'Production Management and marketing First Papre',
-            'group' => 2,
+            'name' => 'Production Management & Marketing First Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1775,9 +1783,9 @@ function defaultSubjects()
         139 => 
         array (
             'id' => 140,
-            'code' => '286',
-            'name' => 'Production Management and marketing Second Papre',
-            'group' => 2,
+            'code' => '287',
+            'name' => 'Production Management & Marketing Second Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1787,8 +1795,8 @@ function defaultSubjects()
         array (
             'id' => 141,
             'code' => '109',
-            'name' => 'Economics First Papre',
-            'group' => 2,
+            'name' => 'Economics First Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1797,9 +1805,9 @@ function defaultSubjects()
         141 => 
         array (
             'id' => 142,
-            'code' => '109',
-            'name' => 'Economics Second Papre',
-            'group' => 2,
+            'code' => '110',
+            'name' => 'Economics Second Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1809,8 +1817,8 @@ function defaultSubjects()
         array (
             'id' => 143,
             'code' => '269',
-            'name' => 'Civic and Good Govern',
-            'group' => 3,
+            'name' => 'Civic and Good Govern First Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1819,9 +1827,9 @@ function defaultSubjects()
         143 => 
         array (
             'id' => 144,
-            'code' => '109',
-            'name' => 'Economics',
-            'group' => 3,
+            'code' => '270',
+            'name' => 'Civic and Good Govern Second Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1830,9 +1838,9 @@ function defaultSubjects()
         144 => 
         array (
             'id' => 145,
-            'code' => '304',
-            'name' => 'History',
-            'group' => 3,
+            'code' => '121',
+            'name' => 'Logic First Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1842,8 +1850,8 @@ function defaultSubjects()
         array (
             'id' => 146,
             'code' => '121',
-            'name' => 'Logic',
-            'group' => 3,
+            'name' => 'Logic Second Paper',
+            'group' => 4,
             'class' => 13,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1864,7 +1872,7 @@ function defaultSubjects()
         array (
             'id' => 148,
             'code' => '102',
-            'name' => 'Bangla Second paper',
+            'name' => 'Bangla Second Paper',
             'group' => 0,
             'class' => 14,
             'status' => 1,
@@ -1897,7 +1905,7 @@ function defaultSubjects()
         array (
             'id' => 151,
             'code' => '275',
-            'name' => 'Information and Communication Technology',
+            'name' => 'Information & Communication Technology',
             'group' => 0,
             'class' => 14,
             'status' => 1,
@@ -1953,7 +1961,7 @@ function defaultSubjects()
             'id' => 156,
             'code' => '178',
             'name' => 'Biology First Paper',
-            'group' => 1,
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1964,7 +1972,7 @@ function defaultSubjects()
             'id' => 157,
             'code' => '179',
             'name' => 'Biology Second Paper',
-            'group' => 1,
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1973,9 +1981,9 @@ function defaultSubjects()
         157 => 
         array (
             'id' => 158,
-            'code' => '265',
-            'name' => 'Higher Math second Paper',
-            'group' => 1,
+            'code' => '266',
+            'name' => 'Higher Math Second Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1984,9 +1992,9 @@ function defaultSubjects()
         158 => 
         array (
             'id' => 159,
-            'code' => '266',
+            'code' => '265',
             'name' => 'Higher Math First Paper',
-            'group' => 1,
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -1996,8 +2004,8 @@ function defaultSubjects()
         array (
             'id' => 160,
             'code' => '292',
-            'name' => 'Finance & Banking First paper',
-            'group' => 2,
+            'name' => 'Finance & Banking First Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2008,7 +2016,7 @@ function defaultSubjects()
             'id' => 161,
             'code' => '293',
             'name' => 'Finance & Banking Second Paper',
-            'group' => 2,
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2018,7 +2026,7 @@ function defaultSubjects()
         array (
             'id' => 162,
             'code' => '253',
-            'name' => 'Accounting First Papre',
+            'name' => 'Accounting First Paper',
             'group' => 2,
             'class' => 14,
             'status' => 1,
@@ -2040,7 +2048,7 @@ function defaultSubjects()
         array (
             'id' => 164,
             'code' => '277',
-            'name' => 'Business Organization and management First Papre',
+            'name' => 'Business Organization & Management First Paper',
             'group' => 2,
             'class' => 14,
             'status' => 1,
@@ -2051,7 +2059,7 @@ function defaultSubjects()
         array (
             'id' => 165,
             'code' => '278',
-            'name' => 'Business Organization and management Second Papre',
+            'name' => 'Business Organization & Management Second Paper',
             'group' => 2,
             'class' => 14,
             'status' => 1,
@@ -2062,8 +2070,8 @@ function defaultSubjects()
         array (
             'id' => 166,
             'code' => '286',
-            'name' => 'Production Management and marketing First Papre',
-            'group' => 2,
+            'name' => 'Production Management & Marketing First Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2072,9 +2080,9 @@ function defaultSubjects()
         166 => 
         array (
             'id' => 167,
-            'code' => '286',
-            'name' => 'Production Management and marketing Second Papre',
-            'group' => 2,
+            'code' => '287',
+            'name' => 'Production Management & Marketing Second Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2084,8 +2092,8 @@ function defaultSubjects()
         array (
             'id' => 168,
             'code' => '109',
-            'name' => 'Economics First Papre',
-            'group' => 2,
+            'name' => 'Economics First Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2094,9 +2102,9 @@ function defaultSubjects()
         168 => 
         array (
             'id' => 169,
-            'code' => '109',
-            'name' => 'Economics Second Papre',
-            'group' => 2,
+            'code' => '110',
+            'name' => 'Economics Second Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2106,8 +2114,8 @@ function defaultSubjects()
         array (
             'id' => 170,
             'code' => '269',
-            'name' => 'Civic and Good Govern',
-            'group' => 3,
+            'name' => 'Civic and Good Govern First Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2116,9 +2124,9 @@ function defaultSubjects()
         170 => 
         array (
             'id' => 171,
-            'code' => '109',
-            'name' => 'Economics',
-            'group' => 3,
+            'code' => '121',
+            'name' => 'Logic First Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2127,9 +2135,9 @@ function defaultSubjects()
         171 => 
         array (
             'id' => 172,
-            'code' => '304',
-            'name' => 'History',
-            'group' => 3,
+            'code' => '122',
+            'name' => 'Logic Second Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
@@ -2138,14 +2146,478 @@ function defaultSubjects()
         172 => 
         array (
             'id' => 173,
-            'code' => '121',
-            'name' => 'Logic',
-            'group' => 3,
+            'code' => '270',
+            'name' => 'Civic and Good Govern Second Paper',
+            'group' => 4,
             'class' => 14,
             'status' => 1,
             'created_at' => '2023-02-09T09:55:01.000000Z',
             'updated_at' => '2023-02-09T09:55:01.000000Z',
-        )
+        ),
+        173 => 
+        array (
+            'id' => 174,
+            'code' => '117',
+            'name' => 'Sociology First Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        174 => 
+        array (
+            'id' => 175,
+            'code' => '118',
+            'name' => 'Sociology Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        175 => 
+        array (
+            'id' => 176,
+            'code' => '304',
+            'name' => 'History First Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        176 => 
+        array (
+            'id' => 177,
+            'code' => '305',
+            'name' => 'History Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        177 => 
+        array (
+            'id' => 178,
+            'code' => '267',
+            'name' => 'Islamic History & Culture Fist Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        178 => 
+        array (
+            'id' => 179,
+            'code' => '268',
+            'name' => 'Islamic History & Culture Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        179 => 
+        array (
+            'id' => 180,
+            'code' => '125',
+            'name' => 'Geography First Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        180 => 
+        array (
+            'id' => 181,
+            'code' => '126',
+            'name' => 'Geography Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        181 => 
+        array (
+            'id' => 182,
+            'code' => '123',
+            'name' => 'Psychology First Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        182 => 
+        array (
+            'id' => 183,
+            'code' => '124',
+            'name' => 'Psychology Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        183 => 
+        array (
+            'id' => 184,
+            'code' => '239',
+            'name' => 'Agriculture First Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        184 => 
+        array (
+            'id' => 185,
+            'code' => '240',
+            'name' => 'Agriculture Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        185 => 
+        array (
+            'id' => 186,
+            'code' => '271',
+            'name' => 'Social Work First Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        186 => 
+        array (
+            'id' => 187,
+            'code' => '272',
+            'name' => 'Social Work Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        187 => 
+        array (
+            'id' => 188,
+            'code' => '249',
+            'name' => 'Studies of Islam First Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        188 => 
+        array (
+            'id' => 189,
+            'code' => '250',
+            'name' => 'Studies of Islam Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        189 => 
+        array (
+            'id' => 190,
+            'code' => '129',
+            'name' => 'Statistics First Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        190 => 
+        array (
+            'id' => 191,
+            'code' => '130',
+            'name' => 'Statistics Second Paper',
+            'group' => 4,
+            'class' => 14,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        191 => 
+        array (
+            'id' => 192,
+            'code' => '117',
+            'name' => 'Sociology First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        192 => 
+        array (
+            'id' => 193,
+            'code' => '118',
+            'name' => 'Sociology Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        193 => 
+        array (
+            'id' => 194,
+            'code' => '304',
+            'name' => 'History First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        194 => 
+        array (
+            'id' => 195,
+            'code' => '305',
+            'name' => 'History Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        195 => 
+        array (
+            'id' => 196,
+            'code' => '267',
+            'name' => 'Islamic History & Culture First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        196 => 
+        array (
+            'id' => 197,
+            'code' => '268',
+            'name' => 'Islamic History & Culture Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        197 => 
+        array (
+            'id' => 198,
+            'code' => '125',
+            'name' => 'Geography First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        198 => 
+        array (
+            'id' => 199,
+            'code' => '126',
+            'name' => 'Geography Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        199 => 
+        array (
+            'id' => 200,
+            'code' => '123',
+            'name' => 'Psychology First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        200 => 
+        array (
+            'id' => 201,
+            'code' => '124',
+            'name' => 'Psychology Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        201 => 
+        array (
+            'id' => 202,
+            'code' => '239',
+            'name' => 'Agriculture First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        202 => 
+        array (
+            'id' => 203,
+            'code' => '240',
+            'name' => 'Agriculture Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        203 => 
+        array (
+            'id' => 204,
+            'code' => '271',
+            'name' => 'Social Work First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        204 => 
+        array (
+            'id' => 205,
+            'code' => '272',
+            'name' => 'Social Work Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        205 => 
+        array (
+            'id' => 206,
+            'code' => '249',
+            'name' => 'Studies of Islam First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        206 => 
+        array (
+            'id' => 207,
+            'code' => '250',
+            'name' => 'Studies of Islam Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        207 => 
+        array (
+            'id' => 208,
+            'code' => '129',
+            'name' => 'Statistics First Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        208 => 
+        array (
+            'id' => 209,
+            'code' => '130',
+            'name' => 'Statistics Second Paper',
+            'group' => 4,
+            'class' => 13,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:01.000000Z',
+            'updated_at' => '2023-02-09T09:55:01.000000Z',
+        ),
+        209 => 
+        array (
+            'id' => 210,
+            'code' => '101',
+            'name' => 'Bangla',
+            'group' => 0,
+            'class' => 1,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:00.000000Z',
+            'updated_at' => '2023-02-09T09:55:00.000000Z',
+        ),
+        210 => 
+        array (
+            'id' => 211,
+            'code' => '107',
+            'name' => 'English',
+            'group' => 0,
+            'class' => 1,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:00.000000Z',
+            'updated_at' => '2023-02-09T09:55:00.000000Z',
+        ),
+        211 => 
+        array (
+            'id' => 212,
+            'code' => '109',
+            'name' => 'Math',
+            'group' => 0,
+            'class' => 1,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:00.000000Z',
+            'updated_at' => '2023-02-09T09:55:00.000000Z',
+        ),
+        212 => 
+        array (
+            'id' => 213,
+            'code' => '101',
+            'name' => 'Bangla',
+            'group' => 0,
+            'class' => 2,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:00.000000Z',
+            'updated_at' => '2023-02-09T09:55:00.000000Z',
+        ),
+        213 => 
+        array (
+            'id' => 214,
+            'code' => '107',
+            'name' => 'English',
+            'group' => 0,
+            'class' => 2,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:00.000000Z',
+            'updated_at' => '2023-02-09T09:55:00.000000Z',
+        ),
+        214 => 
+        array (
+            'id' => 215,
+            'code' => '109',
+            'name' => 'Math',
+            'group' => 0,
+            'class' => 2,
+            'status' => 1,
+            'created_at' => '2023-02-09T09:55:00.000000Z',
+            'updated_at' => '2023-02-09T09:55:00.000000Z',
+        ),
+        
+        
     );
 
 

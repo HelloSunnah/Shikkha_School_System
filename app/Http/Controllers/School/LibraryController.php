@@ -21,38 +21,21 @@ class LibraryController extends Controller
 {
 
     public function booksCreate()
-    {
-        $allData = LibraryBookInfo::all();
-        $bookType = LibBookType::all();
-        $bookTypes = LibBookType::all();
+    {   
+         $seoTitle = 'Book List';
+        $seoDescription = 'Book List' ;
+        $seoKeyword = 'Book List' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        $allData = LibraryBookInfo::where('school_id', Auth::user()->id)->get();
+        $bookType = LibBookType::where('school_id', Auth::user()->id)->get();
+        $bookTypes =LibBookType::where('school_id', Auth::user()->id)->get();   
 
-        
-        return view('frontend.school.library.booksCreate', compact('bookType', 'bookTypes','allData'));
+        return view('frontend.school.library.booksCreate', compact('bookType', 'bookTypes','allData','seo_array'));
     }
-
-    public function booksType()
-    {
-        return view('frontend.school.library.booksType');
-    }
-
-    public function booksTypePost(Request $request)
-    {
-        $request->validate([
-            'book_type' => 'required'
-        ]);
-        // for create new Bookcategory
-        try {
-            LibBookType::create([
-                'book_type' => $request->book_type
-            ]);
-            return redirect()->route('books.create');
-        } catch (\Exception $e) {
-            return redirect()->route('books.type.create')->with('error', 'data insert failed');
-        }
-    }
-
-
-
 
     public function booksCreatePost(Request $request)
     {
@@ -67,12 +50,7 @@ class LibraryController extends Controller
 
 
         ]);
-        // for image upload
-        // $fileName = null;
-        // if ($request->hasFile('image')) {
-        //     $fileName = date('Ymdhmsis') . '.' . $request->file('image')->getclientOriginalExtension();
-        //     $request->file('image')->storeAs('uploads/library/', $fileName);
-        // }
+        
         $fileName = null;
         if ($request->hasFile('image')) {
             $fileName = time() . '.' . $request->file('image')->getclientOriginalExtension();
@@ -88,7 +66,8 @@ class LibraryController extends Controller
                     'rack_no' => $request->rack_no,
                     'quantity' => $request->quantity,
                     'available' => $request->available,
-                    'image' => $fileName
+                    'image' => $fileName,
+                    'school_id' => Auth::user()->id,
                 ]
             );
             return back()->with('insert', 'data insert succesfully');;
@@ -129,7 +108,8 @@ class LibraryController extends Controller
                 'author_name' => $request->author_name,
                 'rack_no' => $request->rack_no,
                 'quantity' => $request->quantity,
-                'image' => $fileName
+                'image' => $fileName,
+                'school_id' => Auth::user()->id,
             ]);
             return redirect()->route('books.create');
         } catch (\Exception $e) {
@@ -142,12 +122,37 @@ class LibraryController extends Controller
         LibraryBookInfo::find($id)->delete();
         return back();
     }
+
     public function books_Check_delete(Request $request)
     {
         $ids=$request->ids;
         LibraryBookInfo::whereIn('id',$ids)->delete();
         Alert::success('Selected books are deleted','success message');
         return response()->json(['status'=>'success']);
+    }
+
+
+
+    public function booksType()
+    {
+        return view('frontend.school.library.booksType');
+    }
+
+    public function booksTypePost(Request $request)
+    {
+        $request->validate([
+            'book_type' => 'required'
+        ]);
+        // for create new Bookcategory
+        try {
+            LibBookType::create([
+                'book_type' => $request->book_type,
+                'school_id' => Auth::user()->id,
+            ]);
+            return redirect()->route('books.create');
+        } catch (\Exception $e) {
+            return redirect()->route('books.type.create')->with('error', 'data insert failed');
+        }
     }
 
     public function bookstypeDelete($id)
@@ -207,16 +212,32 @@ class LibraryController extends Controller
 
 
     public function borrowerinfo()
-    {
-        $borrowlist = BorrowBook::with('bookRelation', 'studentRelation')->orderBy('id', 'desc')->get();
-        return view('frontend.school.library.borrowerPage', compact('borrowlist'));
+    {   
+        $seoTitle = 'Borrower List';
+        $seoDescription = 'Borrower List' ;
+        $seoKeyword = 'Borrower List' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        $borrowlist = BorrowBook::with('bookRelation', 'studentRelation')->where('school_id', Auth::user()->id)->orderBy('id', 'desc')->get();
+        return view('frontend.school.library.borrowerPage', compact('borrowlist','seo_array'));
     }
     public function borrowerCreate()
-    {
+    {   
+         $seoTitle = 'Borrower Add';
+        $seoDescription = 'Borrower Add' ;
+        $seoKeyword = 'Borrower Add' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $books = LibraryBookInfo::all();
         $students = User::where('school_id', Auth::id())->get();
         $defaultDate = Carbon::today()->format('Y-m-d');
-        return view('frontend.school.library.borroerCreate', compact('books', 'students', 'defaultDate'));
+        return view('frontend.school.library.borroerCreate', compact('books', 'students', 'defaultDate','seo_array'));
     }
     public function borrower_store(Request $request)
     {
@@ -236,7 +257,8 @@ class LibraryController extends Controller
                 'Student_id' => $request->student_id,
                 'borrow_date' => $request->borrow_date,
                 'return_date' => $request->return_date,
-                'possible_borrow_date' => $request->possible_borrow_date
+                'possible_borrow_date' => $request->possible_borrow_date,
+                'school_id' => Auth::user()->id,
             ]);
             return redirect()->route('borrowerinfo')->with('insert', 'data has been insert successfully');
         } catch (\Exception $e) {
@@ -249,12 +271,20 @@ class LibraryController extends Controller
         return back();
     }
     public function borrower_Edit($id)
-    {
+    {   
+         $seoTitle = 'Borrower Edit';
+        $seoDescription = 'Borrower Edit' ;
+        $seoKeyword = 'Borrower Edit' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $books = LibraryBookInfo::all();
         $students = User::all();
         $borrowrer = BorrowBook::find($id);
         $defaultDate = Carbon::today()->format('Y-m-d');
-        return view('frontend.school.library.borrowrerEdit', compact('books', 'students', 'borrowrer', 'defaultDate'));
+        return view('frontend.school.library.borrowrerEdit', compact('books', 'students', 'borrowrer', 'defaultDate','seo_array'));
     }
     public function borrower_Update(Request $request, $id)
     {
@@ -272,7 +302,8 @@ class LibraryController extends Controller
                 'Student_id' => $request->Student_id,
                 'borrow_date' => $request->borrow_date,
                 'return_date' => "$request->return_date",
-                'possible_borrow_date' => $request->possible_borrow_date
+                'possible_borrow_date' => $request->possible_borrow_date,
+                'school_id' => Auth::user()->id,
             ]);
             if ($request->has('return_date')) {
                 $book = LibraryBookInfo::find($request->book_id);

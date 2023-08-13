@@ -31,17 +31,25 @@ class ClassPeriodController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    {   
+         $seoTitle = 'Class PeriodeList';
+            $seoDescription = 'Class PeriodeList';
+            $seoKeyword = 'Class PeriodeList';
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
         $rows = DB::table('class_periods')->where('school_id', $this->school->id)->orderBy('shift', 'asc')->get();
 
         if($rows->count() > 0)
         {
-            return view('frontend.school.period.table')->with(compact('rows'));
+            return view('frontend.school.period.table')->with(compact('rows','seo_array'));
         }
         else
         {
             $rows = [];
-            return view('frontend.school.period.form', compact('rows'));
+            return view('frontend.school.period.form', compact('rows','seo_array'));
         }
         
     }
@@ -62,12 +70,19 @@ class ClassPeriodController extends Controller
         if(Auth::user()->is_editor != 3) {
             return back();
         }else {
-
+             $seoTitle = 'Class PeriodeCreate ';
+            $seoDescription = 'Class PeriodeCreate';
+            $seoKeyword = 'Class PeriodeCreate';
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
             $rows = [];
 
             if(is_null($shift))
             {
-                return view('frontend.school.period.form', compact('rows', 'shift'));
+                return view('frontend.school.period.form', compact('rows', 'shift','seo_array'));
             }
             else
             {
@@ -75,11 +90,11 @@ class ClassPeriodController extends Controller
 
                 if($rows->count() > 0)
                 {
-                    return view('frontend.school.period.form', compact('rows', 'shift'));
+                    return view('frontend.school.period.form', compact('rows', 'shift','seo_array'));
                 }
                 else
                 {
-                    return view('frontend.school.period.form', compact('rows', 'shift'));
+                    return view('frontend.school.period.form', compact('rows', 'shift','seo_array'));
                 }
 
             }

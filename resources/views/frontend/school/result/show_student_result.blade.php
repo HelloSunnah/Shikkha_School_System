@@ -128,14 +128,14 @@
                                     @php
                                         $total = 0;
                                         $totalGpa = 0.000;
-                                        // $totalSubject = count($studentResults); Permanent
-                                        $totalSubject = 0; //Temporay
+                                        //  $totalSubject = count($studentResults); //Permanent
+                                       $totalSubject = 0; //Temporay
 
                                     @endphp
 
                                     {{-- @dd($studentResults) --}}
                                     @foreach ($studentResults as $result)
-                                        @if ($result->total != 0)           
+                                        @if ($result->absent == 1 || $result->total != 0)           
                                             @php
                                                 $totalSubject += 1; //Temporary
                                                 $term_id = $term->id;
@@ -205,7 +205,7 @@
                                         $grading_point = array(
                                                                 'A+' => 5, 'A' => 4, 'A-' => 3.5, 'B' => 3, 'C' => 2, 'D' => 1, 'F' => 0
                                                             );
-
+                                                            
                                         foreach ($grading_point as $gpa => $minimum_grade) {
                                                 if (number_format($totalGpa / $totalSubject, 2) >= $minimum_grade) {
                                                     $gpa_point = $gpa;

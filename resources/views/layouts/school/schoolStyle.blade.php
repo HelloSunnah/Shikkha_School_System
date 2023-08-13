@@ -197,6 +197,7 @@
         border-radius: 4px;
         margin-left: 3px;
         margin-right: 3px;
+        color: blueviolet;
     }
 
     .page-link:focus {
@@ -317,7 +318,7 @@
     .toggle-ln input[type="checkbox"] {
         width: 88px;
         height: 32px;
-        background-color: #f2ecf0;
+        background-color: white;
         border: 2px solid blueviolet;
         -webkit-appearance: none;
         border-radius: 20px;
@@ -331,7 +332,7 @@
         -moz-transition: .3s;
         -ms-transition: .3s;
         -o-transition: .3s;
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        /* box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); */
         cursor: pointer;
     }
 
@@ -463,5 +464,18 @@
         background-color: #fff;
         border: 1px solid #aaa;
         border-radius: 4px;
+    }
+
+
+    a.back-to-top {
+        background: blueviolet;
+    }
+
+    .back-to-top:hover {
+        background-color: #7e00a7;
+    }
+
+    a {
+        color: blueviolet;
     }
 </style>

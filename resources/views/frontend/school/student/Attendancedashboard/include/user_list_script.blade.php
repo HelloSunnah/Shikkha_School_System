@@ -32,11 +32,15 @@
     }
 
 
-    // load data table
+    
+    /** -------------   Load Data table
+     * =================================================== **/
     let loadDataTable = (data) => {
         let users = ``;
         var connectedUser = 0;
         var totalUser = data.length;
+        var connectedArray = [];
+        var disConnectedArray = [];
 
         if(data.length > 0)
         {
@@ -61,6 +65,10 @@
                 {
                     ++connectedUser;
                     connected = '<span class="badge bg-success text-uppercase">connected</span>'
+                }
+                else
+                {
+                    connectedArray.push()
                 }
                 
                 users += `<tr>
@@ -104,6 +112,8 @@
 
     
     // init datatable
+    /** -------------   INIT DATATABLE
+     * =================================================== **/
     let initDataTable = () => {
         $.ajax({
             url: "{{url()->current()}}",

@@ -25,7 +25,6 @@ use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Constraint\Count;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
-
 class UserController extends Controller
 {
 
@@ -33,11 +32,9 @@ class UserController extends Controller
     {
         $this->middleware('auth');
     }
-
     public function profile(){
         return view('frontend.user.profile');
     }
-
     public function profileUpdate(Request $request,$id){
         $validator = Validator::make($request->all(),[
             'email' => 'required',
@@ -60,15 +57,10 @@ class UserController extends Controller
         $user->save();
         toast('User Updated Successfully','success');
         return back();
-
-
     }
-
     public function changePassword(Request $request){
-        // dd($request->all());
         $user = User::where('id',Auth::user()->id)->first();
         if(Hash::check($request->password, $user->password)){
-
             $user->password = Hash::make($request->new_password);
             $user->save();
             toast('Password Updated Successfully','success');
@@ -77,19 +69,16 @@ class UserController extends Controller
         }
         return back();
     }
-
     public function accountVaccine(){
         $vaccine = Vaccine::where('student_id',Auth::user()->id)->first();
         return view('frontend.user.vaccine',compact('vaccine'));
     }
-
     public function vaccineUpdate(Request $request){
         if(($request->id != 0)){
             $request->validate([
                 'birth_certificate_no' => 'required',
                 'vaccine' => 'required',
             ]);
-
             $vaccine = new Vaccine();
             $vaccine->birth_certificate_no = $request->birth_certificate_no;
             $vaccine->vaccine = $request->vaccine;
@@ -98,12 +87,11 @@ class UserController extends Controller
             toast('Vaccine Info Uploaded Successfully','success');
             return back();
         }else{
-         //   dd(1);
+
             $request->validate([
                 'birth_certificate_no' => 'required',
                 'vaccine' => 'required',
             ]);
-
             $vaccine = Vaccine::where('student_id',Auth::user()->id)->first();
             $vaccine->birth_certificate_no = $request->birth_certificate_no;
             $vaccine->vaccine = $request->vaccine;
@@ -112,24 +100,17 @@ class UserController extends Controller
             toast('Vaccine Info Updated Successfully','success');
             return back();
         }
-
-
     }
-
-
     public function onlineClass($id){
         $teacher = Teacher::where('id',$id)->first();
         return view('frontend.user.meet',compact('teacher'));
     }
-
     public function notice(){
         $dataAll = Notice::where('school_id',Auth::user()->school_id)->where('class_id',0)->get()->toArray();
         $dataSpecific = Notice::where('school_id',Auth::user()->school_id)->where('class_id',Auth::user()->class_id)->get()->toArray();
         $showData = array_merge($dataAll,$dataSpecific);
         dd($showData);
-
     }
-
     /**
      * Show All Assignment Student Panel (Sajjad)
      * 
@@ -267,7 +248,7 @@ class UserController extends Controller
             return view('frontend.user.payment.index', compact('studentMonthlyFees'));
         }
         else{
-            Alert::success('Not Payment Submitted', 'Success Message');
+            Alert::success('Not Payment Submitted','Success Message');
 
             return view('frontend.user.notice.index');
         }

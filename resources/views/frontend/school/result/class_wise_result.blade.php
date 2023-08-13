@@ -97,8 +97,8 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-12 mb-3">
-                                        <label class="select-form">Select Term</label> <br>
+                                    <div class="col-12 mb-4">
+                                        <label class="">Select Term</label> <br>
                                         @foreach ($terms as $term)
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" name="resultSetting[]" id="resultSetting{{ $term->id }}" value="{{ $term->id }}">

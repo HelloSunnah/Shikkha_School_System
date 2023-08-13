@@ -36,7 +36,8 @@
                                                 @if (count($data) != 0)
                                                     <tr>
                                                         <td>{{++$rank}}</td>
-                                                        <td style="text-align: left;">{{ strtoupper(getStudentName($data['student_id'])?->name) }} ({{getStudentName($data['student_id'])?->roll_number}})</td>
+                                                        
+                                                        <td style="text-align: left;">{{ strtoupper(getStudentName($data['student_id'])?->name) }} ({{getStudentName($data['student_id'])?->roll_number}}) </td>
                                                         <td>{{ $data['total'] }}</td>
                                                         <td>{{ ($data['totalGpa'] > 1 && $data['resultStatus'] == 1) ? classWiseGpa($data['totalGpa']) : "F" }}</td>
                                                         <td>{{ ($data['totalGpa'] > 1 && $data['resultStatus'] == 1) ? $data['totalGpa'] : "0" }}</td>

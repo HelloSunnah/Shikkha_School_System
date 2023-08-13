@@ -20,10 +20,18 @@ class MarkController extends Controller
      */
     public function index($id)
     {   
+        $seoTitle = 'Result Setting';
+        $seoDescription = 'Result Setting' ;
+        $seoKeyword = 'Result Setting';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $resultSettingId = $id;
         $classes = InstituteClass::where('school_id', Auth::user()->id)->get();
 
-        return view('frontend.school.mark_type.mark_type', compact('classes', 'resultSettingId'));
+        return view('frontend.school.mark_type.mark_type', compact('classes', 'resultSettingId','seo_array'));
     }
 
     /**

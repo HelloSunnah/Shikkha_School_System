@@ -37,6 +37,10 @@
                                     <div class="card-body">
                                         <div class="tab-content" id="nav-tabContent">
                                             @foreach ($subjectName as $key => $tabName)
+                                                @php
+                                                   $dataShow =  getStudent($class_id, $section_id, $tabName->group_id, $tabName->subject_code);
+                                                @endphp
+                                                
                                                 <div class="tab-pane fade {{ $key == 0 ? 'show active' : '' }}"
                                                     id="list-home{{ $tabName->id }}" role="tabpanel"
                                                     aria-labelledby="list-home-list">
@@ -65,13 +69,15 @@
                                                                                 <th>Total</th>
                                                                                 <th>Grade</th>
                                                                                 <th>GPA</th>
+                                                                                <th>Action</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
+                                                                            
                                                                             @if (count($markTypes) > 0)
                                                                                 @foreach ($dataShow as $key => $data)
                                                                                     <tr id="result{{ $data->id }}">
-                                                                                        <td>{{ $data->roll_number }}</td>
+                                                                                        <td>{{ $data->roll_number }}</td> 
                                                                                         <td>
                                                                                             <div class="cursor-pointer">
                                                                                                 @if ($data->image != null && file_exists($data->image))
@@ -144,7 +150,7 @@
 
                                                                                         @php
                                                                                             // $totalMark = ($subjectTotalMark * 100) / $termName->total_mark;
-                                                                                            if(subjectMark($termName->id, $data->class_id, $tabName->id) == 1) {
+                                                                                            if(subjectMark($termName->id, $data->class_id, $tabName->id) == 350) {
                                                                                                 $modal = '<div id="myModal" class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                                                                                                 <div class="modal-dialog modal-dialog-centered">
                                                                                                                     <div class="modal-content">
@@ -229,6 +235,10 @@
                                                                                                 {{ $markInvalid ? $invalidMsg : $gpa_point }}
                                                                                             </h5>
                                                                                         </td>
+
+                                                                                        <td>
+                                                                                            <button onclick="studentResultAbsent(event, '{{ $data->id }}', '{{ $data->roll_number }}', '{{ $data->class_id }}', '{{ $section_id }}', '{{ $tabName->id }}', '{{ $termName->id }}');" class="btn btn-primary btn-sm">Absent</button>
+                                                                                        </td>
                                                                                     </tr>
                                                                                 @endforeach
                                                                             @else
@@ -277,6 +287,38 @@
 </script>
 
 <script>
+    function studentResultAbsent(event, student_id, student_roll_number, class_id, section_id, subject_id, term_id)
+    {
+        event.preventDefault();
+        var data = {
+            'student_id'    : student_id,
+            'roll_number'   : student_roll_number,
+            'class_id'      : class_id,
+            'section_id'    : section_id,
+            'subject_id'    : subject_id,
+            'term_id'       : term_id
+        };
+
+        $.ajax({
+            type: "get",
+            url: "{{ route('student.result.absent') }}",
+            data: data,
+            success: function (response) {
+                if(response.status == 'success') {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'This student is absent in this subject.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                }
+            }
+        });
+    }
+</script>
+
+<script>
      function markValidation(studentId, subjectId, subjectMark) 
     {   
         var total = [];
@@ -308,4 +350,5 @@
         }
     }
 </script>
+
 @endpush

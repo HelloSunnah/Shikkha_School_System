@@ -97,7 +97,7 @@
              <div class="row">
                 <div class="col-xxl-12 wow fadeInUp" data-wow-delay=".5s">
                    <div class="text-center footer__copyright-wrapper">
-                      <p>{{__('app.footerbottom')}} <a href="#">{{__('app.footerbottom1')}} </a></p>
+                      <p>{{__('app.footerbottom')}} {{ date('Y') }} {{__('app.footerbottom2')}}<a href="#">{{__('app.footerbottom1')}} </a></p>
                    </div>
                 </div>
              </div>

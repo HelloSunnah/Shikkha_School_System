@@ -31,7 +31,7 @@
                             <div class="col-12 mt-4">
                                 <div class="row">
                                     <div class="col-md-6"><label class="form-label">{{ __('app.PhoneNumber') }} <span style="color:red;">*</span></label>
-                                            <input type="text" class="form-control" value="{{ old('phone') }}" name="phone" required>
+                                    <input type="text" class="form-control" value="{{ old('phone') }}" name="phone" required>
                                     </div>
                                     <div class="col-md-6"> <label class="form-label">{{ __('app.sign4') }} <span style="color:red;">*</span></label>
                                             <input type="text" class="form-control" value="{{ old('address') }}" name="address" required>

@@ -25,7 +25,7 @@ class SMSController extends Controller
     {
         $data['terms'] = Term::where('school_id', Auth::id())->latest()->get();
         $data['classes'] = InstituteClass::where('school_id', Auth::id())->latest()->get();
-
+        
         return view('frontend.school.result.form', compact('data'));
     }
 

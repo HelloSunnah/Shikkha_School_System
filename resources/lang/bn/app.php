@@ -4,6 +4,7 @@ return [
 
       // (SHAHIDUL)
       'upload_attendance' =>  "হাজিরা আপলোড করুন",
+      'auto_attendance' =>    'স্বয়ংক্রিয় হাজিরা',
       'all_class' =>  "সকল শ্রেণী",
       'phone' =>  "মোবাইল নাম্বার",
       'PositionName'    => "পদবী",
@@ -234,7 +235,8 @@ return [
       'Quick6' => "আমরা সামাজিক ",
       'Quick7' => "আমাদের সাথে যোগ দিন ",
       'pricehead' => 'আপনার প্রতিষ্ঠানের জন্য সেরা পরিকল্পনা বাছাই করুন ',
-      'footerbottom' => 'কপিরাইট © ২০২২ অল রাইট রিজার্ভ বাই ',
+      'footerbottom' => 'কপিরাইট © ',
+      'footerbottom2' => 'অল রাইট রিজার্ভ বাই ',
       'footerbottom1' => 'কোডসেল লিমিটেড ',
       //signup
       'signheader' => 'ফ্রীতে একটি একাউন্ট তৈরি করুন ',

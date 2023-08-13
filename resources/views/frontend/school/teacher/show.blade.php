@@ -20,24 +20,17 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="example" class="table" style="width:100%">
-                           
-                            {{-- <button type="button" class="btn btn-primary btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#multiple_status" >
-                                Status Change
-                               </button> --}}
-
+                        <table id="example" class="table w-100">
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="select_all_ids"></th>
                                     <th>{{__('app.nong')}}</th>
                                     <th>{{__('app.Teacher')}} {{__('app.Name')}}</th>
                                     <th>{{__('app.UniqueId')}}</th>
-                                    <th>{{__('app.Email')}}</th>
-                                    <th>{{__('app.Phone')}}</th>
+                                    <th>{{__('app.Email')}} / {{__('app.Phone')}}</th>
                                     <th>{{__('app.Salery')}}</th>
-                                    <th>{{__('app.Designation')}}</th>
 
-                                    @if(Request::segment(2) == 'staff-salary')
+                                    @if(Request::segment(2) == 'teacher-salary')
                                     <th>{{__('app.Action')}}</th>
                                     @else
                                     <th>{{__('app.Status')}}</th>
@@ -51,129 +44,27 @@
                                     <td><input type="checkbox" class="check_ids" name="ids" value="{{$data->id}}"></td>
                                     <td>{{$key++ +1}}</td>
                                     <td>
-                                        @if(File::exists(public_path($data->image)) && !is_null($data->image) && !empty($data->image))
-                                        <img src="{{asset($data->image)}}" class="rounded-circle" width="44" height="44" alt="avatar">
-                                        @else
-                                        <img src="{{asset('d/no-img.jpg')}}" class="rounded-circle" width="44" height="44" alt="avatar">
-                                        @endif
-                                        <a href="{{route('single.view',['id'=>$data->id])}}" class="text-decoration-none ms-2">{{strtoupper($data->full_name)}}</a>
-                                    </td>
-                                    <td>{{$data->unique_id}}</td>
-                                    <td>{{$data->email}}</td>
-
-
-                                    <td>{{$data->phone}}</td>
-                                    <td>{{$data->salary}}</td>
-                                    <td>{{ucwords($data->designation)}}</td>
-                                    @if(Request::segment(2) == 'staff-salary')
-                                    <td>
-                                        <button class="btn btn-primary btn-sm mb-3" style="background-color: #7c00a7;color: white" data-bs-toggle="modal" data-bs-target="#addSalary{{$key}}">Pay Salary</button>
-
-                                        {{-- modal for see month wish salary --}}
-
-                                        <div class="modal fade" id="addSalary{{$key}}" tabindex="-1" aria-labelledby="exampleModalToggleLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                <div class="modal-content">
-                                                    <div class="modal-header" style="background: #7c00a7">
-                                                        <h5 class="modal-title text-white" id="addSalary{{$key}}">{{__('app.Teacher')}} {{__('app.Payment')}} {{__('app.Details')}}</h5>
-                                                        <button type="button" class="btn-close btn-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                            <div class="card-body">
-                                                                <div class="table-responsive">
-                                                                    <table class="table " style="width:100%">
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th>Month Name</th>
-                                                                                <th>Amount</th>
-                                                                                <th>Due</th>
-                                                                                <th>Last updated Date</th>
-                                                                                <th>Action</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            @foreach($studentFees as $item)
-                                                                            @if($item->teacher_id == $data->id)
-                                                                            <tr>
-                                                                                <td>{{$item->month_name}}</td>
-                                                                                <td>@if($item->amount == 0) Non-Paid
-                                                                                    @else {{$item->amount}} ৳
-                                                                                    @endif</td>
-                                                                                <td>{{($item->amount == 0) ? $data->salary  : $data->salary - $item->amount}} ৳</td>
-                                                                                <td>
-                                                                                    @if($item->amount > 0) {{$item->updated_at->format('d-m-Y')}}
-                                                                                    @else
-                                                                                    @endif
-                                                                                </td>
-                                                                                <td>
-                                                                                    @if($item->amount != $data->salary)
-                                                                                    <button class="btn btn-primary btn-sm mb-3" data-bs-target="#paySalary{{$item->id}}" data-bs-toggle="modal">Pay Salary</button>
-                                                                                    @else
-                                                                                    <button class="btn btn-primary btn-sm mb-3" style="pointer-events: none; background: #7c00a7;">Full Paid</button>
-                                                                                    @endif<div class="btn-group mr-2" role="group" aria-label="First group">
-                                                                                        {{-- <a  href="{{route('school.teacher.salary.edit',$item->id)}}" class="btn btn-success">Update fees</a> --}}
-                                                                                    </div>
-                                                                                </td>
-
-                                                                                {{-- child Modal for pay salary--}}
-                                                                                <div class="modal fade" id="paySalary{{$item->id}}" tabindex="-1" aria-labelledby="exampleModalToggleLabel2" aria-hidden="true">
-                                                                                    <div class="modal-dialog modal-dialog-centered">
-                                                                                        <div class="modal-content">
-                                                                                            <div class="modal-header" style="background: #7c00a7">
-                                                                                                <h5 class="modal-title text-white" id="exampleModalLabel"> Pay Staff Salary</h5>
-                                                                                                <button type="button" class="btn-close btn-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                                            </div>
-                                                                                            <div class="modal-body">
-                                                                                                <div class="border p-3 rounded">
-                                                                                                    <form class="row g-3" method="post" action="{{route('school.teacher.salary.update',$item->id)}}" enctype="multipart/form-data">
-                                                                                                        @csrf
-                                                                                                        <div class="col-12">
-                                                                                                            <label class="form-label">Pay For {{$item->month_name}}</label>
-                                                                                                            <div class="input-group mb-3"> <span class="input-group-text" id="basic-addon1">Amount Taka</span>
-
-                                                                                                                <input type="hidden" name="teacher_phone" value="{{$data->phone}}">
-                                                                                                                @if ($item->amount == 0)
-                                                                                                                <input type="text" class="form-control" required name="amount" value="{{$data->salary}}">
-
-                                                                                                                @else <input type="text" class="form-control" required name="amount" value="{{$data->salary - $item->amount}}">
-                                                                                                                @endif
-
-                                                                                                                @error('amount') <div class="alert alert-danger">{{$message}}</div>@enderror
-                                                                                                            </div>
-                                                                                                        </div>
-
-                                                                                                        <div class="col-12">
-                                                                                                            <div class="d-grid">
-                                                                                                                <button type="submit" class="btn btn-primary">Submit</button>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </form>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                {{-- End Child Modal for pay salary--}}
-                                                                            </tr>
-                                                                            @endif
-
-                                                                            @endforeach
-                                                                        </tbody>
-
-                                                                    </table>
-                                                                    
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
+                                        <div class="d-flex gap-3">
+                                            @if(File::exists(public_path($data->image)) && !is_null($data->image) && !empty($data->image))
+                                            <img src="{{asset($data->image)}}" class="rounded-circle" width="44" height="44" alt="avatar">
+                                            @else
+                                            <img src="{{asset('d/no-img.jpg')}}" class="rounded-circle" width="44" height="44" alt="avatar">
+                                            @endif
+                                            <div>
+                                                <a href="{{route('single.view',['id'=>$data->id])}}" class="text-decoration-none">{{strtoupper($data->full_name)}}</a><br>
+                                                {{ucwords($data->designation)}}
                                             </div>
                                         </div>
-
-                                        {{--end modal for see month wish salary --}}
-
+                                    </td>
+                                    <td>{{$data->unique_id}}</td>
+                                    <td>
+                                        {{$data->email}} <br>
+                                        {{$data->phone}}
+                                    </td>
+                                    <td>{{$data->salary}}</td>
+                                    @if(Request::segment(2) == 'teacher-salary')
+                                    <td>
+                                        <button class="btn btn-primary btn-sm mb-3" style="background-color: #7c00a7;color: white" onclick="showPaymentDetails('{{$data->id}}')">Pay Salary</button>
                                     </td>
                                     @else
                                     <td>
@@ -189,7 +80,7 @@
                                         </form>
                                     </td>
                                     @endif
-                                    @if(Request::segment(2) == 'staff-salary')
+                                    @if(Request::segment(2) == 'teacher-salary')
 
                                     @else
                                     <td>
@@ -409,6 +300,40 @@
     </div>
 </main>
 
+
+
+{{-- Modal for showing salary details --}}
+<div class="modal fade" id="payment_details">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+            </div>
+            <div class="modal-body table-responsive">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{{-- modal for salary payment --}}
+<div class="modal fade" id="paySalaryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #7c00a7">
+                <h5 class="modal-title text-white" id="exampleModalLabel">Pay Salary</h5>
+                <button type="button" class="btn-close btn-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!--Delete Modal -->
 <div class="modal fade" id="delete_all_records" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -461,6 +386,163 @@ $tutorialShow = getTutorial('teacher-show');
 @endsection
 @push('js')
 <script>
+
+    const currency = '৳';
+
+    let showPaymentDetails = (id) => {
+        
+        $.ajax({
+            url: '/school/teacher-salary/history/'+id,
+            type: 'get',
+            success: (response) => {
+                console.log(response);
+
+                if(response.data.length)
+                {
+                    let paidAmount, dueAmount, salaryStatus, fixed_salary, paid_amount, month_name, last_update_at;
+                
+                    let element = ` <table class="table table-striped table-bordered" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Month Name</th>
+                                                <th>Amount</th>
+                                                <th>Due</th>
+                                                <th>Last updated Date</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+
+                    response.data.forEach((item, key) => {
+
+                        fixed_salary = Number(parseFloat(item['fixed_salary']));
+                        paid_amount = item['paid_amount'];
+                        month_name = item['month'];
+                        last_updated_at = item['last_updated_at'];
+
+                        
+                        if(paid_amount == 0)
+                        {
+                            paidAmount = '<span class="badge bg-warning text-dark">UNPAID</span>';
+                            dueAmount = fixed_salary;
+                        }
+                        else
+                        {
+                            paidAmount = paid_amount + currency;
+                            dueAmount = fixed_salary - paid_amount;
+                        }
+
+                        if(paid_amount != fixed_salary)
+                        {
+                            salaryStatus = `<button class="btn btn-primary btn-sm mb-3" onclick="paySalaryModal(${fixed_salary}, ${paid_amount}, '${month_name}', ${item['id']})">Pay Salary</button>`;
+                        }
+                        else
+                        {
+                            salaryStatus = `<button class="btn btn-primary btn-sm mb-3" style="pointer-events: none; background: #7c00a7;">Full Paid</button>`;
+                        }
+
+
+                        element += `<tr>
+                                <td>${month_name}</td>
+                                <td>${paidAmount}</td>
+                                <td>${dueAmount} ${currency}</td>
+                                <td>${last_updated_at}</td>
+                                <td>${salaryStatus}</td>
+                            </tr>`
+                    });
+
+                    element += `</tbody></table>`;
+
+                    $("#payment_details .modal-body").html(element);
+
+                    $("#payment_details").modal('show');
+                }
+                else
+                {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Not found',
+                        text: "Record does not exists",
+                    });
+                }
+            },
+            error: (error) => {
+                console.log(error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: error.responseJSON.message,
+                });
+            },
+        });
+
+    }
+
+
+    let paySalaryModal = (FixedSalary, PaidAmount, Month, RowId) => {
+
+        let paidAmount = FixedSalary;
+
+        if(PaidAmount != 0)
+        {
+            paidAmount = paidAmount - PaidAmount;
+        }
+
+
+        let element = `<form class="row g-3" method="post" enctype="multipart/form-data" id="paidSalaryForm" onsubmit="paidSalaryFormSubmit(event)">
+                    @csrf
+                    <input type="hidden" name="id" value="${RowId}"/>
+                    <div class="col-12">
+                        <label class="form-label text-dark">Pay For ${Month}</label>
+                        <input type="text" class="form-control" name="amount" value="${paidAmount}" placeholder="${paidAmount}">
+                    </div>
+                    <div class="col-12">
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>`;
+
+        $("#paySalaryModal .modal-body").html(element);
+
+        $("#paySalaryModal").modal("show");
+    }
+
+
+    let paidSalaryFormSubmit = (event) => {
+        event.preventDefault();
+
+        $.ajax({
+            url: '{{route("school.teacher.salary.update")}}',
+            type: 'POST',
+            data: $("#paidSalaryForm").serialize(),
+            success: (response) => {
+                console.log(response);
+                showPaymentDetails(response.data.id);
+
+                $("#paySalaryModal").modal("hide");
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Great!',
+                    text: response.message,
+                });
+            },
+            error: (error) => {
+                console.log(error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: error.responseJSON.message,
+                });
+            }
+        });
+    }
+
+
+
+
     $(function(e) {
         $("#select_all_ids").click(function() {
             $('.check_ids').prop('checked', $(this).prop('checked'));

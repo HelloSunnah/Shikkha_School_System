@@ -88,8 +88,11 @@ class OnlineAddmissionController extends Controller
         ]);
         Alert::success('Form Submitted Success ', 'Success Message');
 
-        return back();
-
+        return redirect()->route('online.Admission.submited');
+    }
+     
+    public function onlineAdmissionsubmited(){
+        return view ('frontend.school.admission.admissionsubmitpage');
     }
     
     public function pDeleteAdmission($id)
@@ -120,7 +123,7 @@ class OnlineAddmissionController extends Controller
             'dob'=>'required',
             'image'=>'required|file',
             'f_name'=>'required',
-        'm_name'=> 'required',
+            'm_name'=> 'required',
             'pre_address'=>'required',
             'par_address'=>'required',
             'g_name'=>'required',
@@ -184,9 +187,18 @@ class OnlineAddmissionController extends Controller
     }
 
     public function onlineAdmissionFormList(){
+
+         $seoTitle = 'Admission List';
+        $seoDescription = 'Admission List' ;
+        $seoKeyword = 'Admission List' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $list=OnlineAdmission::all();
 
-        return view('frontend.school.admission.admissionFormList',compact('list'));
+        return view('frontend.school.admission.admissionFormList',compact('list','seo_array'));
     }
 
     public function onlineAdmission_Check_Delete(Request $request){

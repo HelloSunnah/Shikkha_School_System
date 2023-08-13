@@ -15,22 +15,49 @@
                                     <div class="col-md-12">
                                         @include('frontend.layouts.message')
                                     </div>
-                                    <div class="col-12">
-                                        <label class="form-label">{{__('app.Subject')}} {{__('app.Name')}}</label>
-                                        
-                                            <input type="text" class="form-control"  name="subject_name" required>
+                                    
+                                    @if (in_array($thisClass->class_name, classFilter()))
+                                        <div class="col-12">
+                                            <label class="form-label">{{__('app.Subject')}} {{__('app.Name')}}</label>
+                                            <input type="text" placeholder="Ex: Bangla" class="form-control" value="{{ old('subject_name') }}"  name="subject_name" required>
                                             <input type="hidden" class="form-control"   name="class_id" value="{{$class_id}}">
-
-                                        
-                                    </div>
-                                    {{-- <div class="col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="gridCheck1" name="active" value="1">
-                                            <label class="form-check-label" for="gridCheck1">
-                                                Check me out
-                                            </label>
                                         </div>
-                                    </div> --}}
+
+                                        <div class="col-12">
+                                            <label class="form-label">Subject Code</label>
+                                            <input type="number" placeholder="Ex: 101" class="form-control" value="{{ old('subject_code') }}"  name="subject_code" required>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label">Group Name</label>
+                                            <select class="form-control mb-3" name="group_id" required>
+                                                <option value="">Select Group</option>
+                                                <option value="0">Common</option>
+                                                <option value="1">Science</option>
+                                                <option value="2">Commerce</option>
+                                                <option value="3">Humanities</option>
+                                                <option value="4">3rd or 4th Subject</option>
+                                            </select>
+                                        </div>
+                                    @else
+                                        <div class="col-12">
+                                            <label class="form-label">{{__('app.Subject')}} {{__('app.Name')}}</label>
+                                            <input type="text" class="form-control" placeholder="Ex: Bangla" value="{{ old('subject_name') }}"  name="subject_name" required>
+                                            <input type="hidden" class="form-control" name="class_id" value="{{$class_id}}">
+                                        </div>
+                                        
+                                        @php
+                                            $class_eight = ["Class Eight", "eight", "class eight", "Eight", "8", "৮", "অষ্টম শ্রেণী", " শ্রেণী অষ্টম", "অষ্টম", "Class VIII", "VIII"];
+                                        @endphp
+
+                                        @if (in_array($thisClass->class_name, $class_eight))
+                                            <div class="col-12">
+                                                <label class="form-label">Subject Code</label>
+                                                <input type="number" class="form-control" placeholder="Ex: 101" value="{{ old('subject_code') }}"  name="subject_code" required>
+                                            </div>
+                                        @endif
+                                    @endif
+                                    
                                     <div class="col-12">
                                         <div class="d-grid">
                                             <button type="submit" class="btn btn-primary">{{__('app.Submit')}}</button>

@@ -8,7 +8,6 @@
         <div class="ms-auto mb-2">
             <a href="{{route('syllabus.form.show')}}" class="btn btn-secondary btn-sm" title="{{__('app.Back')}}"><i class="bi bi-arrow-left-square"></i> </a>
             <button onclick="printDiv('print')" class="btn btn-primary btn-sm" title="{{__('app.Print')}}"><i class="bi bi-printer"></i></button>
-
         </div>
 
         <div class="col-xl-12 mx-auto">
@@ -62,8 +61,7 @@
     </div>
 
 
-    </div>
-    </main>
+</main>
     <script>
         function printDiv(divName) {
             var printContents = document.getElementById(divName).innerHTML;

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\InstituteClass;
 use App\Models\MarkType;
 use App\Models\User;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use App\Models\Result;
 use App\Models\Subject;
@@ -24,9 +23,17 @@ class ResultSetting extends Controller
      * @return \Illuminate\Contracts\View\View
      */
     public function createSetting()
-    {
+    {   
+        $seoTitle = 'Result Setting';
+        $seoDescription = 'Result Setting' ;
+        $seoKeyword = 'Result Setting';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $create = "createResultSetting";
-        return view("frontend.school.student.result.result_setting", compact('create'));
+        return view("frontend.school.student.result.result_setting", compact('create','seo_array'));
     }
 
     /**
@@ -36,11 +43,10 @@ class ResultSetting extends Controller
      * @return \Illuminate\Contracts\View\View
      */
     public function showResultSetting()
-    {   dd('hi');
-        $leatestResultSettings = ModelsResultSetting::where('school_id', Auth::user()->id)->latest()->first();
-        dd($leatestResultSettings);
-        return response()->json($leatestResultSettings);
-        // return view('frontend.school.student.result.createShow', compact('leatestResultSettings'));
+    {   
+        $leatestResultSetting = ModelsResultSetting::where('school_id', Auth::user()->id)->latest()->first();
+       
+        return response()->json($leatestResultSetting);
     }
 
     /**
@@ -104,14 +110,16 @@ class ResultSetting extends Controller
     /**
      * Duplicate Result Setting
      *
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
      * @param $id
      * @return \Illuminate\Routing\Redirector
      */
     public function duplicateResultSetting($id)
-    {
+    {   
         $resultSetting = ModelsResultSetting::findOrFail($id);
-        $resultSubjectCountableMarks = ResultSubjectCountableMark::where('school_id', Auth::user()->id)->where('result_setting_id', $id)->get();
         $title = $resultSetting->title;
+        $resultSubjectCountableMarks = ResultSubjectCountableMark::where('school_id', Auth::user()->id)->where('result_setting_id', $id)->get();
         $number = filter_var($title, FILTER_SANITIZE_NUMBER_INT);
         $findTitle = str_replace($number, '', $title);
         $maxNum = [];
@@ -146,10 +154,7 @@ class ResultSetting extends Controller
                     "mark"                      => $resultSubjectCountableMark->mark,
                 ]);
             };
-
-            toast("Result Setting Duplicate Successfully", "success");
-
-            return redirect()->route('result.school.admin.create.show.all');
+            return response()->json(['status' => 'success']);
         } catch (Exception $e) {
             toast($e->getMessage(), 'error');
 
@@ -172,6 +177,7 @@ class ResultSetting extends Controller
         ModelsResultSetting::findOrFail($id)->delete();
         ResultSubjectCountableMark::where("result_setting_id", $id)->where('school_id', Auth::user()->id)->delete();
         Result::where('term_id', $id)->where('school_id', Auth::user()->id)->delete();
+        
         toast("Result Setting Delete Successfuly", "success");
         return back();
     }
@@ -213,7 +219,7 @@ class ResultSetting extends Controller
             "resultSettingId"   => 'required',
             "subjectMark.*"     =>  'required|min:1'
         ]);
-
+     
         foreach ($request->subjectMark as $class_id => $marks) {
             foreach ($marks as $subject_id => $mark) {
                 ResultSubjectCountableMark::updateOrCreate(
@@ -224,11 +230,43 @@ class ResultSetting extends Controller
                         "school_id"                 => Auth::user()->id,
                     ],
                     [
+                        "mcq"                       => $request->mcqMark[$class_id][$subject_id],
+                        "written"                   => $request->writtenMark[$class_id][$subject_id],
+                        "practical"                 => $request->practicalMark[$class_id][$subject_id],
                         "mark"                      => $mark,
                     ]
                 );
             }
         }
+
+        return response()->json(['status' => "success"]);
+    }
+
+    /**
+     * Store Subject Mark
+     *
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param Request
+     * @param $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeSingleSubjectMark(Request $request)
+    {   
+        ResultSubjectCountableMark::updateOrCreate(
+            [
+                "result_setting_id"         => $request->resultSettingId,
+                "institute_class_id"        => $request->class_id,
+                "subject_id"                => $request->subject_id,
+                "school_id"                 => Auth::user()->id,
+            ],
+            [
+                "mcq"                       => $request->mcq,
+                "written"                   => $request->written,
+                "practical"                 => $request->practical,
+                "mark"                      => $request->mark,
+            ]
+        );
 
         return response()->json(['status' => "success"]);
     }
@@ -257,10 +295,18 @@ class ResultSetting extends Controller
      */
     public function resultPdf(Request $request)
     {   
+        $seoTitle = 'Result Pdf';
+        $seoDescription = 'Result Pdf' ;
+        $seoKeyword = 'Result Pdf';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $class = InstituteClass::where('school_id', Auth::user()->id)->get();
         $terms = ModelsResultSetting::where('school_id', Auth::user()->id)->orderBy('id','desc')->get();
         $users = User::where('school_id', Auth::user()->id)->get();
-        return view('frontend.school.result.result_pdf', compact('class', 'terms', 'users'));
+        return view('frontend.school.result.result_pdf', compact('class', 'terms', 'users','seo_array'));
     }
 
     /**

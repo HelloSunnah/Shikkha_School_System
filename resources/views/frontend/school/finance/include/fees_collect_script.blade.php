@@ -463,7 +463,7 @@
 
         let hiddenFeesId = $("input[name='hiddenFeesId[]']").map(function(){return $(this).val();}).get();
         let feesAmount = $("input[name='feesAmount[]']").map(function(){return $(this).val();}).get();
-
+        
         Swal.fire({
             title: 'Are you sure?',
             text: "",

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Models\AccesoriesType;
 use App\Models\Bank;
 use App\Models\FeesType;
 use App\Models\InstituteClass;
@@ -25,7 +26,15 @@ class CollectFeesController extends Controller
      * show students list
      */
     public function userList(Request $request)
-    {
+    {   
+        $seoTitle = 'Collect   Fees';
+        $seoDescription = 'Collect   Fees';
+        $seoKeyword = 'Collect   Fees';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         try
         {
             $users = User::with('class:id,class_name', 'section:id,section_name')->where('school_id', Auth::id());
@@ -82,7 +91,7 @@ class CollectFeesController extends Controller
             }
             else
             {
-                return view('frontend.school.finance.students-fee')->with($data);
+                return view('frontend.school.finance.students-fee',compact('seo_array'))->with($data);
             }
         }
         catch(Exception $e)
@@ -102,9 +111,21 @@ class CollectFeesController extends Controller
 
     /**
      * received fees
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 
+     * @author Codecell Limited <support@codecell.com.bd>
+     * @contributor Shahidul Islam <contact.shahidul@gmail.com>
+     * @created August 08, 2023
+     * 
      */
     public function collectFees(Request $request)
     {
+        // return $request;
+        $schoolId = Auth::id();
+        $studentId = $request->studentId;
+
         try
         {
             if(isset($request->hiddenFeesId) && is_array($request->hiddenFeesId) && !empty($request->hiddenFeesId) && count($request->hiddenFeesId) > 0)
@@ -112,7 +133,9 @@ class CollectFeesController extends Controller
                 foreach($request->hiddenFeesId as $key => $id)
                 {
                     $paidAmount = (double) $request->feesAmount[$key];
-                    $fee = StudentMonthlyFee::findOrFail($id);
+
+                    $fee = StudentMonthlyFee::find($id);
+
                     $requiredAmount = abs((double)$fee->amount - (double)$fee->paid_amount);
                     if($fee->status < 2)
                     {
@@ -131,14 +154,39 @@ class CollectFeesController extends Controller
                         }
                         $fee->save();
                     }
+                    
                 }
                 $sid = $fee->student_id;
             }
+
+            if(isset($request->hiddenAccessoriesId) && is_array($request->hiddenAccessoriesId) && !empty($request->hiddenAccessoriesId) && count($request->hiddenAccessoriesId) > 0)
+            {
+                foreach($request->hiddenAccessoriesId as $key => $id)
+                {
+                    $paidAmount = (double) $request->accessoriesAmount[$key];
+
+                    $acc = AccesoriesType::find($id)->toArray();
+
+                    Transection::create([
+                        'purpose'   =>  json_encode($acc),
+                        'payment_method'  => 1, // 1 for hand cash
+                        'amount'    =>  $paidAmount,
+                        'name'      =>  User::find($studentId)->name,
+                        'type'      =>  3, // 3 for accessories txns
+                        'status'    => 1,
+                        'datee'     => now(),
+                        'school_id' => $schoolId
+                    ]);
+                }
+            }
+
+
             else
             {
-                return $this->error("Invalid Data", $request->all());
+                return $this->error("Select atleast one item", $request->all());
             }
-            return $this->success("Record stored successfully", $sid);
+
+            return $this->success("Record stored successfully", $studentId);
         }
         catch(Exception $e)
         {
@@ -148,20 +196,16 @@ class CollectFeesController extends Controller
 
 
     /**domPDF */
-    public function domPdf(Request $request)
+    public function receipt(Request $request)
     {
+        // return $request;
         $data = [
             "feesTable"      =>  $request->feesTable,
             "student"      =>  User::find($request->studentId),
             "school"      =>  Auth::user(),
         ];
 
-        set_time_limit(300);
-        $pdf = Pdf::loadView("frontend.school.finance.pdf.pdf_collect_fees", $data);
-        $fileName =  date("dmYHis").'.'. 'pdf' ;
-        $pdf->save(public_path("collectFees") . '/' . $fileName);
-        $pdf = public_path("collectFees/".$fileName);
-        return response()->download($pdf);
+        return view("frontend.school.finance.pdf.pdf_collect_fees", $data);
     }
 
 

@@ -115,28 +115,28 @@ class CronjobController extends Controller
                     
                 }
 
-                DB::table('cron_jobs')
-                ->insert([
-                    "title" =>  "Call Auto Attendance",
-                    "route" =>  url()->current(),
-                    "active"=>  1,
-                    "response"  =>  json_encode($resp),
-                    "created_at"    =>  now()
-                ]);
+                // DB::table('cron_jobs')
+                // ->insert([
+                //     "title" =>  "Call Auto Attendance",
+                //     "route" =>  url()->current(),
+                //     "active"=>  1,
+                //     "response"  =>  json_encode($resp),
+                //     "created_at"    =>  now()
+                // ]);
 
                 return "Cronjob running successfully at " . date("d-m-Y H:i:s");
             }
             catch(Exception $e)
             {
-                DB::table('cron_jobs')
-                ->insert([
-                    "title" =>  "Call Auto Attendance",
-                    "route" =>  url()->current(),
-                    "active"=>  0,
-                    "status"=>  "failed",
-                    "response"  =>  $e->getMessage(),
-                    "created_at"    =>  now()
-                ]);
+                // DB::table('cron_jobs')
+                // ->insert([
+                //     "title" =>  "Call Auto Attendance",
+                //     "route" =>  url()->current(),
+                //     "active"=>  0,
+                //     "status"=>  "failed",
+                //     "response"  =>  $e->getMessage(),
+                //     "created_at"    =>  now()
+                // ]);
 
                 return $e->getMessage();
             }
@@ -462,27 +462,27 @@ class CronjobController extends Controller
                 }
 
 
-                DB::table('cron_jobs')
-                ->insert([
-                    "title" =>  "Schedule SMS Send",
-                    "route" =>  url()->current(),
-                    "active"=>  1,
-                    "response"  =>  json_encode($resp),
-                    'created_at'    =>  now()
-                ]);
+                // DB::table('cron_jobs')
+                // ->insert([
+                //     "title" =>  "Absent SMS Send",
+                //     "route" =>  url()->current(),
+                //     "active"=>  1,
+                //     "response"  =>  json_encode($resp),
+                //     'created_at'    =>  now()
+                // ]);
         
             }
             catch(Exception $e)
             {
-                DB::table('cron_jobs')
-                ->insert([
-                    "title" =>  "Schedule SMS Send",
-                    "route" =>  url()->current(),
-                    "active"=>  0,
-                    "status"=>  "failed",
-                    "response"  =>  $e->getMessage(),
-                    'created_at'    =>  now()
-                ]);
+                // DB::table('cron_jobs')
+                // ->insert([
+                //     "title" =>  "Absent SMS Send",
+                //     "route" =>  url()->current(),
+                //     "active"=>  0,
+                //     "status"=>  "failed",
+                //     "response"  =>  $e->getMessage(),
+                //     'created_at'    =>  now()
+                // ]);
 
                 return $e->getMessage();
             }
@@ -546,20 +546,57 @@ class CronjobController extends Controller
             $user = $raw->first();
 
             if(!is_null($data->access_date) && !empty($data->access_date) && !is_null($data->access_time) && !empty($data->access_time)):
-                Attendance::updateOrCreate(
-                    [
-                        'student_id'    => $user->id,
-                        'class_id'      => $user->class_id,
-                        'section_id'    => $user->section_id,
-                        'school_id'     => $user->school_id,
-                        'access_date'   => $data->access_date,
-                    ],
-                    [
-                        'attendance'    => 1,
-                        'comment'       => "Fingerprint",
-                        'access_time'   => $data->access_time,
-                    ]
-                );
+                
+                $hasAccessTime =  Attendance::where([
+                    'student_id'    => $user->id,
+                    'class_id'      => $user->class_id,
+                    'section_id'    => $user->section_id,
+                    'school_id'     => $user->school_id,
+                    'access_date'   => $data->access_date,
+                    'attendance'    => 1,
+                ]);
+                
+                if($hasAccessTime->exists())
+                {
+                    $accessTimeInDB = strtotime($hasAccessTime->first()->access_time);
+                    $accessTimeInAPI = strtotime($data->access_time);
+
+                    if($accessTimeInDB != $accessTimeInAPI)
+                    {
+                        Attendance::updateOrCreate(
+                            [
+                                'student_id'    => $user->id,
+                                'class_id'      => $user->class_id,
+                                'section_id'    => $user->section_id,
+                                'school_id'     => $user->school_id,
+                                'access_date'   => $data->access_date,
+                                'attendance'    => 1,
+                            ],
+                            [
+                                'comment'       => "Entry & Exit",
+                                'exit_time'   => $data->access_time,
+                            ]
+                        );
+                    }
+                }
+                else
+                {
+                    Attendance::updateOrCreate(
+                        [
+                            'student_id'    => $user->id,
+                            'class_id'      => $user->class_id,
+                            'section_id'    => $user->section_id,
+                            'school_id'     => $user->school_id,
+                            'access_date'   => $data->access_date,
+                        ],
+                        [
+                            'attendance'    => 1,
+                            'comment'       => "Entry",
+                            'access_time'   => $data->access_time,
+                        ]
+                    );
+                }
+
             endif;
 
             return true;
@@ -585,18 +622,52 @@ class CronjobController extends Controller
             $user = $raw->first();
 
             if(!is_null($data->access_date) && !empty($data->access_date) && !is_null($data->access_time) && !empty($data->access_time)):
-                TeacherAttendance::updateOrCreate(
-                    [
-                        'teacher_id'    => $user->id,
-                        'school_id'     =>  $user->school_id,
-                        'access_date'   =>  $data->access_date,
-                    ],
-                    [
-                        'attendance'    =>  1,
-                        'comment'       =>  "Fingerprint",
-                        'access_time'   =>  $data->access_time
-                    ]
-                );
+                
+                $hasAccessTime =  TeacherAttendance::where([
+                    'teacher_id'    => $user->id,
+                    'school_id'     =>  $user->school_id,
+                    'access_date'   =>  $data->access_date,
+                    'attendance'    =>  1,
+                ]);
+                
+                if($hasAccessTime->exists())
+                {
+                    $accessTimeInDB = strtotime($hasAccessTime->first()->access_time);
+                    $accessTimeInAPI = strtotime($data->access_time);
+
+                    if($accessTimeInDB != $accessTimeInAPI):
+
+                    TeacherAttendance::updateOrCreate(
+                        [
+                            'teacher_id'    => $user->id,
+                            'school_id'     =>  $user->school_id,
+                            'access_date'   =>  $data->access_date,
+                            'attendance'    =>  1,
+                        ],
+                        [
+                            'comment'       =>  "Entry & Exit",
+                            'exit_time'   =>  $data->access_time
+                        ]
+                    );
+
+                    endif;
+                }
+                else
+                {
+                    TeacherAttendance::updateOrCreate(
+                        [
+                            'teacher_id'    => $user->id,
+                            'school_id'     =>  $user->school_id,
+                            'access_date'   =>  $data->access_date,
+                        ],
+                        [
+                            'attendance'    =>  1,
+                            'comment'       =>  "Only Entry Time",
+                            'access_time'   =>  $data->access_time
+                        ]
+                    );
+                }
+                
             endif;
 
             return true;
@@ -623,18 +694,53 @@ class CronjobController extends Controller
 
             if(!is_null($data->access_date) && !empty($data->access_date) && !is_null($data->access_time) && !empty($data->access_time)):
             
-                StaffAttendance::updateOrCreate(
-                    [
-                        'employee_id'    => $user->id,             
-                        'school_id'     =>  $user->school_id,
-                        'access_date'   =>  $data->access_date,
-                    ],
-                    [
-                        'attendance'    => 1,
-                        'comment'       =>  "Fingerprint",
-                        'access_time'   =>  $data->access_time,
-                    ]
-                );
+                $hasAccessTime =  StaffAttendance::where([
+                    'employee_id'    => $user->id,
+                    'school_id'     =>  $user->school_id,
+                    'access_date'   =>  $data->access_date,
+                    'attendance'    =>  1,
+                ]);
+
+
+                if($hasAccessTime->exists())
+                {
+
+                    $accessTimeInDB = strtotime($hasAccessTime->first()->access_time);
+                    $accessTimeInAPI = strtotime($data->access_time);
+
+                    if($accessTimeInDB != $accessTimeInAPI):
+
+                    StaffAttendance::updateOrCreate(
+                        [
+                            'employee_id'    => $user->id,             
+                            'school_id'     =>  $user->school_id,
+                            'access_date'   =>  $data->access_date,
+                            'attendance'    =>  1,
+                        ],
+                        [
+                            // 'attendance'    => 1,
+                            'comment'       =>  "Entry & Exit",
+                            'exit_time'   =>  $data->access_time,
+                        ]
+                    );
+
+                    endif;
+                }
+                else
+                {
+                    StaffAttendance::updateOrCreate(
+                        [
+                            'employee_id'    => $user->id,             
+                            'school_id'     =>  $user->school_id,
+                            'access_date'   =>  $data->access_date,
+                        ],
+                        [
+                            'attendance'    => 1,
+                            'comment'       =>  "Entry",
+                            'access_time'   =>  $data->access_time,
+                        ]
+                    );
+                }
 
             endif;
 

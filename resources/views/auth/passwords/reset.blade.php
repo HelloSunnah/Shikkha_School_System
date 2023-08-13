@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Shikkha-Password-Reset</title>
+    <title>Reset Passwrod | Shikkha</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
@@ -17,14 +17,14 @@
             font-family: "Poppins", sans-serif;
         }
 
-        .col-5 {
+        .col-left {
             background: linear-gradient(120deg, #7302a7, #8e44ad);
             height: 100vh;
             padding-top: 110px;
             overflow: hidden;
         }
 
-        .col-7 {
+        .col-right {
             background: white;
             height: 100vh;
             padding-top: 120px;
@@ -37,7 +37,7 @@
             border-top: none;
             border-left: none;
             border-right: none;
-            width: 460px;
+            /* width: 460px; */
             border-radius: 0px;
         }
 
@@ -58,23 +58,29 @@
 </head>
 
 <body>
-    <div class="row">
-        <div class="col-5 text-center ">
+    <div class="row m-0">
+        <div class="col-5 col-left text-center ">
             <img src="{{ asset('schools\assets\images\icons\undraw_my_password_re_ydq7 1.svg') }}" alt=""
                 style="">
             <h3 class="text-white pt-5">Your good to go now</h3>
             <h6 class="text-white pl-5 pt-2">Enter your new password <br> and make sure its memorable</h6>
         </div>
-        <div class="col-7 ">
+        <div class="col-5 col-right">
+            <center class="mb-3">
+                <a href="{{ route('home') }}">
+                    <img src="{{ asset('images/logo/logo.svg') }}" width="180" height="80">
+                </a>
+            </center>
+
             <h3 style="color:#a861c8" class="fw-bolder mb-5">Enter your new password</h3>
 
             <center>
-          @if (session('status'))
-          <div style="color: red;" class="alert alert-danger">
-            {{ session('status')}}
-          </div>
-          @endif
-        </center>
+                @if (session('status'))
+                    <p style="color: red;">
+                        {{ session('status') }}
+                    </p>
+                @endif
+            </center>
             <form method="post" action="{{ route('user.reset.password.post', $token) }}">
                 @csrf
                 <input type="hidden" name="token" value="{{ $token }}">
@@ -87,7 +93,7 @@
                         id="exampleInputEmail1" placeholder="Confirm password">
                 </div>
                 <div class="mt-5" style="padding-left:120px;">
-                    <button type="submit" value="Reset" class="btn btn-primary" style="width:40%">Go</button>
+                    <button type="submit" value="Reset" class="btn btn-primary w-50">Go</button>
                 </div>
             </form>
 

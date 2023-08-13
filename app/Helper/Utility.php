@@ -5,7 +5,7 @@ namespace App\Helper;
 use App\Models\Employee;
 use App\Models\Teacher;
 use App\Models\User;
-
+use Illuminate\Support\Facades\DB;
 
 class Utility
 {
@@ -27,19 +27,19 @@ class Utility
 
         if($userType == "employee")
         {
-            $rawCount = Employee::where('school_id', $schoolId)->whereYear('created_at', date("Y"))->count();
+            $rawCount = DB::table('employees')->where('school_id', $schoolId)->whereYear('created_at', date("Y"))->count();
             $serial = str_pad(++$rawCount, 2, '0', STR_PAD_LEFT); // number in two digit; Ex: 01
         }
 
         elseif($userType == "teacher")
         {
-            $rawCount = Teacher::where('school_id', $schoolId)->whereYear('created_at', date("Y"))->count();
+            $rawCount = DB::table('teachers')->where('school_id', $schoolId)->whereYear('created_at', date("Y"))->count();
             $serial = str_pad(++$rawCount, 3, '0', STR_PAD_LEFT); // number in three digit; Ex: 001
         }
 
         elseif($userType == "student")
         {
-            $rawCount = User::where('school_id', $schoolId)->whereYear('created_at', date("Y"))->count();
+            $rawCount = DB::table('users')->where('school_id', $schoolId)->whereYear('created_at', date("Y"))->count();
             $serial = str_pad(++$rawCount, 4, '0', STR_PAD_LEFT); // number in four digit; Ex: 0001
         }
         
@@ -49,6 +49,59 @@ class Utility
         }
 
         $uniqueId = $year.$sId.$serial;
+
+        return self::checkUniqueId($userType, $uniqueId);
+        // return $uniqueId;
+    }
+
+    /**
+     * check unique id is exists or not
+     */
+    protected static function checkUniqueId($userType, $uniqueId)
+    {
+        if($userType == 'student')
+        {
+            for($i=0; $i<100; $i++)
+            {
+                if(DB::table('users')->where('unique_id', $uniqueId)->exists())
+                {
+                    ++$uniqueId;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        elseif($userType == 'teacher')
+        {
+            for($i=0; $i<100; $i++)
+            {
+                if(DB::table('teachers')->where('unique_id', $uniqueId)->exists())
+                {
+                    ++$uniqueId;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
+        }
+        elseif($userType == 'employee')
+        {
+            for($i=0; $i<100; $i++)
+            {
+                if(DB::table('employees')->where('employee_id', $uniqueId)->exists())
+                {
+                    ++$uniqueId;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
 
         return $uniqueId;
     }

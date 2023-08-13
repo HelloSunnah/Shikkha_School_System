@@ -21,9 +21,9 @@ class CreateResultSubjectCountableMarksTable extends Migration
             $table->foreign('institute_class_id')->references('id')->on('institute_classes')->onDelete('cascade');
             $table->unsignedBigInteger('subject_id');
             $table->foreign('subject_id')->references('id')->on('subjects')->onDelete('cascade');
-            // $table->integer('result_setting_id');
-            // $table->integer('institute_class_id');
-            // $table->integer('subject_id');
+            $table->integer('mcq')->nullable();
+            $table->integer('written')->nullable();
+            $table->integer('practical')->nullable();
             $table->integer('mark');
             $table->integer("school_id");
             $table->timestamps();

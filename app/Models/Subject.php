@@ -10,9 +10,7 @@ class Subject extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $fillable = [
-        'class_id', 'subject_name', 'result_total_mark', 'school_id', 'active'
-    ];
+    protected $guarded = [];
 
     public function class_name()
     {

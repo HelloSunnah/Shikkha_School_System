@@ -10,11 +10,11 @@
                     <h1 style="padding-top:0px;font-size:35px !important" class="fs-1 fw-bold">{{__('app.userpage1')}} </h1><br>
                     <p class="text-muted mt-4">{{__('app.userpage2.1')}}</p>
                     <ul class="mt-4">
-                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.userpage3')}}</li>
-                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.userpage4')}}</li>
-                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.userpage5')}}</li>
-                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.userpage6')}}</li>
-                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.userpage7')}}</li>
+                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.userpage3')}}</li>
+                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.userpage4')}}</li>
+                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.userpage5')}}</li>
+                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.userpage6')}}</li>
+                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.userpage7')}}</li>
                     </ul>
 
                     <div class="hero__search wow fadeInUp" data-wow-delay=".7s">

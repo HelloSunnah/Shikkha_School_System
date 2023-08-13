@@ -38,7 +38,8 @@
         },
         "files":[
             "app/Helper/helper.php",
-            "app/Helper/helper2.php"
+            "app/Helper/helper2.php",
+            "app/Helper/LogActivity.php"
         ]
     },
     "autoload-dev": {

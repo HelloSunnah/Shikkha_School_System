@@ -10,8 +10,6 @@ use App\Models\StudentFee;
 use App\Models\StudentMonthlyFee;
 use App\Models\Teacher;
 use App\Models\User;
-use DateTime;
-use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +18,68 @@ use Rats\Zkteco\Lib\ZKTeco;
 
 class ZktecoController extends Controller
 {
+    public function testOnly()
+    {
+
+        // $schools = School::whereIn('id', [13, 14, 15, 17, 18, 19, 21, 23, 25, 26, 27, 29, 31, 34, 35, 40, 36, 37])->pluck('school_name', 'id');
+        
+        // foreach ($schools as $id => $name) {
+        //     DB::table('accesories_transactions')->where('school_id', $id)->delete();
+        //     DB::table('accesories_types')->where('school_id', $id)->delete();
+        //     DB::table('assign_student_fees')->where('school_id', $id)->delete();
+        //     DB::table('assign_teachers')->where('school_id', $id)->delete();
+        //     DB::table('attendances')->where('school_id', $id)->delete();
+        //     DB::table('banks')->where('school_id', $id)->delete();
+        //     DB::table('borrow_books')->where('school_id', $id)->delete();
+        //     DB::table('checkouts')->where('school_id', $id)->delete();
+        //     DB::table('class_periods')->where('school_id', $id)->delete();
+        //     DB::table('custom_attendance_input')->where('school_id', $id)->delete();
+        //     DB::table('departments')->where('school_id', $id)->delete();
+        //     DB::table('employees')->where('school_id', $id)->delete();
+        //     DB::table('employee_salaries')->where('school_id', $id)->delete();
+        //     DB::table('exam_routines')->where('school_id', $id)->delete();
+        //     DB::table('fees_types')->where('school_id', $id)->delete();
+        //     DB::table('institute_classes')->where('school_id', $id)->delete();
+        //     DB::table('groups')->where('school_id', $id)->delete();
+        //     DB::table('library_book_infos')->where('school_id', $id)->delete();
+        //     DB::table('lib_book_types')->where('school_id', $id)->delete();
+        //     DB::table('mark_types')->where('school_id', $id)->delete();
+        //     DB::table('messages')->where('school_id', $id)->delete();
+        //     DB::table('notices')->where('school_id', $id)->delete();
+        //     DB::table('otps')->where('school_id', $id)->delete();
+        //     DB::table('payments')->where('school_id', $id)->delete();
+        //     DB::table('questions')->where('school_id', $id)->delete();
+        //     DB::table('results')->where('school_id', $id)->delete();
+        //     DB::table('result_settings')->where('school_id', $id)->delete();
+        //     DB::table('result_subject_countable_marks')->where('school_id', $id)->delete();
+        //     DB::table('routines')->where('school_id', $id)->delete();
+        //     DB::table('school_checkouts')->where('school_id', $id)->delete();
+        //     DB::table('school_fees')->where('school_id', $id)->delete();
+        //     DB::table('sections')->where('school_id', $id)->delete();
+        //     DB::table('shikkhabillings')->where('school_id', $id)->delete();
+        //     DB::table('staff_attendances')->where('school_id', $id)->delete();
+        //     DB::table('staff_types')->where('school_id', $id)->delete();
+        //     DB::table('student_absent_sms')->where('school_id', $id)->delete();
+
+        //     DB::table('student_absent_sms')->where('school_id', $id)->delete();
+        //     DB::table('student_document_uploads')->where('school_id', $id)->delete();
+        //     DB::table('student_fees')->where('school_id', $id)->delete();
+        //     DB::table('student_monthly_fees')->where('school_id', $id)->delete();
+        //     DB::table('subjects')->where('school_id', $id)->delete();
+        //     DB::table('teachers')->where('school_id', $id)->delete();
+        //     DB::table('teacher_attendances')->where('school_id', $id)->delete();
+        //     DB::table('teacher_salaries')->where('school_id', $id)->delete();
+        //     DB::table('terms')->where('school_id', $id)->delete();
+        //     // DB::table('todolists')->where('school_id', $id)->delete();
+        //     DB::table('transections')->where('school_id', $id)->delete();
+        //     DB::table('users')->where('school_id', $id)->delete();
+        //     DB::table('workplace_infos')->where('school_id', $id)->delete();
+
+        //     School::destroy($id);
+        // }
+    }
+
+
     public function zkteco()
     {
 
@@ -41,37 +101,4 @@ class ZktecoController extends Controller
     }
 
 
-    // public function testOnly()
-    // {
-
-    // }
-
-    public function testOnly()
-    {
-
-        // $result = $this->sendCurlRequestToStellar('fetch_user_in_device_list', 'WinnerModel');
-
-        // return in_array('230280045', array_column($result->device_user, 'registraton_id'));
-    }
-
-
-    protected  static function sendCurlRequestToStellar($operation, $authUser)
-    {
-        $data = array(
-            "operation" => $operation,
-            "auth_user" => $authUser,
-            "auth_code" => env('STELLAR_AUTH_CODE'),
-        );
-
-        $datapayload = json_encode($data);
-        $api_request = curl_init('https://rumytechnologies.com/rams/json_api');
-        curl_setopt($api_request, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($api_request, CURLINFO_HEADER_OUT, true);
-        curl_setopt($api_request, CURLOPT_POST, true);
-        curl_setopt($api_request, CURLOPT_POSTFIELDS, $datapayload);
-        curl_setopt($api_request, CURLOPT_HTTPHEADER, array('Content-Type:application/json','Content-Length: ' . strlen($datapayload)));
-        $result = curl_exec($api_request);
-        
-        return json_decode($result);
-    }
 }

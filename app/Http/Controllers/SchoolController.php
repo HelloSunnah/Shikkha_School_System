@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use PDF;
 use Session;
 use Exception;
+use DatePeriod;
 use Carbon\Carbon;
 use App\Models\Otp;
 use App\Models\Term;
 use App\Models\User;
+use App\Models\Admin;
 use App\Models\Asset;
 use App\Models\Group;
 use App\Models\Price;
@@ -24,7 +26,9 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Checkout;
 use App\Models\Employee;
+use App\Models\FeesType;
 use App\Models\MarkType;
+use App\Models\SEOModel;
 use App\Models\Transfer;
 use App\Models\SchoolFee;
 use App\Models\StaffType;
@@ -32,13 +36,16 @@ use App\Models\Attendance;
 use App\Models\Department;
 use App\Models\StudentFee;
 use App\Mail\InviteTeacher;
+use App\Models\ClassPeriod;
 use App\Models\ExamRoutine;
 use App\Models\Testimonial;
 use App\Models\Transection;
 use Rats\Zkteco\Lib\ZKTeco;
 use App\Imports\UsersImport;
+use App\Traits\HttpResponse;
 use Illuminate\Http\Request;
 use App\Models\AssignTeacher;
+use App\Models\ClassSyllabus;
 use App\Models\CommonSubject;
 use App\Models\TeacherSalary;
 use App\Models\WorkplaceInfo;
@@ -47,24 +54,20 @@ use App\Models\InstituteClass;
 use App\Models\MessagePackage;
 use App\Models\SchoolCheckout;
 use App\Models\AssignStudentFee;
-use App\Models\SEOModel;
 use App\Exports\AttendanceExport;
 use App\Models\StudentMonthlyFee;
 use Illuminate\Support\Facades\DB;
+// use Excel;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-// use Excel;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\StudentDocumentUpload;
 use Barryvdh\DomPDF\PDF as DomPDFPDF;
 use App\Http\Requests\ResultCreatePost;
-use App\Models\ClassPeriod;
-use App\Models\ClassSyllabus;
-use App\Models\FeesType;
 use Maatwebsite\Excel\Concerns\ToModel;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Contracts\Validation\Rule;
@@ -72,12 +75,17 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Testing\Fluent\Concerns\Has;
 use App\Models\ResultSetting as ModelsResultSetting;
 use App\Models\ResultSubjectCountableMark;
-use DatePeriod;
+use Illuminate\Contracts\Session\Session as SessionSession;
+use Illuminate\Support\Facades\Session as FacadesSession;
 use Maatwebsite\Excel\Validators\ValidationException;
+use function PHPUnit\Framework\returnSelf;
 
 
 class SchoolController extends Controller
 {
+
+    use HttpResponse;
+
     public function pdfShow($student_id, $class_id, $month, $amount)
     {
         return view('frontend.school.pdf.invoice', compact('student_id', 'class_id', 'month', 'amount'));
@@ -148,8 +156,16 @@ class SchoolController extends Controller
     }
 
     public function school()
-    {
+    {   
         if (Auth::user()->is_editor == 3) {
+            $seoTitle = 'School Dashboard';
+            $seoDescription = 'School Dashboard' ;
+            $seoKeyword = 'School Dashboard' ;
+            $seo_array = [
+                'seoTitle' => $seoTitle,
+                'seoKeyword' => $seoKeyword,
+                'seoDescription' => $seoDescription,
+            ];
             $users = User::select(DB::raw("Count(*) as count"))->where('school_id', Auth::user()->id)->whereYear('created_at', date('Y'))
                 ->groupby(DB::raw("Month(created_at)"))->pluck('count');
 
@@ -159,7 +175,7 @@ class SchoolController extends Controller
             $datas = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
             foreach ($months as $index => $month) {
-                $datas[$month] = $users[$index];
+               $datas[$month] = $users[$index];
             }
             $defaultDate = Carbon::today()->format('d-M-Y');
             $incomeAmount = StudentMonthlyFee::select(DB::raw("sum(amount) as sum"))
@@ -168,8 +184,9 @@ class SchoolController extends Controller
                 ->groupBy('month_name')
                 // ->orderBy('id','asc')
                 ->pluck('sum');
-            // dd($incomeAmount);
-            // dd("hi");
+            $totalTeacher=Teacher::where('school_id',Auth::user()->id)->get()->count();
+             $totalAuthor=School::where('id',Auth::user()->id)->get()->count();
+            $totalStudent=User::where('school_id',Auth::user()->id)->get()->count();
             $incomeMonths = StudentMonthlyFee::select(DB::raw("month_name as month"))
                 ->where('school_id', Auth::user()->id)
                 ->whereYear('created_at', date('Y'))
@@ -181,17 +198,18 @@ class SchoolController extends Controller
             foreach ($incomeMonths as $index => $incomeMonth) {
                 $incomeDatas[date("n", strtotime($incomeMonth)) - 1] = $incomeAmount[$index];
             }
-            $exAmount = EmployeeSalary::select(DB::raw("sum(amount) as sum"))
+               $exAmount = EmployeeSalary::select(DB::raw("sum(amount) as sum"))
                 ->where('school_id', Auth::user()->id)
                 ->whereYear('created_at', date('Y'))
                 // ->orderby('id','desc')
                 ->groupby('month_name')->pluck('sum');
-            $staffAmount = TeacherSalary::select(DB::raw("sum(amount) as sum"))
+                   $staffAmount = TeacherSalary::select(DB::raw("sum(amount) as sum"))
                 ->where('school_id', Auth::user()->id)
                 ->whereYear('created_at', date('Y'))
                 // ->orderby('id','desc')
                 ->groupby('month_name')->pluck('sum');
-
+             $transection=Transection::where('school_id', Auth::user()->id)->where('type',1)
+            ->whereYear('created_at', date('Y'))->get()->sum('amount');
             $exMonths = EmployeeSalary::select(DB::raw("month_name as month"))
                 ->where('school_id', Auth::user()->id)
                 ->whereYear('created_at', date('Y'))
@@ -204,7 +222,7 @@ class SchoolController extends Controller
             }
             //  dd($exDatas);
 
-            return view('school', compact('datas', 'incomeDatas', 'exDatas', 'defaultDate'));
+            return view('school', compact('datas','totalStudent','totalAuthor','totalTeacher', 'incomeDatas', 'exDatas', 'defaultDate','seo_array'));
         } else {
             return back();
         }
@@ -237,8 +255,16 @@ class SchoolController extends Controller
 
 
     public function schoolMessage()
-    {
-        return view('frontend.school.message.package');
+    {   
+        $seoTitle = 'SMS Purchase';
+        $seoDescription = 'SMS Purchase' ;
+        $seoKeyword = 'SMS Purchase' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        return view('frontend.school.message.package',compact('seo_array'));
     }
 
     public function schoolMessagePost(Request $request)
@@ -279,9 +305,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $classText = 'Payment Details';
-            $seoTitle = 'Payment Details | ' . Auth::user()->school_name;
-            $seoDescription = 'Payment Details | ' . Auth::user()->school_name;
-            $seoKeyword = 'Payment Details | ' . Auth::user()->school_name;
+            $seoTitle = 'Payment Details';
+            $seoDescription = 'Payment Details' ;
+            $seoKeyword = 'Payment Details' ;
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -458,9 +484,9 @@ class SchoolController extends Controller
                 $urlTeacher = '';
             }
             $classText = 'Term Input create';
-            $seoTitle = 'Term | ' . Auth::user()->school_name;
-            $seoDescription = 'Term | ' . Auth::user()->school_name;
-            $seoKeyword = 'Term | ' . Auth::user()->school_name;
+            $seoTitle = 'Term Create';
+            $seoDescription = 'Term Create';
+            $seoKeyword = 'Term Create';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -499,9 +525,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $classText = 'Term Show';
-            $seoTitle = 'Term | ' . Auth::user()->school_name;
-            $seoDescription = 'Term | ' . Auth::user()->school_name;
-            $seoKeyword = 'Term | ' . Auth::user()->school_name;
+            $seoTitle = 'Term Show';
+            $seoDescription = 'Term Show';
+            $seoKeyword = 'Term Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -524,9 +550,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $classText = 'Class Input Edit';
-            $seoTitle = 'Class | ' . Auth::user()->school_name;
-            $seoDescription = 'Class | ' . Auth::user()->school_name;
-            $seoKeyword = 'Class | ' . Auth::user()->school_name;
+            $seoTitle = 'Term Show';
+            $seoDescription = 'Term Show';
+            $seoKeyword = 'Term Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -590,9 +616,9 @@ class SchoolController extends Controller
                 $urlTeacher = '';
             }
             $classText = 'Class Input create';
-            $seoTitle = 'Class | ' . Auth::user()->school_name;
-            $seoDescription = 'Class | ' . Auth::user()->school_name;
-            $seoKeyword = 'Class | ' . Auth::user()->school_name;
+            $seoTitle = 'Class Create';
+            $seoDescription = 'Class Create';
+            $seoKeyword = 'Class Create';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -650,9 +676,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $classText = 'Class Show';
-            $seoTitle = 'Class | ' . Auth::user()->school_name;
-            $seoDescription = 'Class | ' . Auth::user()->school_name;
-            $seoKeyword = 'Class | ' . Auth::user()->school_name;
+            $seoTitle = 'Class Show  ';
+            $seoDescription = 'Class Show ';
+            $seoKeyword = 'Class Show  ';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -675,9 +701,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $classText = 'Class Input Edit';
-            $seoTitle = 'Class | ' . Auth::user()->school_name;
-            $seoDescription = 'Class | ' . Auth::user()->school_name;
-            $seoKeyword = 'Class | ' . Auth::user()->school_name;
+            $seoTitle = 'Class Show';
+            $seoDescription = 'Class Show';
+            $seoKeyword = 'Class Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -767,9 +793,9 @@ class SchoolController extends Controller
             }
             $class = InstituteClass::where('school_id', Auth::user()->id)->where('school_id', Auth::user()->id)->get();
             $sectionText = 'Section Input create';
-            $seoTitle = 'Section | ' . Auth::user()->school_name;
-            $seoDescription = 'Section | ' . Auth::user()->school_name;
-            $seoKeyword = 'Section | ' . Auth::user()->school_name;
+            $seoTitle = 'Section Create';
+            $seoDescription = 'Section Create';
+            $seoKeyword = 'Section Create';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -822,9 +848,12 @@ class SchoolController extends Controller
     /**
      * Save Section with ajax
      * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
      * @param Request
      * @param $request
-     * $return response
+     * @modified 05-07-23
+     * @return \Illuminate\Http\Response|
      */
     public function sectionCreatePostAjax(Request $request)
     {   
@@ -866,9 +895,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $sectionText = 'Section Show';
-            $seoTitle = 'Section | ' . Auth::user()->school_name;
-            $seoDescription = 'Section | ' . Auth::user()->school_name;
-            $seoKeyword = 'Section | ' . Auth::user()->school_name;
+            $seoTitle = 'Section Show';
+            $seoDescription = 'Section Show';
+            $seoKeyword = 'Section Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -891,9 +920,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $sectionText = 'Section Input Edit';
-            $seoTitle = 'Section | ' . Auth::user()->school_name;
-            $seoDescription = 'Section | ' . Auth::user()->school_name;
-            $seoKeyword = 'Section | ' . Auth::user()->school_name;
+            $seoTitle = 'Section Show';
+            $seoDescription = 'Section Show';
+            $seoKeyword = 'Section Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -956,9 +985,9 @@ class SchoolController extends Controller
             $class = InstituteClass::where('school_id', Auth::user()->id)->get();
             $section = Section::where('school_id', Auth::user()->id)->get();
             $groupText = 'Group Input create';
-            $seoTitle = 'Group | ' . Auth::user()->school_name;
-            $seoDescription = 'Group | ' . Auth::user()->school_name;
-            $seoKeyword = 'Group | ' . Auth::user()->school_name;
+            $seoTitle = 'Group Create';
+            $seoDescription = 'Group Create';
+            $seoKeyword = 'Group Create';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1027,9 +1056,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $groupText = 'Group Show';
-            $seoTitle = 'Group | ' . Auth::user()->school_name;
-            $seoDescription = 'Group | ' . Auth::user()->school_name;
-            $seoKeyword = 'Group | ' . Auth::user()->school_name;
+            $seoTitle = 'Group Show';
+            $seoDescription = 'Group Show';
+            $seoKeyword = 'Group Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1052,9 +1081,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $groupText = 'Section Input Edit';
-            $seoTitle = 'Section | ' . Auth::user()->school_name;
-            $seoDescription = 'Section | ' . Auth::user()->school_name;
-            $seoKeyword = 'Section | ' . Auth::user()->school_name;
+            $seoTitle = 'Group Show';
+            $seoDescription = 'Group Show';
+            $seoKeyword = 'Group Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1125,9 +1154,9 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
             $subjectText = 'Subject Show';
-            $seoTitle = 'Subject | ' . Auth::user()->school_name;
-            $seoDescription = 'Subject | ' . Auth::user()->school_name;
-            $seoKeyword = 'Subject | ' . Auth::user()->school_name;
+            $seoTitle = 'Subject Show';
+            $seoDescription = 'Subject Show';
+            $seoKeyword = 'Subject Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1161,6 +1190,16 @@ class SchoolController extends Controller
         }
     }
 
+    /**
+     * Show Subject
+     * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param int $class_id
+     * @modified 06-07-23
+     * 
+     * @return \Illuminate\Contracts\View\View
+     */
     public function subjectShow($class_id)
     {
         if (Auth::user()->status == 0) {
@@ -1173,22 +1212,33 @@ class SchoolController extends Controller
             return back();
         } else {
             // $group_id = ($group_id == 0) ? NULL : $group_id;
+            $thisClass = InstituteClass::findOrFail($class_id);
             $dataShow = Subject::where('class_id', $class_id)->get();
             $subjectText = 'Subject Input create';
-            $seoTitle = 'Subject | ' . Auth::user()->school_name;
-            $seoDescription = 'Subject | ' . Auth::user()->school_name;
-            $seoKeyword = 'Subject | ' . Auth::user()->school_name;
+            $seoTitle = 'Subject Show';
+            $seoDescription = 'Subject Show';
+            $seoKeyword = 'Subject Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            return view('frontend.school.subject.show', compact('subjectText', 'seo_array', 'dataShow', 'class_id'));
+            
+            return view('frontend.school.subject.show', compact('subjectText', 'seo_array', 'dataShow', 'class_id', 'thisClass'));
         }
     }
 
+    /**
+     * Save Subject 
+     * 
+     * @param Request 
+     * @param $request
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @return mixed
+     */
     public function subjectCreatePost(Request $request)
-    {
+    {   
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -1198,28 +1248,48 @@ class SchoolController extends Controller
         if (Auth::user()->is_editor != 3) {
             return back();
         } else {
-            // $request->group_id = ($request->group_id == 0) ? NULL : $request->group_id;
+            $class = InstituteClass::findOrFail($request->class_id);
+            if (in_array($class->class_name, classFilter())) {
+                $request->validate([
+                    "subject_name"  => 'required',
+                    "subject_code"  => 'required|numeric',
+                    "group_id"      => 'required'
+                ]);
+            }
+
             $request->validate([
                 'subject_name' => 'required',
-                // 'subject_name_bn' => 'required',
             ]);
+
+            if ($request->subject_code != null) {
+                $request->validate([
+                    'subject_code' => 'required|numeric',
+                ]);
+
+                $existCode = Subject::where(['class_id' => $request->class_id, 'subject_code' => $request->subject_code, "school_id" => Auth::user()->id])->exists();
+                if ($existCode) {
+                    toast("This subject code is already exist", "info");
+                    return back()->withInput();
+                }
+            }
+
             $data = Subject::where('class_id', $request->class_id)->where('section_id', $request->section_id)->where('group_id', $request->group_id)->where('subject_name', $request->subject_name)->count();
             if ($data == 0) {
                 $class = new Subject();
                 $class->class_id = $request->class_id;
                 $class->section_id = $request->section_id;
                 $class->group_id = $request->group_id;
+                $class->subject_code = $request->subject_code;
                 $class->subject_name = $request->subject_name;
-                // $class->subject_name_bn = $request->subject_name_bn;
                 $class->active = (is_null($request->active) ? 0 : $request->active);
                 $class->school_id = Auth::user()->id;
                 $class->save();
 
                 $class_id = $request->class_id;
                 $section_id = $request->section_id;
-                // $group_id = $request->group_id;
                 $group_id = is_null($request->group_id) ? 0 : $request->group_id;
-                toast('Subject upload Successfully', 'success');
+
+                toast('Subject Save Successfully', 'success');
                 return redirect()->route('subject.subjectShow', ['class_id' => $class_id, 'section_id' => $section_id, 'group_id' => $group_id]);
             } else {
                 toast('This subject already exits', 'error');
@@ -1228,38 +1298,72 @@ class SchoolController extends Controller
         }
     }
 
+    /**
+     * Subject Update
+     * 
+     * @author CodeCell <suppor@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param Request
+     * @param $request
+     * @param int $id
+     * @modified 05-07-23
+     * @modifier 05-07-2023
+     * 
+     * @return mixed
+     */
     public function subjectUpdatePost(Request $request, $id)
-    {
+    {   
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        // dd($request->all());
+
         $request->validate([
             'subject_name' => 'required',
-            // 'subject_name_bn' => 'required',
-            'class_id' => 'required',
-            // 'section_id' => 'required',
+            'class_id'     => 'required',
         ]);
-        $class = Subject::find($id);
-        $class->class_id = $request->class_id;
-        // $class->section_id = $request->section_id;
-        // $class->group_id = $request->group_id;
-        $class->subject_name = $request->subject_name;
-        // $class->subject_name_bn = $request->subject_name_bn;
-        // $class->active = (is_null($request->active) ? 0 : $request->active);
-        $class->school_id = Auth::user()->id;
-        $class->save();
+
+        $subject = Subject::find($id);
+
+        if ($request->subject_code != null) {
+            $request->validate([
+                'subject_code' => 'required|numeric',
+            ]);
+
+            $existCode = Subject::where('class_id', $request->class_id)
+                                ->where('subject_code', $request->subject_code)
+                                ->where('subject_code', '!=', $subject->subject_code)
+                                ->exists();
+                               
+            if ($existCode) {
+                toast("This subject code is already exist", "info");
+                return back();
+            }
+        }
+
+        $subject->class_id = $request->class_id;
+        $subject->subject_code = $request->subject_code;
+        $subject->group_id     = $request->group_id;
+        $subject->subject_name = $request->subject_name;
+        $subject->school_id = Auth::user()->id;
+        $subject->save();
 
         $class_id = $request->class_id;
-        // $section_id = $request->section_id;
-        // $group_id = is_null($request->group_id) ? 0 : $request->group_id;
-        Alert::success('Success Subject Updated', 'Success Message');
+        Alert::success('Subject Update Successfully', 'Success Message');
         return redirect()->route('subject.subjectShow', ['class_id' => $class_id]);
     }
 
+    /**
+     * Edit Subject
+     * 
+     * @param int $id
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmai.com>
+     * @modified 05-07-23
+     * @return \Illuminate\Contracts\View\View
+     */
     public function subjectEditPost($id)
     {
         if (Auth::user()->status == 0) {
@@ -1272,20 +1376,21 @@ class SchoolController extends Controller
             return back();
         } else {
             $subject = Subject::where('id', $id)->first();
-            $class = InstituteClass::where('school_id', Auth::user()->id)->get();
+            
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
-
+            $thisClass = InstituteClass::findOrFail($subject->class_id); 
             $subjectText = 'Subject Input create';
-            $seoTitle = 'Subject | ' . Auth::user()->school_name;
-            $seoDescription = 'Subject | ' . Auth::user()->school_name;
-            $seoKeyword = 'Subject | ' . Auth::user()->school_name;
+            $seoTitle = 'Subject Show';
+            $seoDescription = 'Subject Show';
+            $seoKeyword = 'Subject Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            return view('frontend.school.subject.edit', compact('subject', 'seo_array', 'subjectText', 'class', 'section', 'group'));
+
+            return view('frontend.school.subject.edit', compact('subject', 'seo_array', 'subjectText', 'thisClass', 'section', 'group'));
         }
     }
 
@@ -1324,9 +1429,9 @@ class SchoolController extends Controller
                 $urlTeacher = '';
             }
             $classText = 'department Input create';
-            $seoTitle = 'department | ' . Auth::user()->school_name;
-            $seoDescription = 'department | ' . Auth::user()->school_name;
-            $seoKeyword = 'department | ' . Auth::user()->school_name;
+            $seoTitle = 'department';
+            $seoDescription = 'department';
+            $seoKeyword = 'department';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1377,9 +1482,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $classText = 'Department Show';
-            $seoTitle = 'Department | ' . Auth::user()->school_name;
-            $seoDescription = 'Department | ' . Auth::user()->school_name;
-            $seoKeyword = 'Department | ' . Auth::user()->school_name;
+            $seoTitle = 'Department';
+            $seoDescription = 'Department';
+            $seoKeyword = 'Department';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1402,9 +1507,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $classText = 'Department Input Edit';
-            $seoTitle = 'Department | ' . Auth::user()->school_name;
-            $seoDescription = 'Department | ' . Auth::user()->school_name;
-            $seoKeyword = 'Department | ' . Auth::user()->school_name;
+            $seoTitle = 'Department';
+            $seoDescription = 'Department';
+            $seoKeyword = 'Department';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1468,9 +1573,9 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $department = Department::where('active', 1)->get();
             $teacherText = 'Teacher Show';
-            $seoTitle = 'Teacher | ' . Auth::user()->school_name;
-            $seoDescription = 'Teacher | ' . Auth::user()->school_name;
-            $seoKeyword = 'Teacher | ' . Auth::user()->school_name;
+            $seoTitle = 'Teacher Create';
+            $seoDescription = 'Teacher Create';
+            $seoKeyword = 'Teacher Create';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1625,9 +1730,9 @@ class SchoolController extends Controller
                 $section = Section::where('school_id', Auth::user()->id)->get();
                 $department = Department::where('school_id', Auth::user()->id)->get();
                 $teacherText = 'Teacher Input create';
-                $seoTitle = 'Teacher | ' . Auth::user()->school_name;
-                $seoDescription = 'Teacher | ' . Auth::user()->school_name;
-                $seoKeyword = 'Teacher | ' . Auth::user()->school_name;
+                $seoTitle = 'Teacher Show';
+                $seoDescription = 'Teacher Show';
+                $seoKeyword = 'Teacher Show';
                 $seo_array = [
                     'seoTitle' => $seoTitle,
                     'seoKeyword' => $seoKeyword,
@@ -1665,9 +1770,13 @@ class SchoolController extends Controller
                 Alert::success('Success Teacher Updated', 'Success Message');
                 return redirect()->route('teacher.Show');
             }
-            //  $password = 123456789;
 
         }
+    }
+    public function teacherShowget(){
+        $salary = EmployeeSalary::where('school_id', Auth::user()->id)->where('id', $staffId)->get();
+        return response()->json($salary);
+
     }
 
     public function teacherShow()
@@ -1682,9 +1791,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $teacherText = 'Teacher Show';
-            $seoTitle = 'Teacher | ' . Auth::user()->school_name;
-            $seoDescription = 'Teacher | ' . Auth::user()->school_name;
-            $seoKeyword = 'Teacher | ' . Auth::user()->school_name;
+            $seoTitle = 'Teacher Show';
+            $seoDescription = 'Teacher Show';
+            $seoKeyword = 'Teacher Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1692,34 +1801,35 @@ class SchoolController extends Controller
             ];
             $teacher = Teacher::where('school_id', Auth::user()->id)->orderby('active', 'desc')->get();
             $studentFees = TeacherSalary::where('school_id', Auth::user()->id)->get();
-            // $teacher = where('school_id', Auth::user()->id)->orderby('active','asc')->get();
             return view('frontend.school.teacher.show', compact('studentFees','teacher', 'seo_array', 'teacherText'));
         }
     }
 
     public function teacherDelete($id)
     {
-
         $teacherSalary = TeacherSalary::where('teacher_id', $id)->delete();
-
-
-
         $teacher = Teacher::find($id);
         File::delete(public_path($teacher->image));
         $teacher->delete();
         Alert::success('Successfully Teacher Deleted', 'Success Message');
         return back();
     }
+
+    /**
+     * Delete All Teacher
+     * 
+     * @param Request
+     * @param $request
+     */
     public function teacher_Check_Delete(Request $request){
         $ids = $request->ids;
-        Teacher::whereIn('id',$ids)->delete();
+        Teacher::whereIn('id', $ids)->delete();
         Alert::success(' Selected Teachers are deleted', 'Success Message');
         return response()->json(['status'=>'success']);
     }
 
     public function restoreteacher($id)
     {
-
         TeacherSalary::withTrashed()->where('teacher_id', $id)->restore();
         Teacher::withTrashed()->where('id', $id)->restore();
         toast("Restore data", "success");
@@ -1749,9 +1859,9 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $department = Department::where('school_id', Auth::user()->id)->get();
             $teacherText = 'Teacher Input create';
-            $seoTitle = 'Teacher | ' . Auth::user()->school_name;
-            $seoDescription = 'Teacher | ' . Auth::user()->school_name;
-            $seoKeyword = 'Teacher | ' . Auth::user()->school_name;
+            $seoTitle = 'Teacher Show';
+            $seoDescription = 'Teacher Show';
+            $seoKeyword = 'Teacher Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -1811,9 +1921,9 @@ class SchoolController extends Controller
             //return $subjects;
 
             $subjectText = 'Teacher Show';
-            $seoTitle = 'Teacher | ' . Auth::user()->school_name;
-            $seoDescription = 'Teacher | ' . Auth::user()->school_name;
-            $seoKeyword = 'Teacher | ' . Auth::user()->school_name;
+            $seoTitle = 'Teacher Assign ';
+            $seoDescription = 'Teacher Assign ';
+            $seoKeyword = 'Teacher Assign ';
 
             $seo_array = [
                 'seoTitle' => $seoTitle,
@@ -1821,8 +1931,7 @@ class SchoolController extends Controller
                 'seoDescription' => $seoDescription,
             ];
 
-            return view(
-                'frontend.school.teacher.createShow',
+            return view('frontend.school.teacher.createShow',
                 compact(
                     'subjectText',
                     'seo_array',
@@ -2032,9 +2141,9 @@ class SchoolController extends Controller
             $dataSubject = Subject::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->get();
             $dataTeacher = Teacher::where('school_id', Auth::user()->id)->get();
             $teacherText  = 'Assign Teacher Input create';
-            $seoTitle = 'Assign Teacher | ' . Auth::user()->school_name;
-            $seoDescription = 'Assign Teacher | ' . Auth::user()->school_name;
-            $seoKeyword = 'Assign Teacher | ' . Auth::user()->school_name;
+            $seoTitle = 'Assign Teacher';
+            $seoDescription = 'Assign Teacher';
+            $seoKeyword = 'Assign Teacher';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -2048,9 +2157,9 @@ class SchoolController extends Controller
     public function assignTeacherEditShow($id)
     {
         $teacherText  = 'Assign Teacher Input create';
-        $seoTitle = 'Assign Teacher | ' . Auth::user()->school_name;
-        $seoDescription = 'Assign Teacher | ' . Auth::user()->school_name;
-        $seoKeyword = 'Assign Teacher | ' . Auth::user()->school_name;
+        $seoTitle = 'Assign Teacher';
+        $seoDescription = 'Assign Teacher';
+        $seoKeyword = 'Assign Teacher';
         $seo_array = [
             'seoTitle' => $seoTitle,
             'seoKeyword' => $seoKeyword,
@@ -2064,8 +2173,17 @@ class SchoolController extends Controller
         return view('frontend.school.teacher.editShow', compact('teacherText', 'seo_array', 'dataEdit', 'dataSubject', 'dataTeacher'));
     }
 
+    /**
+     * Show Student List
+     * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Shohidul 
+     * @modifier Sajjad <sajjad.develpr@gmail.com>
+     * @modified 05-07-23
+     * @return \Illuminate\Contracts\View\View|
+     */
     public function studentCreateShow()
-    {
+    {   
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -2080,23 +2198,28 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
             $subjectText = 'Student Input create';
-            $seoTitle = 'Students | ' . Auth::user()->school_name;
-            $seoDescription = 'Student | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student | ' . Auth::user()->school_name;
+            $seoTitle = 'Students Show';
+            $seoDescription = 'Student Show';
+            $seoKeyword = 'Student Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
 
+            $count = User::where(['school_id'=>auth()->id()])->count();
+            if($count > 0){
+                $dataShow =  User::where(['school_id'=>auth()->id()])->where('class_id', $class->first()->id)->latest()->get();
+                return view('frontend.school.student.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'dataShow'));
+            }
+            else{
+                $dataShow = User::where(['school_id'=>auth()->id()])->get();
+                return view('frontend.school.student.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'dataShow'));
+            }
 
-           $dataShow =  User::where(['school_id'=>auth()->id()])->where('class_id', $class->first()->id)->latest()->get();
-
-            return view('frontend.school.student.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'dataShow'));
+           
         }
     }
-
-    
 
     /**------------------   Find Student
      * =====================================================*/
@@ -2245,9 +2368,9 @@ class SchoolController extends Controller
         $section = Section::where('school_id', Auth::user()->id)->get();
         $group = Group::where('school_id', Auth::user()->id)->get();
         $subjectText = 'Students';
-        $seoTitle = 'student | ' . Auth::user()->school_name;
-        $seoDescription = 'student | ' . Auth::user()->school_name;
-        $seoKeyword = 'student | ' . Auth::user()->school_name;
+        $seoTitle = 'student Show';
+        $seoDescription = 'student Show';
+        $seoKeyword = 'student Show';
         $seo_array = [
             'seoTitle' => $seoTitle,
             'seoKeyword' => $seoKeyword,
@@ -2256,6 +2379,14 @@ class SchoolController extends Controller
         return view('frontend.school.student.createShow', compact('subjectText', 'seo_array', 'class', 'section', 'group', 'dataShow'));
     }
 
+    /**
+     * View Student Create Form
+     * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * 
+     * @return \Illuminate\Contracts\View\View|
+     */
     public function studentCreate()
     {
         if (Auth::user()->status == 0) {
@@ -2268,27 +2399,39 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Student Input create';
-            $seoTitle = 'Student | ' . Auth::user()->school_name;
-            $seoDescription = 'Student | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student | ' . Auth::user()->school_name;
+            $seoTitle = 'Student Create';
+            $seoDescription = 'Student Create';
+            $seoKeyword = 'Student Create';
 
             $class = InstituteClass::where('school_id', Auth::user()->id)->get();
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
-
+            $subjects = Subject::where('school_id', Auth::user()->id)->where('class_id', 95)->get();
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
                 'seoDescription' => $seoDescription,
             ];
-            return view('frontend.school.student.create', compact('studentText', 'seo_array', 'class', 'section', 'group'));
+            
+            return view('frontend.school.student.create', compact('studentText', 'seo_array', 'class', 'section', 'group', 'subjects'));
         }
     }
 
     /**----------------------   Register a user into database
      * =============================================================*/
+    /**
+     * Save Student Data In Database
+     * 
+     * @author CodeCell <suppor@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param Request
+     * @param $request
+     * @modified 05-07-23
+     * 
+     * @return \Illuminate\Routing\Redirector
+     */
     public function studentCreatePost(Request $request)
-    {
+    {   
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -2296,23 +2439,41 @@ class SchoolController extends Controller
             return back();
         }
 
-        $request->validate([
-            'discount' => 'nullable',
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'phone' => 'nullable|numeric',
-            'roll_number' => 'required|numeric',
-            'gender' => 'nullable',
-            'dob' => 'nullable',
-            'father_name' => 'nullable|string',
-            'mother_name' => 'nullable|string',
-            'class_id' => 'nullable|integer',
-            'section_id' => 'nullable|integer',
-        ]);
+        $userExist = User::where('email', $request->email)->whereNull('unique_id');
+        $userUp = User::where('email', $request->email)->whereNull('unique_id')->first();
+        
+        if($userExist->exists()) {
+            $request->validate([
+                'discount' => 'nullable',
+                'name' => 'required|string',
+                'email' => 'required|email|',
+                'phone' => 'nullable|numeric',
+                'roll_number' => 'required|numeric',
+                'gender' => 'nullable',
+                'dob' => 'nullable',
+                'father_name' => 'nullable|string',
+                'mother_name' => 'nullable|string',
+                'class_id' => 'nullable|integer',
+                'section_id' => 'nullable|integer',
+            ]);
+        } else {
+            $request->validate([
+                'discount' => 'nullable',
+                'name' => 'required|string',
+                'email' => 'required|email|unique:users',
+                'phone' => 'nullable|numeric',
+                'roll_number' => 'required|numeric',
+                'gender' => 'nullable',
+                'dob' => 'nullable',
+                'father_name' => 'nullable|string',
+                'mother_name' => 'nullable|string',
+                'class_id' => 'nullable|integer',
+                'section_id' => 'nullable|integer',
+            ]);
+        }
 
         $userRoll = User::where('class_id', $request->class_id)
             ->where('section_id', $request->section_id)
-            // ->where('group_id',$request->group_id)
             ->where('roll_number', $request->roll_number);
 
         if ($userRoll->exists()) {
@@ -2321,6 +2482,43 @@ class SchoolController extends Controller
             return back()->withInput()
                 ->withErrors(['roll_number.required' => 'This roll number already Exits']);
         } else {
+
+            if($userExist->exists()) {
+                $uniqueId = Utility::createUniqueId(Auth::id(), 'student');
+                
+                $userUp->unique_id = $uniqueId;
+                $userUp->name = $request->name;
+                $userUp->father_name = $request->father_name ?? null;
+                $userUp->mother_name = $request->mother_name ?? null;
+                $userUp->email = $request->email;
+                $userUp->roll_number = (int)$request->roll_number;
+                $userUp->address = $request->address ?? null;
+                $userUp->phone = $request->phone;
+                $userUp->discount = $request->discount ?? 0;
+    
+                $userUp->gender = $request->gender ?? null;
+                $userUp->dob = $request->dob ?? null;
+                $userUp->blood_group = $request->blood_group ?? null;
+                $userUp->class_id = $request->class_id;
+                $userUp->section_id = $request->section_id;
+                $userUp->group_id = $request->group_id;
+                $userUp->shift = $request->shift ?? 2; // default is day shift
+                $userUp->school_id = Auth::user()->id;
+                $userUp->password = Hash::make(123456789);
+    
+                $image = $request->file('image');
+                if ($request->hasfile('image')) {
+                    $new_name = 'profile/img/' . rand() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('profile/img'), $new_name);
+                    $userUp->image = $new_name;
+                }
+                $userUp->save();
+    
+                session(['user' => $userUp]);
+                
+                return redirect()->route('student.create');
+            }
+
             $uniqueId = Utility::createUniqueId(Auth::id(), 'student');
 
             $user = new User();
@@ -2359,7 +2557,16 @@ class SchoolController extends Controller
         }
     }
 
-
+    /**
+     * Student Update
+     * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param Request
+     * @param $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function studentUpdatePost(Request $request, $id)
     {
         if (Auth::user()->status == 0) {
@@ -2423,7 +2630,7 @@ class SchoolController extends Controller
             if($user->discount > 0)
             {
                 $updateStudentMonthlyFees = \App\Http\Controllers\Finance\CollectFeesController::updateStudentMonthlyFees($user->id);
-            
+                
                 if($updateStudentMonthlyFees['status'] == false)
                 {
                     Alert::error('Server Error', $updateStudentMonthlyFees['message']);
@@ -2438,44 +2645,66 @@ class SchoolController extends Controller
     }
 
     public function studentDelete($id)
-    {
-
-
+    {   
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
             toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
             return back();
         }
-        $result = Result::where('student_roll_number', $id)->delete();
+
+        $result = Result::where('student_id', $id)->delete();
         $fee = StudentMonthlyFee::where('student_id', $id)->delete();
         $data = User::where('id', $id)->delete();
         Alert::success('Success student deleted', 'Success Message');
         return back();
     }
+
     public function student_Check_Delete(Request $request)
     {   
-       $ids = $request->ids;
-        User::whereIn('id',$ids)->delete();
+        $ids = $request->ids;
+        User::whereIn('id', $ids)->delete();
+        DB::table('results')->whereIn('student_id', $ids)->delete();
+
         Alert::success(' Selected students are deleted', 'Success Message');
         return response()->json(['status'=>'success']);
     }
-    public function restorestudent($id)
-    {
-        StudentMonthlyFee::withTrashed()->where('student_id', $id)->restore();
-        Result::withTrashed()->where('student_id', $id)->restore();
 
-        User::withTrashed()->where('id', $id)->restore();
-        toast("Restore data", "success");
-        return back();
+    public function restorestudent($id)
+    {   
+        try {
+            StudentMonthlyFee::withTrashed()->where('student_id', $id)->restore();
+            Result::withTrashed()->where('student_id', $id)->restore();
+            User::withTrashed()->where('id', $id)->restore();
+            
+            $users = User::onlyTrashed()->where('school_id', Auth::user()->id)->orderBy('deleted_at', 'desc')->get();
+            return response()->json(['message' => 'student Data restored successfully', 
+                'data' => $users
+            ]);
+                            
+        }
+        catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to restore Student data'], 500);
+        }
+        
     }
+
     public function Pdelete_student($id)
     {
-        StudentMonthlyFee::withTrashed()->where('student_id', $id)->forcedelete();
-        Result::withTrashed()->where('student_id', $id)->forcedelete();
-        User::withTrashed()->where('id', $id)->forcedelete();
-        toast("Data delete permanently", "success");
-        return back();
+        try{
+            StudentMonthlyFee::withTrashed()->where('student_id', $id)->forcedelete();
+            Result::withTrashed()->where('student_id', $id)->forcedelete();
+            User::withTrashed()->where('id', $id)->forcedelete();
+            
+            $users = User::onlyTrashed()->where('school_id', Auth::user()->id)->orderBy('deleted_at', 'desc')->get();
+            return response()->json(['message' => 'Student data deleted Permanently.',
+                'data' => $users
+            ]);
+        }
+        catch(\Exception $e){
+            return response()->json(['message' => 'Failed to delete student data.'], 500);
+        }
+        
     }
 
     //upload Excel file for student
@@ -2532,9 +2761,9 @@ class SchoolController extends Controller
             $group_id = ($group_id == 0) ? NULL : $group_id;
             $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->get();
             $teacherText  = 'Student Input create';
-            $seoTitle = 'Student | ' . Auth::user()->school_name;
-            $seoDescription = 'Student | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student | ' . Auth::user()->school_name;
+            $seoTitle = 'Student Show';
+            $seoDescription = 'Student Show';
+            $seoKeyword = 'Student Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -2560,6 +2789,14 @@ class SchoolController extends Controller
     // Student singleShow
     public function singleShow($id)
     {
+        $seoTitle = 'Student SingleShow';
+        $seoDescription = 'Student SingleShow';
+        $seoKeyword = 'Student SingleShow';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $date = Carbon::now();
         $testimonial = Testimonial::where('user_id', $id)->first();
         $transfer = Transfer::where('user_id', $id)->first();
@@ -2575,7 +2812,7 @@ class SchoolController extends Controller
         $classTeacherPhone = Teacher::find($AssignTeacher)?->first()->phone;
         $accountant = Teacher::where('designation', '=', "Accountant")->where('school_id', Auth::user()->id)->first()?->phone;
 
-        return view('frontend.school.student.singleShow', compact('user', 'testimonial', 'transfer', 'data', 'studentMonthlyFees', 'alldocuments','date','totalDue','classTeacher','accountant','totalPaid','classTeacherPhone'));
+        return view('frontend.school.student.singleShow', compact('user', 'testimonial', 'transfer', 'data', 'studentMonthlyFees', 'alldocuments','date','totalDue','classTeacher','accountant','totalPaid','classTeacherPhone','seo_array'));
     }
 
     public function singlePassword(Request $request)
@@ -2610,9 +2847,9 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $text = 'Student Attendance ';
             $defaultDate = Carbon::today()->format('Y-m-d');
-            $seoTitle = 'Student Attendance | ' . Auth::user()->school_name;
-            $seoDescription = 'Student Attendance  | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student Attendance  | ' . Auth::user()->school_name;
+            $seoTitle = 'Student Take/View Attendance';
+            $seoDescription = 'Student  Attendance';
+            $seoKeyword = 'Student Attendance';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -2709,6 +2946,7 @@ class SchoolController extends Controller
         } else {
 
             $dataAttendance = Attendance::join('users', 'users.id', 'attendances.student_id')
+            ->select('attendances.*')
             ->where("attendances.school_id", Auth::user()->id)
             ->where('attendances.class_id', $class_id)
             ->where('attendances.section_id', $section_id)
@@ -2723,9 +2961,9 @@ class SchoolController extends Controller
                 ->get();
 
             $Text = 'Attendance Input create';
-            $seoTitle = 'Attendance | ' . Auth::user()->school_name;
-            $seoDescription = 'Attendance | ' . Auth::user()->school_name;
-            $seoKeyword = 'Attendance | ' . Auth::user()->school_name;
+            $seoTitle = 'Student Attendance';
+            $seoDescription = 'Student Attendance ';
+            $seoKeyword = 'Student Attendance';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -2752,9 +2990,9 @@ class SchoolController extends Controller
             $dataAttendance = Attendance::where('class_id', $class_id)->where('section_id', $section_id)->whereDate('created_at', $date)->get();
             $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->get();
             $Text = 'Attendance Input create';
-            $seoTitle = 'Attendance | ' . Auth::user()->school_name;
-            $seoDescription = 'Attendance | ' . Auth::user()->school_name;
-            $seoKeyword = 'Attendance | ' . Auth::user()->school_name;
+            $seoTitle = 'Student Attendance Monthly';
+            $seoDescription = 'Student Attendance Monthly';
+            $seoKeyword = 'Student Attendance Monthly';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -2810,12 +3048,12 @@ class SchoolController extends Controller
             return back();
         } else {
             $group_id = ($group_id == 0) ? NULL : $group_id;
-            $dataAttendance = Attendance::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->whereDate('created_at', Carbon::today())->get();
+            $dataAttendance = Attendance::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->whereDate('created_at', date('d-m-Y'))->get();
             $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->get();
             $Text = 'Subject Input create';
-            $seoTitle = 'Subject | ' . Auth::user()->school_name;
-            $seoDescription = 'Subject | ' . Auth::user()->school_name;
-            $seoKeyword = 'Subject | ' . Auth::user()->school_name;
+            $seoTitle = 'Student Attendance';
+            $seoDescription = 'Student Attendance';
+            $seoKeyword = 'Student Attendance';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -2843,6 +3081,7 @@ class SchoolController extends Controller
             return back();
         } else {
 
+            // return $request;
             foreach ($request->student_id as $index => $code) {
                 $attend = Attendance::where("school_id", Auth::user()->id)
                     ->where('class_id', getUserName($code)->class_id)
@@ -2896,27 +3135,28 @@ class SchoolController extends Controller
             $data = Attendance::find($id);
             $data->attendance = $request->attendance;
             $data->save();
-            if ($request->attendance == 1) {
-                $token   = "8371b733bd239059f940b857e94d4cf2";
-                $code    = getUserName($data->student_id)->id;
-                $to      = getUserName($data->student_id)->phone;
-                $message = 'Student Name:' . getUserName($data->student_id)->name . ' is now Present';
 
-                $url = "http://api.greenweb.com.bd/api.php?json";
+            // if ($request->attendance == 1) {
+            //     $token   = "8371b733bd239059f940b857e94d4cf2";
+            //     $code    = getUserName($data->student_id)->id;
+            //     $to      = getUserName($data->student_id)->phone;
+            //     $message = 'Student Name:' . getUserName($data->student_id)->name . ' is now Present';
 
-                $data = [
-                    'to'      => "$to",
-                    'message' => "$message",
-                    'token'   => "$token"
-                ];
+            //     $url = "http://api.greenweb.com.bd/api.php?json";
 
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_ENCODING, '');
-                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                $smsresult = curl_exec($ch);
-            }
+            //     $data = [
+            //         'to'      => "$to",
+            //         'message' => "$message",
+            //         'token'   => "$token"
+            //     ];
+
+            //     $ch = curl_init();
+            //     curl_setopt($ch, CURLOPT_URL, $url);
+            //     curl_setopt($ch, CURLOPT_ENCODING, '');
+            //     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            //     $smsresult = curl_exec($ch);
+            // }
 
             return back();
         }
@@ -2937,9 +3177,9 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
             $text = 'Student Attendance Show';
-            $seoTitle = 'Student Attendance Show | ' . Auth::user()->school_name;
-            $seoDescription = 'Student Attendance Show   | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student Attendance Show   | ' . Auth::user()->school_name;
+            $seoTitle = 'Student Attendance Show';
+            $seoDescription = 'Student Attendance Show';
+            $seoKeyword = 'Student Attendance Show';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -2964,9 +3204,9 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
             $text = 'Student Attendance Show';
-            $seoTitle = 'Student Attendance Show | ' . Auth::user()->school_name;
-            $seoDescription = 'Student Attendance Show   | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student Attendance Show   | ' . Auth::user()->school_name;
+            $seoTitle = 'Student Attendance Monthly';
+            $seoDescription = 'Student Attendance Monthly';
+            $seoKeyword = 'Student Attendance Monthly';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -2988,9 +3228,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Fees Input create';
-            $seoTitle = 'Fees | ' . Auth::user()->school_name;
-            $seoDescription = 'Fees | ' . Auth::user()->school_name;
-            $seoKeyword = 'Fees | ' . Auth::user()->school_name;
+            $seoTitle = 'Fees Create';
+            $seoDescription = 'Fees Create';
+            $seoKeyword = 'Fees Create';
 
             $seo_array = [
                 'seoTitle' => $seoTitle,
@@ -3013,9 +3253,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Fees Input create';
-            $seoTitle = 'Fees | ' . Auth::user()->school_name;
-            $seoDescription = 'Fees | ' . Auth::user()->school_name;
-            $seoKeyword = 'Fees | ' . Auth::user()->school_name;
+            $seoTitle = 'Fees Show';
+            $seoDescription = 'Fees Show';
+            $seoKeyword = 'Fees Show';
             $fees = StudentFee::where('school_id', Auth::user()->id)->get();
             $feesclass = InstituteClass::where('school_id', Auth::user()->id)->get();
             $seo_array = [
@@ -3193,9 +3433,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Fees Input Edit';
-            $seoTitle = 'Fees | ' . Auth::user()->school_name;
-            $seoDescription = 'Fees | ' . Auth::user()->school_name;
-            $seoKeyword = 'Fees | ' . Auth::user()->school_name;
+            $seoTitle = 'Fees Show';
+            $seoDescription = 'Fees Show';
+            $seoKeyword = 'Fees Show';
             $feesEdit = StudentFee::where('id', $id)->first();
             $seo_array = [
                 'seoTitle' => $seoTitle,
@@ -3277,9 +3517,9 @@ class SchoolController extends Controller
             $group_id = ($group_id == 0) ? NULL : $group_id;
             $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->get();
             $teacherText  = 'Student Input create';
-            $seoTitle = 'Student | ' . Auth::user()->school_name;
-            $seoDescription = 'Student | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student | ' . Auth::user()->school_name;
+            $seoTitle = 'Finance DataShow';
+            $seoDescription = 'Finance DataShow';
+            $seoKeyword = 'Finance DataShow';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -3303,9 +3543,9 @@ class SchoolController extends Controller
             $group_id = ($group_id == 0) ? NULL : $group_id;
             $dataShow = User::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->get();
             $teacherText  = 'Student Input create';
-            $seoTitle = 'Student | ' . Auth::user()->school_name;
-            $seoDescription = 'Student | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student | ' . Auth::user()->school_name;
+            $seoTitle = 'Finance DataShow';
+            $seoDescription = 'Finance DataShow';
+            $seoKeyword = 'Finance DataShow';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -3330,9 +3570,9 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
             $subjectText = 'student Input create';
-            $seoTitle = 'student | ' . Auth::user()->school_name;
-            $seoDescription = 'student | ' . Auth::user()->school_name;
-            $seoKeyword = 'student | ' . Auth::user()->school_name;
+            $seoTitle = 'Finance DataShow';
+            $seoDescription = 'Finance DataShow';
+            $seoKeyword = 'Finance DataShow';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -3357,9 +3597,9 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
             $subjectText = 'student Input create';
-            $seoTitle = 'student | ' . Auth::user()->school_name;
-            $seoDescription = 'student | ' . Auth::user()->school_name;
-            $seoKeyword = 'student | ' . Auth::user()->school_name;
+            $seoTitle = 'Finance DataShow';
+            $seoDescription = 'Finance DataShow';
+            $seoKeyword = 'Finance DataShow';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -3381,9 +3621,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $subjectText = 'student Fees Input create';
-            $seoTitle = 'student | ' . Auth::user()->school_name;
-            $seoDescription = 'student | ' . Auth::user()->school_name;
-            $seoKeyword = 'student | ' . Auth::user()->school_name;
+            $seoTitle = 'Finance DataShow';
+            $seoDescription = 'Finance DataShow';
+            $seoKeyword = 'Finance DataShow';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -3406,9 +3646,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $subjectText = 'student Fees Input Edit';
-            $seoTitle = 'student | ' . Auth::user()->school_name;
-            $seoDescription = 'student | ' . Auth::user()->school_name;
-            $seoKeyword = 'student | ' . Auth::user()->school_name;
+            $seoTitle = 'Finance DataShow';
+            $seoDescription = 'Finance DataShow';
+            $seoKeyword = 'Finance DataShow';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -3888,10 +4128,10 @@ class SchoolController extends Controller
         if (Auth::user()->is_editor != 3) {
             return back();
         } else {
-            $classText = 'Payment Details';
-            $seoTitle = 'Payment Details | ' . Auth::user()->school_name;
-            $seoDescription = 'Payment Details | ' . Auth::user()->school_name;
-            $seoKeyword = 'Payment Details | ' . Auth::user()->school_name;
+            $classText = 'Message UseageData';
+            $seoTitle = 'Message UseageData';
+            $seoDescription = 'Message UseageData';
+            $seoKeyword = 'Message UseageData';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -3978,9 +4218,9 @@ class SchoolController extends Controller
                 $urlEmployee = '';
             }
             $classText = 'Employee Sms Send';
-            $seoTitle = 'Employee Sms | ' . Auth::user()->school_name;
-            $seoDescription = 'Employee Sms | ' . Auth::user()->school_name;
-            $seoKeyword = 'Employee Sms | ' . Auth::user()->school_name;
+            $seoTitle = 'Employee SMS';
+            $seoDescription = 'Employee SMS';
+            $seoKeyword = 'Employee SMS';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -4072,9 +4312,9 @@ class SchoolController extends Controller
                 $urlTeacher = '';
             }
             $classText = 'Teacher Sms Send';
-            $seoTitle = 'Teacher Sms | ' . Auth::user()->school_name;
-            $seoDescription = 'Teacher Sms | ' . Auth::user()->school_name;
-            $seoKeyword = 'Teacher Sms | ' . Auth::user()->school_name;
+            $seoTitle = 'Teacher SMS';
+            $seoDescription = 'Teacher SMS';
+            $seoKeyword = 'Teacher SMS';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -4173,9 +4413,9 @@ class SchoolController extends Controller
                 $urlTeacher = '';
             }
             $classText = 'Student Sms Send';
-            $seoTitle = 'Student Sms | ' . Auth::user()->school_name;
-            $seoDescription = 'Student Sms | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student Sms | ' . Auth::user()->school_name;
+            $seoTitle = 'Student SMS';
+            $seoDescription = 'Student SMS';
+            $seoKeyword = 'Student SMS';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -4301,9 +4541,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Staff Input create';
-            $seoTitle = 'Staff | ' . Auth::user()->school_name;
-            $seoDescription = 'Staff | ' . Auth::user()->school_name;
-            $seoKeyword = 'Staff | ' . Auth::user()->school_name;
+            $seoTitle = 'Staff TypeCreate';
+            $seoDescription = 'Staff TypeCreate';
+            $seoKeyword = 'Staff TypeCreate';
 
             $seo_array = [
                 'seoTitle' => $seoTitle,
@@ -4326,9 +4566,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Staff Input Edit';
-            $seoTitle = 'Staff | ' . Auth::user()->school_name;
-            $seoDescription = 'Staff | ' . Auth::user()->school_name;
-            $seoKeyword = 'Staff | ' . Auth::user()->school_name;
+            $seoTitle = 'Staff Show';
+            $seoDescription = 'Staff Show';
+            $seoKeyword = 'Staff Show';
             $feesEdit = StaffType::where('id', $id)->first();
             $seo_array = [
                 'seoTitle' => $seoTitle,
@@ -4351,9 +4591,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Staff Input create';
-            $seoTitle = 'Staff | ' . Auth::user()->school_name;
-            $seoDescription = 'Staff | ' . Auth::user()->school_name;
-            $seoKeyword = 'Staff | ' . Auth::user()->school_name;
+            $seoTitle = 'Staff Type List';
+            $seoDescription = 'Staff Type List';
+            $seoKeyword = 'Staff Type List';
             $fees = StaffType::where('school_id', Auth::user()->id)->get();
             $seo_array = [
                 'seoTitle' => $seoTitle,
@@ -4429,8 +4669,13 @@ class SchoolController extends Controller
         Alert::success(' Selected Staff-Type are deleted', 'Success Message');
         return response()->json(['status'=>'success']);
     }
+    public function getSalaryStaff($staffId)
+{
+    $salary = EmployeeSalary::where('school_id', Auth::user()->id)->where('id', $staffId)->get();
+    return response()->json($salary);
+}   
 
-    public function schoolStaffList()
+ public function schoolStaffList()
     {
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
@@ -4442,9 +4687,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Staff Data Show';
-            $seoTitle = 'Staff | ' . Auth::user()->school_name;
-            $seoDescription = 'Staff | ' . Auth::user()->school_name;
-            $seoKeyword = 'Staff | ' . Auth::user()->school_name;
+            $seoTitle = 'Staff List';
+            $seoDescription = 'Staff List';
+            $seoKeyword = 'Staff List';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -4457,7 +4702,6 @@ class SchoolController extends Controller
             return view('frontend.school.staff.details.show', compact('studentText', 'position_name', 'employee','staffSalary', 'seo_array'));
         }
     }
-
     public function schoolStaffListEdit($id)
     {
         if (Auth::user()->status == 0) {
@@ -4470,9 +4714,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Staff Data Show';
-            $seoTitle = 'Staff | ' . Auth::user()->school_name;
-            $seoDescription = 'Staff | ' . Auth::user()->school_name;
-            $seoKeyword = 'Staff | ' . Auth::user()->school_name;
+            $seoTitle = 'Staff Show';
+            $seoDescription = 'Staff Show';
+            $seoKeyword = 'Staff Show';
             $position = StaffType::where('school_id', Auth::user()->id)->get();
             $employeeEdit = Employee::where('school_id', Auth::user()->id)->where('id', $id)->first();
             $seo_array = [
@@ -4496,9 +4740,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $studentText = 'Staff Details create';
-            $seoTitle = 'Staff | ' . Auth::user()->school_name;
-            $seoDescription = 'Staff | ' . Auth::user()->school_name;
-            $seoKeyword = 'Staff | ' . Auth::user()->school_name;
+            $seoTitle = 'Staff Create';
+            $seoDescription = 'Staff Create';
+            $seoKeyword = 'Staff Create';
             $position = StaffType::where('school_id', Auth::user()->id)->get();
             $seo_array = [
                 'seoTitle' => $seoTitle,
@@ -4602,34 +4846,6 @@ class SchoolController extends Controller
         return back();
     }
 
-    public function schoolStaffSalaryUpdate(Request $request, $id)
-    {
-        if (Auth::user()->status == 0) {
-            return redirect()->route('school.payment.info');
-        } elseif (Auth::user()->status == 2) {
-            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
-            return back();
-        }
-        $payStaffSalary = EmployeeSalary::where('id', $id)->first();
-        // $payStaffSalary->employee_phone = $request->employee_phone;
-        if($payStaffSalary->amount > 0) $addAmount = $payStaffSalary->amount + $request->amount;
-        else $addAmount = $request->amount;
-        $payStaffSalary->amount = $addAmount;
-        $payStaffSalary->save();
-        $staff = Employee::where('school_id', Auth::user()->id,);
-        $to = $request['employee_phone'];
-        $message = $request['message'] . " You received $request->amount taka form " . '(' . Auth::user()->school_name . ')';
-        Controller::GreenWebSMS($to, $message); // send sms
-
-        $dataMessage = new Message();
-        $dataMessage->school_id = Auth::user()->id;
-        $dataMessage->message = 1;
-        $dataMessage->send_number = $to;
-        $dataMessage->save();
-        toast('Staff Salary Updated', 'success');
-        return redirect()->route('school.staff.salary.List');
-    }
-
     public function schoolStaffDelete($id)
     {
         if (Auth::user()->status == 0) {
@@ -4656,55 +4872,39 @@ class SchoolController extends Controller
         return response()->json(['status'=>'success']);
     }
 
-    public function schoolTeacherSalaryUpdate(Request $request, $id)
-    {
-        $request->validate([
-            'amount' => 'required'
-        ]);
-
-        if (Auth::user()->status == 0) {
-            return redirect()->route('school.payment.info');
-        } elseif (Auth::user()->status == 2) {
-            toast('Sorry Admin can Inactive Your Account Please Contact', 'error');
-            return back();
-        }
-        $payTeacherSalary = TeacherSalary::where('id', $id)->first();
-        // $payTeacherSalary->teacher_phone = $request->teacher_phone;
-
-        if($payTeacherSalary->amount > 0) $addAmount = $payTeacherSalary->amount + $request->amount;
-        else $addAmount = $request->amount;
-        $payTeacherSalary->amount = $addAmount;
-
-        $payTeacherSalary->save();
-        $teacher = Teacher::where('school_id', Auth::user()->id,);
-        $to = $request['teacher_phone'];
-        $message = $request['message'] . " You received $request->amount taka form " . '(' . Auth::user()->school_name . ')';
-        Controller::GreenWebSMS($to, $message); // send sms
-
-        $dataMessage = new Message();
-        $dataMessage->school_id = Auth::user()->id;
-        $dataMessage->message = 1;
-        $dataMessage->send_number = $to;
-        $dataMessage->save();
-        toast('Teacher Salary Update SuccessFully', 'success');
-        return redirect()->route('teacher.salary.Show');
-    }
 
     /**
      * Result Setting View Page
      *
+     * @author CodeCell <support@codecell.com.bd>
+     * @distributor Sajjad <sajjad.develpr@com.bd>
      * @return \Illuminate\Contracts\View\View
      */
     public function resultCreateShow()
     {   
-        $resultSettings = ModelsResultSetting::where('school_id', Auth::user()->id)->orderBy('id', 'asc')->get();
+        $seoTitle = 'Result Setting';
+        $seoDescription = 'Result Setting' ;
+        $seoKeyword = 'Result Setting';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        $schoolExist = School::where('id', Auth::user()->id)->exists();
+        $layout = $schoolExist ? 'layouts.school.master' : 'layouts.teacher.master';
+        $school_id = $schoolExist ? Auth::user()->id : Auth::user()->school_id;
 
-        return view('frontend.school.student.result.createShow', compact('resultSettings'));
+        $resultSettings = ModelsResultSetting::where('school_id', $school_id)->orderBy('id', 'asc')->get();
+
+        return view('frontend.school.student.result.createShow', compact('resultSettings', 'layout','seo_array'));
     }
 
     /**
      * Result Upload First Step (Select Class, Section, Term)
-     *
+     * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param int $id
      * @return \Illuminate\Contracts\View\View
      */
     public function resultUpFirstStep($id)
@@ -4723,10 +4923,10 @@ class SchoolController extends Controller
             $section = Section::where('school_id', Auth::user()->id)->get();
             $group = Group::where('school_id', Auth::user()->id)->get();
             $term = Term::where('school_id', Auth::user()->id)->orderBy('id', 'desc')->get();
-            $subjectText = 'Subject Input create';
-            $seoTitle = 'Subject | ' . Auth::user()->school_name;
-            $seoDescription = 'Subject | ' . Auth::user()->school_name;
-            $seoKeyword = 'Subject | ' . Auth::user()->school_name;
+            $subjectText = 'Result Setting';
+            $seoTitle = 'Result Setting';
+            $seoDescription = 'Result Setting';
+            $seoKeyword = 'Result Setting';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -4786,14 +4986,35 @@ class SchoolController extends Controller
         }
     }
 
-
+    /**
+     * Show Student and Input Result
+     * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param int $class_id
+     * @param int $section_id
+     * @param int $term_id
+     * 
+     * @return \Illuminate\Contracts\View\View
+     */
     public function resultStudentDataShowAll($class_id, $section_id, $term_id)
-    {
-        $dataShow = User::where('school_id', Auth::user()->id)->where('class_id', $class_id)->where('section_id', $section_id)->orderBy('roll_number', 'asc')->get();
+    {   
+        $seoTitle = 'Result Setting';
+        $seoDescription = 'Result Setting' ;
+        $seoKeyword = 'Result Setting';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        ini_set('max_execution_time', 600); 
+        
+        // $dataShow = User::where('school_id', Auth::user()->id)->where('class_id', $class_id)->where('section_id', $section_id)->orderBy('roll_number', 'asc')->get();
         $termName = ModelsResultSetting::where('id', $term_id)->first();
         $subjectName = Subject::where('class_id', $class_id)->get();
         $markTypes = MarkType::where('institute_classes_id', $class_id)->where('school_id', Auth::user()->id)->orderBy('id', 'asc')->get();
-        return view('frontend.school.student.result.dataShowAll', compact('dataShow', 'termName', 'subjectName', 'markTypes', 'section_id'));
+        
+        return view('frontend.school.student.result.dataShowAll', compact( 'termName', 'subjectName', 'markTypes', 'section_id', 'class_id','seo_array'));
     }
 
     public function resultStudentDataShow($class_id, $section_id, $group_id, $subject_id, $term_id)
@@ -4813,10 +5034,10 @@ class SchoolController extends Controller
             $dataShowTeacher = AssignTeacher::where('class_id', $class_id)->where('section_id', $section_id)->where('group_id', $group_id)->where('subject_id', $subject_id)->first();
             $subjectName = Subject::where('id', $subject_id)->first();
             $termName = Term::where('id', $term_id)->first();
-            $teacherText  = 'Student Input create';
-            $seoTitle = 'Student | ' . Auth::user()->school_name;
-            $seoDescription = 'Student | ' . Auth::user()->school_name;
-            $seoKeyword = 'Student | ' . Auth::user()->school_name;
+            $teacherText  = 'Result Setting';
+            $seoTitle = 'Result Setting';
+            $seoDescription = 'Result Setting';
+            $seoKeyword = 'Result Setting';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -4830,15 +5051,27 @@ class SchoolController extends Controller
     /**
      * Update Student Result
      *
-     * @param ResultCreatePost
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Sajjad <sajjad.develpr@gmail.com>
+     * @param Request
      * @param $request
+     * @param int $id
      * @return Response
      */
     public function resultmarkSet(Request $request, $id)
-    {   $resultSettingId = $id;
+    {   
+        $seoTitle = 'Result Setting';
+        $seoDescription = 'Result Setting' ;
+        $seoKeyword = 'Result Setting';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
+        $resultSettingId = $id;
         $class = InstituteClass::where('school_id', Auth::user()->id)->get();
-
-        return view('frontend.school.student.result.resultSet', compact('class','resultSettingId'));
+        
+        return view('frontend.school.student.result.resultSet', compact('class','resultSettingId','seo_array'));
     }
 
     public function resultCreatePost(ResultCreatePost $request)
@@ -4847,6 +5080,11 @@ class SchoolController extends Controller
         if (is_array($request->student_id) && count($request->student_id) > 0) :
             try {
                 foreach ($request->student_id as $key => $data) {
+                    
+                    $practical =  is_array($request->Practical) ? $request->Practical[$key] : 199;
+                    $written = is_array($request->Written) ? $request->Written[$key] : 199;
+                    $mcq =  is_array($request->MCQ) ? $request->MCQ[$key] : 199;
+                    
                     $dataHave = Result::where('student_id', $data)->where('subject_id', $request->subject_id)->where('term_id', $request->term_id)->first();
                     if (isset($dataHave)) {
                         $result = Result::where('id', $dataHave->id)->first();
@@ -4870,8 +5108,8 @@ class SchoolController extends Controller
                     $result->mcq =  is_null($request->MCQ) ? 0 : $request->MCQ[$key] ?? 0;
                     $result->others =  is_null($request->Others) ? 0 : $request->Others[$key] ?? 0;
                     $result->total  = totalMark($result);
-                    $result->grade  = grade($result->total, $request->term_id, $request->class_id, $request->subject_id);
-                    $result->gpa  = gpa($result->total, $request->term_id, $request->class_id, $request->subject_id);
+                    $result->grade  = grade($mcq, $written, $practical, $result->total, $request->term_id, $request->class_id, $request->subject_id);
+                    $result->gpa  = gpa($mcq, $written, $practical, $result->total, $request->term_id, $request->class_id, $request->subject_id);
                     $result->save();
                 }
 
@@ -4903,6 +5141,7 @@ class SchoolController extends Controller
 
     public function noticeCreateShow()
     {
+        
         if (Auth::user()->status == 0) {
             return redirect()->route('school.payment.info');
         } elseif (Auth::user()->status == 2) {
@@ -4913,9 +5152,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $teacherText  = 'Notice Input create';
-            $seoTitle = 'Notice | ' . Auth::user()->school_name;
-            $seoDescription = 'Notice | ' . Auth::user()->school_name;
-            $seoKeyword = 'Notice | ' . Auth::user()->school_name;
+            $seoTitle = 'Notice';
+            $seoDescription = 'Notice';
+            $seoKeyword = 'Notice';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -4938,9 +5177,9 @@ class SchoolController extends Controller
             return back();
         } else {
             $teacherText  = 'Notice Input create';
-            $seoTitle = 'Notice | ' . Auth::user()->school_name;
-            $seoDescription = 'Notice | ' . Auth::user()->school_name;
-            $seoKeyword = 'Notice | ' . Auth::user()->school_name;
+            $seoTitle = 'Notice';
+            $seoDescription = 'Notice';
+            $seoKeyword = 'Notice';
             $seo_array = [
                 'seoTitle' => $seoTitle,
                 'seoKeyword' => $seoKeyword,
@@ -4971,7 +5210,7 @@ class SchoolController extends Controller
 
     public function notice_Check_Delete(Request $request)
     {
-        $ids = $request->ids;
+        $id = $request->id;
         Notice::withTrashed()->where('id', $id)->forcedelete();
         toast("Data delete permanently", "success");
         return back();
@@ -5052,15 +5291,142 @@ class SchoolController extends Controller
         return back();
     }
 
-    // ajax operation  .....
+    /**
+     * Get Subjects
+     * @author CodeCell<-support@codecell.com.bd->
+     * @contributor Sajjad <sajjad.develpr.gmail.com>
+     * @created 18-06-2023
+     * @return \Illuminate\Http\Response
+     */
+    public function groupWiseSubject(Request $request)
+    {   
+        $studentSubjects = User::where('id', $request->student_id)->value('subject_list');
+        $takenOptional = User::where('id', $request->student_id)->value('optional_subject');
+        
+        $subjects = Subject::where('school_id', Auth::user()->id)
+                           ->where('class_id', $request->class_id)
+                           ->whereIn('group_id', [4, $request->group_id])
+                           ->get();
+        
+        $optionSubjects = Subject::where('school_id', Auth::user()->id)
+                           ->where('class_id', $request->class_id)
+                           ->where('group_id', 4)
+                           ->get();
+        
+        return response()->json(['success' => ['subjects' => $subjects, 'optionSubjects' => $optionSubjects, 'studentSubjects' => $studentSubjects, 'takenOptional' => $takenOptional]]);
+    }
+
+    /**
+     * Save Subjects Student Table
+     * 
+     * @param Request
+     * @param $request
+     * @author CodeCell <-support@codecell.com.bd->
+     * @contributor Sajjad <sajjad.develpr.gmail.com>
+     * @created 18-06-2023
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function saveGroupWiseSubject(Request $request)
+    {   
+        if (Auth::user()->status == 0) {
+
+            return response()->json(['status' => 0]);
+
+        } elseif (Auth::user()->status == 2) {
+
+            return response()->json(['status' => 2]);
+        }
+
+        if(isset($request->subject_student_id)) {
+            
+            $validator = Validator::make($request->all(), [
+                'group_id' => 'required',
+                'subjects'  => 'required',
+                'optional_subject'  => 'array|required|max:2',
+            ]);
+
+            if($validator->fails()) {
+
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+
+            $user = DB::table('users')->where('id', $request->subject_student_id);
+            $user->update([
+                'subject_list'      =>  $request->subjects,
+                "optional_subject"  =>  $request->optional_subject,
+                "group_id"          =>  $request->group_id
+            ]);
+
+            return response()->json(['status' => 'edit-success']);
+            
+        } else {
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string',
+                'email' => 'required|email|unique:users',
+                'phone' => 'required|numeric',
+                'roll_number' => 'required|numeric',
+                'shift' => 'required',
+                'group_id' => 'required',
+                'class_id' => 'required|integer',
+                'section_id' => 'required|integer',
+                'subjects'  => 'required',
+                'optional_subject'  => 'array|required|max:2'
+            ]);
+        
+
+            if($validator->fails()) {
+
+                return response()->json(['error' => $validator->errors()->all()]);
+            }
+            
+            $userRoll = User::where('class_id', $request->class_id)
+                ->where('section_id', $request->section_id)
+                ->where('roll_number', $request->roll_number);
+
+            if ($userRoll->exists()) {
+                
+                return response()->json(['status' => 'exist']);
+                
+            } else {
+                User::create([
+                    'name'              => $request->name,
+                    'email'             => $request->email,
+                    'phone'             => $request->phone,
+                    'class_id'          => $request->class_id,
+                    'section_id'        => $request->section_id,
+                    'group_id'          => $request->group_id,
+                    'shift'             => $request->shift,
+                    'subject_list'      => $request->subjects,
+                    'optional_subject'  => $request->optional_subject,
+                    'discount'          => $request->discount ?? 0,
+                    'school_id'         => Auth::user()->id,
+                    'password'          => Hash::make(123456789)
+                ]);
+            }
+        }    
+    }
+
+    /**
+     * Pass Section HTML and Group Value
+     * 
+     * @author CodeCell <support@codecell.com.bd>
+     * @contributor Shahidul
+     * @param Request
+     * @param $request
+     * @modifier Sajjad <sajjad.develpr@gmail.com>
+     * @modified 11-07-23
+     * 
+     * @return mixed
+     */
     public function showAjaxSection(Request $request)
     {
         $classes = InstituteClass::find($request->class_id)->class_name;
         $section = Section::orderby('id', 'asc')->where('class_id', $request->class_id)->where('school_id', Auth::user()->id)->get();
         $class = InstituteClass::where('id', $request->class_id)->first();
-
         $group = 0;
-        if ($classes == "Class Nine" || $classes == "Class Ten" || $classes == "Class Eleven" || $classes == "Class Twelve") {
+        if (in_array($classes, classFilter())) {
             $group = 1;
         }
         $html = "<option value=''>Select One";
@@ -5074,6 +5440,7 @@ class SchoolController extends Controller
         $return = [
             'html'  =>  $html, 'class' =>  $class, 'group' =>  $group,
         ];
+
         return  $return;
     }
 
@@ -5101,22 +5468,6 @@ class SchoolController extends Controller
         ];
         return  $return;
     }
-
-    // public function showAjaxGroup(Request $request)
-    // {
-
-    //     $section = Group::orderby('id', 'desc')->where('class_id', $request->class_id)->where('school_id', Auth::user()->id)->get();
-
-    //     $html = "<option value=''>Select One";
-    //     $html .= "</option>";
-    //     foreach ($section as $data) {
-    //         $html .= "<option value='$data->id'>";
-    //         $html .= $data->group_name;
-    //         $html .= "</option>";
-    //     }
-    //     echo  $html;
-    // }
-
 
     public function getSubjectTeacher(Request $request)
     {

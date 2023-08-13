@@ -7,6 +7,7 @@ use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use App\Models\InstituteClass;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -18,10 +19,18 @@ class SubjectController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    {   
+        $seoTitle = 'Subject Searchpage';
+        $seoDescription = 'Subject Searchpage';
+        $seoKeyword = 'Subject Searchpage';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $classes = InstituteClass::where('school_id',Auth::user()->id)->get();
 
-        return view('frontend.school.subject.createShow',compact('classes'));
+        return view('frontend.school.subject.createShow',compact('classes','seo_array'));
     }
 
     /**
@@ -48,14 +57,25 @@ class SubjectController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @author CodeCell <support@codecell.com.bd>
+     * @distributor Sajjad <sajjad.develpr@gmail.com>
+     * @param Request
+     * @param  $request
+     * @return \Illuminate\Contracts\View\View|
      */
     public function show(Request $request)
-    {
+    {   
+        $seoTitle = 'Subject Show';
+        $seoDescription = 'Subject Show';
+        $seoKeyword = 'Subject Show';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $subjects = Subject::where("class_id", $request->class_id)->get();
 
-        return view('frontend.school.subject.show')->with(compact('subjects'));
+        return view('frontend.school.subject.show')->with(compact('subjects','seo_array'));
     }
 
     /**

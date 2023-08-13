@@ -14,7 +14,6 @@ class Question extends Model
     protected $guarded = [];
 
     protected $casts = [
-        
         'question_title' => 'json',
         'question_mark'  => 'json',
         'question'      => 'json',

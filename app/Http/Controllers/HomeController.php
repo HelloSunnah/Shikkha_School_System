@@ -29,7 +29,7 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index()
-    {
+    {   
         // $subjects = Subject::where('class_id',Auth::user()->class_id)
         //                     ->where('section_id',Auth::user()->section_id)
         //                     ->where('group_id',Auth::user()->group_id)

@@ -17,10 +17,18 @@ class SyllabusController extends Controller
 {
     public function SyllabusCreate()
     {
+        $seoTitle = 'Syllabus Create';
+        $seoDescription = 'Syllabus Create';
+        $seoKeyword = 'Syllabus Create';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $term = Term::where('school_id', auth()->id())->orderby('id', 'desc')->get();
         $class = InstituteClass::where('school_id', auth()->id())->get();
         $subjects = Subject::all();
-        return view('frontend.school.syllabus.create', compact('class', 'subjects', 'term'));
+        return view('frontend.school.syllabus.create', compact('class', 'subjects', 'term','seo_array'));
     }
     public function SyllabusCreatePost(Request $request)
     {
@@ -61,9 +69,16 @@ class SyllabusController extends Controller
     }
     public function SyllabusDataShow()
     {
-
+        $seoTitle = 'Syllabus DataShow';
+        $seoDescription = 'Syllabus DataShow';
+        $seoKeyword = 'Syllabus DataShow';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $syllabus = ClassSyllabus::with('classRelation', 'subjectRelation', 'termRelation')->get();
-        return view('frontend.school.syllabus.show', compact('syllabus'));
+        return view('frontend.school.syllabus.show', compact('syllabus','seo_array'));
     }
 
 
@@ -96,23 +111,37 @@ class SyllabusController extends Controller
 
     public function SyllabusFormShow()
     {
-
+         $seoTitle = 'Syllabus Searchpage';
+        $seoDescription = 'Syllabus Searchpage';
+        $seoKeyword = 'Syllabus Searchpage';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $class = InstituteClass::where('school_id', auth()->id())->get();
         
-        return view('frontend.school.syllabus.selectform', compact('class'));
+        return view('frontend.school.syllabus.selectform', compact('class','seo_array'));
     }
 
 
 
     public function SyllabusFormPost(Request $request)
     {
-        // return $request;
-
+       
+        $seoTitle = 'Syllabus View';
+        $seoDescription = 'Syllabus View';
+        $seoKeyword = 'Syllabus View';
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
          $syllabus = ClassSyllabus::with('termRelation')->where('class_id', $request->select_class)->get()->groupBy('term_id');
          $school = School::find(Auth::user()->id);
          
         if ($syllabus->count()>0){
-            return view('frontend.school.syllabus.show')->with(compact('syllabus','school'));
+            return view('frontend.school.syllabus.show')->with(compact('syllabus','school','seo_array'));
         }
         else {
             Alert::error('Sorry', "No record found");

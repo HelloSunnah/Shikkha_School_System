@@ -16,6 +16,7 @@ class CreateSupportDepartmentsTable extends Migration
         Schema::create('support_departments', function (Blueprint $table) {
             $table->id();
             $table->string('department');
+            $table->tinyInteger('active')->default(true);
             $table->timestamps();
         });
     }

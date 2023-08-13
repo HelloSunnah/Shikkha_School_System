@@ -14,7 +14,7 @@
                     <ul class="mt-4">
                         <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.as4')}}
                         </li>
-                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt="">{{__('app.as5')}}</li>
+                        <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.as5')}}</li>
                         <li class="text-dark my-3 fw-bolder"><img src="{{ asset('frontend/assets/img/projects/right.svg') }}" alt=""> {{__('app.as6')}}</li>
                     </ul>
 

@@ -24,11 +24,19 @@ class ExamController extends Controller
      * @return \Illuminate\Contracts\View\ 
      */
     public function examRoutine()
-    {
+    {   
+        $seoTitle = 'Exam Routine';
+        $seoDescription = 'Exam Routine' ;
+        $seoKeyword = 'Exam Routine' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $data['classes'] = InstituteClass::where('school_id', Auth::user()->id)->get();
         $data['terms']   = Term::where('school_id', Auth::user()->id)->orderBy('id', 'asc')->get();
 
-        return view('frontend.school.exam.index', $data);
+        return view('frontend.school.exam.index', $data ,compact('seo_array'));
     }
 
     /**
@@ -167,17 +175,26 @@ class ExamController extends Controller
 
     // view admit card
     public function showAdmitCard(){
+        $seoTitle = 'Admit Card';
+        $seoDescription = 'Admit Card' ;
+        $seoKeyword = 'Admit Card' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $class = InstituteClass::where('school_id',Auth::id())->get();
         $term = ResultSetting::where('school_id',Auth::id())->get();
         if(count($term)>0){
-            return view('frontend.school.exam.admitCard', compact('class','term'));    
+            return view('frontend.school.exam.admitCard', compact('class','term','seo_array'));    
         }
         else{
-            $resultSettings = ModelsResultSetting::where('school_id', Auth::user()->id)->orderBy('id', 'asc')->get();
+            $resultSettings = ResultSetting::where('school_id', Auth::user()->id)->orderBy('id', 'asc')->get();
             return view('frontend.school.student.result.createShow', compact('resultSettings'));
         }
     }
 
+    // Admit Card Download
     public function showAdmitCardDownload(Request $request){
         //  return $request -> term_id;
         $request->validate([
@@ -202,19 +219,26 @@ class ExamController extends Controller
 
     // view sit Plan
     public function showSitPlan(){
+        $seoTitle = 'Sit Plan';
+        $seoDescription = 'Sit Plan' ;
+        $seoKeyword = 'Sit Plan' ;
+        $seo_array = [
+            'seoTitle' => $seoTitle,
+            'seoKeyword' => $seoKeyword,
+            'seoDescription' => $seoDescription,
+        ];
         $class = InstituteClass::where('school_id',Auth::id())->get();
         $term = ResultSetting::where('school_id',Auth::id())->get();
         $year = Carbon::now()->format('Y');
-        return view('frontend.school.exam.sitPlan', compact('class','term', 'year'));
+        return view('frontend.school.exam.sitPlan', compact('class','term', 'year','seo_array'));
     }
 
+    // Sit Plan Download
     public function showSitPlanDownload(Request $request){
-        //  return $request -> term_id;
         $request->validate([
             'term_id' => 'required',
             'class_id' => 'required',
         ]);
-
         $term = ResultSetting::find($request -> term_id)->title;
         
         if($request->section_id){
